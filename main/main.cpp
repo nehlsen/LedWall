@@ -5,8 +5,8 @@
 #include "esp_log.h"
 
 #include "wifi_connector.h"
-//#include "mqtt.h"
-//#include "led_controller.h"
+#include "LedController.h"
+#include "mqtt.h"
 
 static const char *APP_LOG_TAG = "LED_WALL";
 
@@ -34,10 +34,10 @@ void app_main()
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     ESP_ERROR_CHECK(wifi_connector_start());
 
-//    mqtt_app_start();
-//    led_controller_init();
+    LedController *controller = new LedController;
+    mqtt_app_start(controller);
 }
 
 #ifdef __cplusplus
-}
+} // extern "C"
 #endif

@@ -19,4 +19,12 @@ menu "LedWall Configuration"
         help
             URL of the broker to connect to
 
+    config DATA_PIN
+        int "Data PIN the LEDs are attached to"
+        default 26
+
+    config NUM_LEDS
+        int "Number of LEDs"
+        default 16
+
 endmenu
