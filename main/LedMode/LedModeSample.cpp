@@ -34,7 +34,7 @@ void LedModeSample::update()
     startIndex = startIndex + 1; /* motion speed */
 
     for( int i = 0; i < m_ledCount; i++) {
-        (*m_leds)[i] = ColorFromPalette(m_currentPalette, startIndex, 64, m_currentBlending);
+        m_leds[i] = ColorFromPalette(m_currentPalette, startIndex, 64, m_currentBlending);
         startIndex += 3;
     }
 }
