@@ -29,31 +29,40 @@ e.g. "/ledwall/state/power"
 void publish_status()
 {
     char topic[30];
+    char topicValue[2];
+
     sprintf(topic, "/%s/state/power", MQTT_NAME);
+    sprintf(topicValue, "%d", ledController->getPower());
+    esp_mqtt_client_publish(mqtt_client, topic, topicValue, 0, 1, 0);
 
-    char powerStatus[2];
-    sprintf(powerStatus, "%d", ledController->getPower());
-
-    esp_mqtt_client_publish(mqtt_client, topic, powerStatus, 0, 1, 0);
+    sprintf(topic, "/%s/state/mode", MQTT_NAME);
+    sprintf(topicValue, "%d", ledController->getMode());
+    esp_mqtt_client_publish(mqtt_client, topic, topicValue, 0, 1, 0);
 }
 
 void setup_subscriptions()
 {
     char topic[30];
-    sprintf(topic, "/%s/cmd/power", MQTT_NAME);
 
-    int msg_id = esp_mqtt_client_subscribe(mqtt_client, topic, 0);
-    ESP_LOGI(MQTT_LOG_TAG, "sent subscribe successful, msg_id=%d", msg_id);
+    sprintf(topic, "/%s/cmd/power", MQTT_NAME);
+    esp_mqtt_client_subscribe(mqtt_client, topic, 0);
+    ESP_LOGI(MQTT_LOG_TAG, "sent subscribe successful: \"%s\"", topic);
+
+    sprintf(topic, "/%s/cmd/mode", MQTT_NAME);
+    esp_mqtt_client_subscribe(mqtt_client, topic, 0);
+    ESP_LOGI(MQTT_LOG_TAG, "sent subscribe successful: \"%s\"", topic);
 }
 
 void handleMqttData(esp_mqtt_event_handle_t event)
 {
-    printf("TOPIC=%.*s (%d)\r\n", event->topic_len, event->topic, event->topic_len);
-    printf("DATA=%.*s (%d)\r\n", event->data_len, event->data, event->data_len);
+//    printf("TOPIC=%.*s (%d)\r\n", event->topic_len, event->topic, event->topic_len);
+//    printf("DATA=%.*s (%d)\r\n", event->data_len, event->data, event->data_len);
 
-    if (NULL != strstr(event->topic, "/power") && event->data_len >= 1) {
-//        ESP_LOGI(MQTT_LOG_TAG, ">>> somebody wants to power on ... or off :)");
+    if (nullptr != strstr(event->topic, "/power") && event->data_len >= 1) {
         ledController->setPower(event->data[0] == '1');
+    }
+    if (nullptr != strstr(event->topic, "/mode") && event->data_len >= 1) {
+        ledController->setMode((LedController::Mode)atoi(event->data));
     }
 }
 

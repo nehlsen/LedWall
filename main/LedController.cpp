@@ -79,6 +79,8 @@ void LedController::setMode(LedController::Mode mode)
 
     LedMode *newMode = nullptr;
     switch (mode) {
+        default:
+            ESP_LOGE(LED_CONTROLLER_LOG_TAG, "UNRECOGNIZED MODE");
         case ModeStatus:
             newMode = new LedModeStatus(leds, CONFIG_NUM_LEDS);
             break;
@@ -88,6 +90,7 @@ void LedController::setMode(LedController::Mode mode)
             break;
     }
 
+    turnAllLedsOff();
     m_mode = mode;
     delete m_ledMode;
     m_ledMode = newMode;
