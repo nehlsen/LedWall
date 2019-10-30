@@ -5,6 +5,7 @@
 #include "FastLED.h"
 #include "LedMode/LedModeStatus.h"
 #include "LedMode/LedModeSample.h"
+#include "LedMode/LedModeHsiboy.h"
 
 static const char *LED_CONTROLLER_LOG_TAG = "LED_CONTROLLER";
 
@@ -36,8 +37,10 @@ void led_update_task(void *pvParameter)
 
 LedController::LedController()
 {
-    FastLED.addLeds<WS2812, CONFIG_DATA_PIN>(leds, CONFIG_NUM_LEDS);
+    FastLED.addLeds<WS2812, CONFIG_DATA_PIN>(leds, CONFIG_NUM_LEDS).setCorrection(TypicalLEDStrip);
+//    FastLED.setBrightness(MAX_BRIGHTNESS);
     FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
+    FastLED.clear();
 
     led_update_task_event_group = xEventGroupCreate();
     xEventGroupSetBits(led_update_task_event_group, LED_WALL_ENABLED_BIT);
@@ -87,6 +90,10 @@ void LedController::setMode(LedController::Mode mode)
 
         case ModeSample:
             newMode = new LedModeSample(leds, CONFIG_NUM_LEDS);
+            break;
+
+        case ModeHsiboy:
+            newMode = new LedModeHsiboy(leds, CONFIG_NUM_LEDS);
             break;
     }
 

@@ -76,7 +76,6 @@ void LedModeSample::setupBlackAndWhiteStripedPalette()
     m_currentPalette[4] = CRGB::White;
     m_currentPalette[8] = CRGB::White;
     m_currentPalette[12] = CRGB::White;
-
 }
 
 void LedModeSample::setupPurpleAndGreenPalette()

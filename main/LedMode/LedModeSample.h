@@ -4,6 +4,7 @@
 #include "FastLED.h"
 #include "LedMode.h"
 
+// samples from  https://github.com/eshkrab/fastLED-idf
 class LedModeSample: public LedMode
 {
 public:

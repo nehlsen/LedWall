@@ -16,6 +16,7 @@ public:
     enum Mode {
         ModeStatus = 0, // display wlan, mqtt status
         ModeSample,
+        ModeHsiboy,
     };
 
     void setMode(Mode mode);
