@@ -7,6 +7,7 @@ set(COMPONENT_SRCS
         "LedMode/LedModeStatus.cpp"
         "LedMode/LedModeSample.cpp"
         "LedMode/LedModeHsiboy.cpp"
+        "WebServer.cpp"
         )
 
 register_component()

@@ -7,6 +7,7 @@
 #include "wifi_connector.h"
 #include "LedController.h"
 #include "mqtt.h"
+#include "WebServer.h"
 
 static const char *APP_LOG_TAG = "LED_WALL";
 
@@ -36,6 +37,9 @@ void app_main()
 
     LedController *controller = new LedController;
     mqtt_app_start(controller);
+    // TODO the example creates (starts) the server once wifi is ready, stops and restarts on re-connects
+    WebServer *server = new WebServer(controller);
+    server->startServer();
 }
 
 #ifdef __cplusplus
