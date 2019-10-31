@@ -19,6 +19,8 @@ public:
 protected:
     LedController *m_ledController;
     httpd_handle_t m_hdnlServer = nullptr;
+
+    void registerUriHandlers();
 };
 
 #endif //LEDWALL_WEBSERVER_H
