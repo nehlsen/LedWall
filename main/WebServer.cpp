@@ -12,7 +12,7 @@ static esp_err_t system_info_get_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
-    return server->reqSystemInfo(req);
+    return server->getSystemInfo(req);
 }
 
 static esp_err_t led_state_get_handler(httpd_req_t *req)
@@ -22,7 +22,26 @@ static esp_err_t led_state_get_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
-    return server->reqLedState(req);
+    return server->getLedState(req);
+}
+
+static esp_err_t led_power_get_handler(httpd_req_t *req)
+{
+    auto *server = (WebServer*)req->user_ctx;
+    if (!server) {
+        return ESP_FAIL;
+    }
+
+    return server->getLedPower(req);
+}
+static esp_err_t led_power_post_handler(httpd_req_t *req)
+{
+    auto *server = (WebServer*)req->user_ctx;
+    if (!server) {
+        return ESP_FAIL;
+    }
+
+    return server->postLedPower(req);
 }
 
 WebServer::WebServer(LedController *ledController):
@@ -30,7 +49,7 @@ WebServer::WebServer(LedController *ledController):
 {
 }
 
-esp_err_t WebServer::reqSystemInfo(httpd_req_t *req)
+esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
 {
     httpd_resp_set_type(req, "application/json");
     cJSON *root = cJSON_CreateObject();
@@ -48,7 +67,7 @@ esp_err_t WebServer::reqSystemInfo(httpd_req_t *req)
     return ESP_OK;
 }
 
-esp_err_t WebServer::reqLedState(httpd_req_t *req)
+esp_err_t WebServer::getLedState(httpd_req_t *req)
 {
     httpd_resp_set_type(req, "application/json");
     cJSON *root = cJSON_CreateObject();
@@ -62,6 +81,62 @@ esp_err_t WebServer::reqLedState(httpd_req_t *req)
     free((void *)sys_info);
     cJSON_Delete(root);
 
+    return ESP_OK;
+}
+
+esp_err_t WebServer::getLedPower(httpd_req_t *req)
+{
+    httpd_resp_set_type(req, "application/json");
+    cJSON *root = cJSON_CreateObject();
+
+    cJSON_AddNumberToObject(root, "power", m_ledController->getPower());
+
+    const char *sys_info = cJSON_Print(root);
+    httpd_resp_sendstr(req, sys_info);
+
+    free((void *)sys_info);
+    cJSON_Delete(root);
+
+    return ESP_OK;
+}
+
+esp_err_t WebServer::postLedPower(httpd_req_t *req)
+{
+    int total_len = req->content_len;
+    int cur_len = 0;
+    char *buf = m_readBuffer;
+    int received = 0;
+    if (total_len >= READ_BUFFER_SIZE) {
+        /* Respond with 500 Internal Server Error */
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "content too long");
+        return ESP_FAIL;
+    }
+    while (cur_len < total_len) {
+        received = httpd_req_recv(req, buf + cur_len, total_len);
+        if (received <= 0) {
+            /* Respond with 500 Internal Server Error */
+            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to post control value");
+            return ESP_FAIL;
+        }
+        cur_len += received;
+    }
+    buf[total_len] = '\0';
+
+    cJSON *root = cJSON_Parse(buf);
+    if (!root) {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Failed to parse JSON");
+    } else {
+        cJSON *const powerObj = cJSON_GetObjectItem(root, "power");
+        if (powerObj) {
+            int power = powerObj->valueint;
+            m_ledController->setPower(power);
+        } else {
+            httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing item \"power\"");
+        }
+    }
+
+    cJSON_Delete(root);
+    httpd_resp_sendstr(req, "Post control value successfully");
     return ESP_OK;
 }
 
@@ -106,4 +181,19 @@ void WebServer::registerUriHandlers()
             .user_ctx = this
     };
     httpd_register_uri_handler(m_hdnlServer, &led_state_get_uri);
+
+    httpd_uri_t led_power_get_uri = {
+            .uri = "/api/v1/led/power",
+            .method = HTTP_GET,
+            .handler = led_power_get_handler,
+            .user_ctx = this
+    };
+    httpd_register_uri_handler(m_hdnlServer, &led_power_get_uri);
+    httpd_uri_t led_power_post_uri = {
+            .uri = "/api/v1/led/power",
+            .method = HTTP_POST,
+            .handler = led_power_post_handler,
+            .user_ctx = this
+    };
+    httpd_register_uri_handler(m_hdnlServer, &led_power_post_uri);
 }
