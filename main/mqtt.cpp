@@ -36,7 +36,7 @@ void publish_status()
     esp_mqtt_client_publish(mqtt_client, topic, topicValue, 0, 1, 0);
 
     sprintf(topic, "/%s/state/mode", MQTT_NAME);
-    sprintf(topicValue, "%d", ledController->getMode());
+    sprintf(topicValue, "%d", ledController->getModeIndex());
     esp_mqtt_client_publish(mqtt_client, topic, topicValue, 0, 1, 0);
 }
 
@@ -62,7 +62,7 @@ void handleMqttData(esp_mqtt_event_handle_t event)
         ledController->setPower(event->data[0] == '1');
     }
     if (nullptr != strstr(event->topic, "/mode") && event->data_len >= 1) {
-        ledController->setMode((LedController::Mode)atoi(event->data));
+        ledController->setModeIndex(atoi(event->data));
     }
 }
 

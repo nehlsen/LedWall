@@ -2,6 +2,7 @@
 #include <cJSON.h>
 #include <esp_log.h>
 #include "LedController.h"
+#include "LedMode/LedModes.h"
 
 static const char *WEBSERVER_LOG_TAG = "WebServer";
 
@@ -41,7 +42,7 @@ esp_err_t WebServer::getLedState(httpd_req_t *req)
 {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "power", m_ledController->getPower());
-    cJSON_AddNumberToObject(root, "mode", m_ledController->getMode());
+    cJSON_AddNumberToObject(root, "mode-index", m_ledController->getModeIndex());
 
     return jsonResponse(root, req);
 }
@@ -71,7 +72,8 @@ esp_err_t WebServer::postLedPower(httpd_req_t *req)
 esp_err_t WebServer::getLedMode(httpd_req_t *req)
 {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "mode", m_ledController->getMode());
+    cJSON_AddNumberToObject(root, "index", m_ledController->getModeIndex());
+    cJSON_AddStringToObject(root, "name", LedModes.at(m_ledController->getModeIndex()).name);
 
     return jsonResponse(root, req);
 }
@@ -79,23 +81,26 @@ esp_err_t WebServer::getLedMode(httpd_req_t *req)
 esp_err_t WebServer::postLedMode(httpd_req_t *req)
 {
     return handlePost(req, [=](cJSON *root) -> bool {
-        cJSON *const modeObj = cJSON_GetObjectItem(root, "mode");
+        cJSON *const modeObj = cJSON_GetObjectItem(root, "index");
         if (!modeObj) {
             return false;
         }
 
         int mode = modeObj->valueint;
-        m_ledController->setMode((LedController::Mode)mode);
-        return true;
+        return m_ledController->setModeIndex(mode);
     });
 }
 
 esp_err_t WebServer::getLedModes(httpd_req_t *req)
 {
-    // TODO array of mode objects (num, name)
-
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "modes", 1337);
+    cJSON *modeList = cJSON_AddArrayToObject(root, "modes");
+    for (int idx = 0; idx < LedModes.size(); ++idx) {
+        cJSON *modeDescription = cJSON_CreateObject();
+        cJSON_AddNumberToObject(modeDescription, "index", idx);
+        cJSON_AddStringToObject(modeDescription, "name", LedModes.at(idx).name);
+        cJSON_AddItemToArray(modeList, modeDescription);
+    }
 
     return jsonResponse(root, req);
 }

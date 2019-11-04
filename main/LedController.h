@@ -1,6 +1,8 @@
 #ifndef LEDWALL_LEDCONTROLLER_H
 #define LEDWALL_LEDCONTROLLER_H
 
+#include <list>
+
 class LedMode;
 
 typedef void (*change_handler_t)();
@@ -13,14 +15,8 @@ public:
     void setPower(bool power);
     bool getPower() const;
 
-    enum Mode {
-        ModeStatus = 0, // display wlan, mqtt status
-        ModeSample,
-        ModeHsiboy,
-    };
-
-    void setMode(Mode mode);
-    Mode getMode() const;
+    bool setModeIndex(int modeIndex);
+    int getModeIndex() const;
 
     LedMode *getLedMode() const;
 
@@ -29,7 +25,7 @@ public:
 
 protected:
     bool m_power = true;
-    Mode m_mode = ModeStatus;
+    int m_modeIndex = -1;
     LedMode *m_ledMode = nullptr;
 
     void onChanged();

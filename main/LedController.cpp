@@ -3,9 +3,7 @@
 #include <freertos/event_groups.h>
 #include <freertos/task.h>
 #include "FastLED.h"
-#include "LedMode/LedModeStatus.h"
-#include "LedMode/LedModeSample.h"
-#include "LedMode/LedModeHsiboy.h"
+#include "LedMode/LedModes.h"
 
 static const char *LED_CONTROLLER_LOG_TAG = "LED_CONTROLLER";
 
@@ -45,7 +43,7 @@ LedController::LedController()
     led_update_task_event_group = xEventGroupCreate();
     xEventGroupSetBits(led_update_task_event_group, LED_WALL_ENABLED_BIT);
 
-    setMode(ModeStatus);
+    setModeIndex(0);
 
     xTaskCreatePinnedToCore(
             &led_update_task,
@@ -76,38 +74,30 @@ bool LedController::getPower() const
     return m_power;
 }
 
-void LedController::setMode(LedController::Mode mode)
+bool LedController::setModeIndex(int modeIndex)
 {
-    ESP_LOGI(LED_CONTROLLER_LOG_TAG, "setMode: %d", mode);
+    ESP_LOGI(LED_CONTROLLER_LOG_TAG, "setModeIndex: modeIndex:%d", modeIndex);
 
-    LedMode *newMode = nullptr;
-    switch (mode) {
-        default:
-            ESP_LOGE(LED_CONTROLLER_LOG_TAG, "UNRECOGNIZED MODE");
-        case ModeStatus:
-            newMode = new LedModeStatus(leds, CONFIG_NUM_LEDS);
-            break;
-
-        case ModeSample:
-            newMode = new LedModeSample(leds, CONFIG_NUM_LEDS);
-            break;
-
-        case ModeHsiboy:
-            newMode = new LedModeHsiboy(leds, CONFIG_NUM_LEDS);
-            break;
+    if (modeIndex < 0 || modeIndex >= LedModes.size()) {
+        ESP_LOGE(LED_CONTROLLER_LOG_TAG, "setModeIndex: Failed to set Mode: Invalid Index");
+        return false;
     }
 
+    ESP_LOGI(LED_CONTROLLER_LOG_TAG, "setModeIndex: going to create mode:\"%s\"", LedModes.at(modeIndex).name);
+    LedMode *newMode = LedModes.at(modeIndex).factory(leds, CONFIG_NUM_LEDS);
+
     turnAllLedsOff();
-    m_mode = mode;
+    m_modeIndex = modeIndex;
     delete m_ledMode;
     m_ledMode = newMode;
     
     onChanged();
+    return true;
 }
 
-LedController::Mode LedController::getMode() const
+int LedController::getModeIndex() const
 {
-    return m_mode;
+    return m_modeIndex;
 }
 
 LedMode* LedController::getLedMode() const
