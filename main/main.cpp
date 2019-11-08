@@ -8,6 +8,7 @@
 #include "LedController.h"
 #include "mqtt.h"
 #include "WebServer.h"
+#include "ConfigManager.h"
 
 static const char *APP_LOG_TAG = "LED_WALL";
 
@@ -35,7 +36,9 @@ void app_main()
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     ESP_ERROR_CHECK(wifi_connector_start());
 
-    LedController *controller = new LedController;
+    ConfigManager *cfg = new ConfigManager;
+    cfg->open();
+    LedController *controller = new LedController(cfg);
     mqtt_app_start(controller);
     // TODO the example creates (starts) the server once wifi is ready, stops and restarts on re-connects
     WebServer *server = new WebServer(controller);

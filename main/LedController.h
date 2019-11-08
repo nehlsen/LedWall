@@ -4,13 +4,14 @@
 #include <list>
 
 class LedMode;
+class ConfigManager;
 
 typedef void (*change_handler_t)();
 
 class LedController
 {
 public:
-    LedController();
+    explicit LedController(ConfigManager *configManager);
 
     void setPower(bool power);
     bool getPower() const;
@@ -24,6 +25,8 @@ public:
     void setChangeHandler(change_handler_t change_handler);
 
 protected:
+    ConfigManager *m_configManager;
+
     bool m_power = true;
     int m_modeIndex = -1;
     LedMode *m_ledMode = nullptr;

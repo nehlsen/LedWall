@@ -4,6 +4,7 @@
 #include <freertos/task.h>
 #include "FastLED.h"
 #include "LedMode/LedModes.h"
+#include "ConfigManager.h"
 
 static const char *LED_CONTROLLER_LOG_TAG = "LED_CONTROLLER";
 
@@ -33,7 +34,8 @@ void led_update_task(void *pvParameter)
     }
 }
 
-LedController::LedController()
+LedController::LedController(ConfigManager *configManager):
+    m_configManager(configManager)
 {
     FastLED.addLeds<WS2812, CONFIG_DATA_PIN>(leds, CONFIG_NUM_LEDS).setCorrection(TypicalLEDStrip);
 //    FastLED.setBrightness(MAX_BRIGHTNESS);
@@ -43,7 +45,8 @@ LedController::LedController()
     led_update_task_event_group = xEventGroupCreate();
     xEventGroupSetBits(led_update_task_event_group, LED_WALL_ENABLED_BIT);
 
-    setModeIndex(0);
+    setPower(m_configManager->isPoweredOnBoot());
+    setModeIndex(m_configManager->getBootIntoMode());
 
     xTaskCreatePinnedToCore(
             &led_update_task,
@@ -67,6 +70,7 @@ void LedController::setPower(bool power)
     setLedUpdateTaskEnabled(m_power);
     
     onChanged();
+    m_configManager->setPowerState(m_power);
 }
 
 bool LedController::getPower() const
@@ -92,6 +96,7 @@ bool LedController::setModeIndex(int modeIndex)
     m_ledMode = newMode;
     
     onChanged();
+    m_configManager->setLedMode(m_modeIndex);
     return true;
 }
 
