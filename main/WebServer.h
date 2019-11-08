@@ -6,27 +6,36 @@
 
 class LedController;
 class cJSON;
+class ConfigManager;
 
 #define READ_BUFFER_SIZE 1024 * 5
 
 class WebServer
 {
 public:
-    WebServer(LedController *ledController);
+    WebServer(LedController *ledController, ConfigManager *configManager);
 
     esp_err_t getSystemInfo(httpd_req_t *req);
+
     esp_err_t getLedState(httpd_req_t *req);
+
     esp_err_t getLedPower(httpd_req_t *req);
     esp_err_t postLedPower(httpd_req_t *req);
+
     esp_err_t getLedMode(httpd_req_t *req);
     esp_err_t postLedMode(httpd_req_t *req);
     esp_err_t getLedModes(httpd_req_t *req);
+
+    esp_err_t getConfig(httpd_req_t *req);
+    esp_err_t postConfig(httpd_req_t *req);
 
     void startServer();
     void stopServer();
 
 protected:
     LedController *m_ledController;
+    ConfigManager *m_configManager;
+
     httpd_handle_t m_hdnlServer = nullptr;
     char m_readBuffer[READ_BUFFER_SIZE];
 

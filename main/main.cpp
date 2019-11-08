@@ -41,7 +41,7 @@ void app_main()
     LedController *controller = new LedController(cfg);
     mqtt_app_start(controller);
     // TODO the example creates (starts) the server once wifi is ready, stops and restarts on re-connects
-    WebServer *server = new WebServer(controller);
+    WebServer *server = new WebServer(controller, cfg);
     server->startServer();
 }
 

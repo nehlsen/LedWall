@@ -2,6 +2,7 @@
 #include <cJSON.h>
 #include <esp_log.h>
 #include "LedController.h"
+#include "ConfigManager.h"
 #include "LedMode/LedModes.h"
 
 static const char *WEBSERVER_LOG_TAG = "WebServer";
@@ -23,8 +24,13 @@ CREATE_FUNCTION_TO_METHOD(led_power_post_handler, postLedPower);
 CREATE_FUNCTION_TO_METHOD(led_mode_get_handler, getLedMode);
 CREATE_FUNCTION_TO_METHOD(led_mode_post_handler, postLedMode);
 CREATE_FUNCTION_TO_METHOD(led_modes_get_handler, getLedModes);
+CREATE_FUNCTION_TO_METHOD(config_get_handler, getConfig);
+CREATE_FUNCTION_TO_METHOD(config_post_handler, postConfig);
 
-WebServer::WebServer(LedController *ledController):m_ledController(ledController) {}
+WebServer::WebServer(LedController *ledController, ConfigManager *configManager) :
+    m_ledController(ledController),
+    m_configManager(configManager)
+{}
 
 esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
 {
@@ -34,6 +40,8 @@ esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
     esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
     cJSON_AddNumberToObject(root, "cores", chip_info.cores);
+
+    cJSON_AddNumberToObject(root, "restarts", m_configManager->getRestartCounter());
 
     return jsonResponse(root, req);
 }
@@ -105,6 +113,34 @@ esp_err_t WebServer::getLedModes(httpd_req_t *req)
     return jsonResponse(root, req);
 }
 
+esp_err_t WebServer::getConfig(httpd_req_t *req)
+{
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddNumberToObject(root, "PowerOnResetMode", m_configManager->getPowerOnResetMode());
+    cJSON_AddNumberToObject(root, "LedModeAutoRestore", m_configManager->getLedModeAutoRestore());
+
+    return jsonResponse(root, req);
+}
+
+esp_err_t WebServer::postConfig(httpd_req_t *req)
+{
+    return handlePost(req, [=](cJSON *root) -> bool {
+        cJSON *const powerOnResetMode = cJSON_GetObjectItem(root, "PowerOnResetMode");
+        if (powerOnResetMode) {
+            int mode = powerOnResetMode->valueint;
+            m_configManager->setPowerOnResetMode((ConfigManager::AutoPowerOn)mode);
+        }
+
+        cJSON *const ledModeAutoRestore = cJSON_GetObjectItem(root, "LedModeAutoRestore");
+        if (ledModeAutoRestore) {
+            int mode = ledModeAutoRestore->valueint;
+            m_configManager->setLedModeAutoRestore(mode);
+        }
+
+        return powerOnResetMode && ledModeAutoRestore;
+    });
+}
+
 void WebServer::startServer()
 {
     if (m_hdnlServer != nullptr) {
@@ -113,6 +149,7 @@ void WebServer::startServer()
     }
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.max_uri_handlers = 9;
 
     ESP_LOGI(WEBSERVER_LOG_TAG, "Starting server on port: '%d'", config.server_port);
     if (httpd_start(&m_hdnlServer, &config) == ESP_OK) {
@@ -183,6 +220,21 @@ void WebServer::registerUriHandlers()
             .user_ctx = this
     };
     httpd_register_uri_handler(m_hdnlServer, &led_modes_get_uri);
+
+    httpd_uri_t config_get_uri = {
+            .uri = "/api/v1/config",
+            .method = HTTP_GET,
+            .handler = config_get_handler,
+            .user_ctx = this
+    };
+    httpd_register_uri_handler(m_hdnlServer, &config_get_uri);
+    httpd_uri_t config_post_uri = {
+            .uri = "/api/v1/config",
+            .method = HTTP_POST,
+            .handler = config_post_handler,
+            .user_ctx = this
+    };
+    httpd_register_uri_handler(m_hdnlServer, &config_post_uri);
 }
 
 esp_err_t WebServer::jsonResponse(cJSON *root, httpd_req_t *req)
