@@ -1,3 +1,4 @@
+#include <mdns.h>
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include "esp_event.h"
@@ -15,6 +16,24 @@ static const char *APP_LOG_TAG = "LED_WALL";
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+static void initialise_mdns(void)
+{
+    if (mdns_init() != ESP_OK) {
+        ESP_LOGW(APP_LOG_TAG, "mDNS init failed");
+    }
+
+    mdns_hostname_set(CONFIG_MDNS_HOSTNAME);
+    mdns_instance_name_set("LedWall REST and Web interface");
+
+    mdns_txt_item_t serviceTxtData[] = {
+            {"board", "esp32"},
+            {"path", "/"}
+    };
+
+    ESP_ERROR_CHECK(mdns_service_add("LedWall-WebServer", "_http", "_tcp", 80, serviceTxtData,
+                                     sizeof(serviceTxtData) / sizeof(serviceTxtData[0])));
+}
 
 void app_main()
 {
@@ -34,6 +53,7 @@ void app_main()
     ESP_ERROR_CHECK(nvs_flash_init());
     tcpip_adapter_init();
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+    initialise_mdns();
     ESP_ERROR_CHECK(wifi_connector_start());
 
     ConfigManager *cfg = new ConfigManager;

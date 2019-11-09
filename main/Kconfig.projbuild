@@ -13,11 +13,17 @@ menu "LedWall Configuration"
             WiFi password (WPA or WPA2) to use.
             Can be left blank if the network has no security set.
 
+    config MDNS_HOSTNAME
+        string "mDNS Hostname"
+        default "ledwall"
+        help
+            Hostname to advertise via mDNS
+
     config BROKER_URL
-        string "Broker URL"
+        string "MQTT Broker URL"
         default "mqtt://iot.eclipse.org"
         help
-            URL of the broker to connect to
+            URL of the MQTT broker to connect to
 
     config DATA_PIN
         int "Data PIN the LEDs are attached to"
