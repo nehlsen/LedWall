@@ -2,7 +2,7 @@
 #include "ConfigManager.h"
 
 #define NVS_NAMESPACE "led_wall_config"
-static const char *CONFIG_MANAGER_LOG_TAG = "LED_CONTROLLER";
+static const char *CONFIG_MANAGER_LOG_TAG = "CONFIG_MANAGER";
 
 #define RESTART_COUNTER_KEY "restart_counter"
 #define POWER_LAST_STATE_KEY "power_state"
@@ -43,7 +43,7 @@ bool ConfigManager::commit()
     esp_err_t err = nvs_commit(m_nvsHandle);
     
     if (err != ESP_OK) {
-        ESP_LOGE(CONFIG_MANAGER_LOG_TAG, "Error (%s) committing NVS Data!\n", esp_err_to_name(err));
+        ESP_LOGE(CONFIG_MANAGER_LOG_TAG, "Error (%s) committing NVS Data!", esp_err_to_name(err));
         return false;
     }
 
@@ -56,7 +56,7 @@ int32_t ConfigManager::getIntVal(const char *key, int32_t defaultValue)
     esp_err_t err = nvs_get_i32(m_nvsHandle, key, &value);
 
     if (err != ESP_OK) {
-        ESP_LOGW(CONFIG_MANAGER_LOG_TAG, "Error (%s) reading int-val from NVS Data! (yield default)\n", esp_err_to_name(err));
+        ESP_LOGW(CONFIG_MANAGER_LOG_TAG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key);
     }
     
     return value;
@@ -67,7 +67,7 @@ bool ConfigManager::setIntVal(const char *key, int32_t value)
     esp_err_t err = nvs_set_i32(m_nvsHandle, key, value);
 
     if (err != ESP_OK) {
-        ESP_LOGE(CONFIG_MANAGER_LOG_TAG, "Error (%s) setting int-val to NVS Data!\n", esp_err_to_name(err));
+        ESP_LOGE(CONFIG_MANAGER_LOG_TAG, "NVS write Error (%s), key:\"%s\"", esp_err_to_name(err), key);
         return false;
     }
 
@@ -159,6 +159,7 @@ void ConfigManager::updateRestartCounter()
 
     int32_t newCount = getRestartCounter() + 1;
     if (setIntVal(RESTART_COUNTER_KEY, newCount)) {
+        ESP_LOGI(CONFIG_MANAGER_LOG_TAG, "Restart counter updated to %d", newCount);
         m_restartCounter = newCount;
     }
 }
