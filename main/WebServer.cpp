@@ -1,9 +1,13 @@
 #include "WebServer.h"
 #include <cJSON.h>
 #include <esp_log.h>
+#include <fcntl.h>
+#include "esp_vfs.h"
 #include "LedController.h"
 #include "ConfigManager.h"
 #include "LedMode/LedModes.h"
+
+#define FILE_PATH_MAX (ESP_VFS_PATH_MAX + 128)
 
 static const char *WEBSERVER_LOG_TAG = "WebServer";
 
@@ -26,6 +30,7 @@ CREATE_FUNCTION_TO_METHOD(led_mode_post_handler, postLedMode);
 CREATE_FUNCTION_TO_METHOD(led_modes_get_handler, getLedModes);
 CREATE_FUNCTION_TO_METHOD(config_get_handler, getConfig);
 CREATE_FUNCTION_TO_METHOD(config_post_handler, postConfig);
+CREATE_FUNCTION_TO_METHOD(file_get_handler, getFile);
 
 WebServer::WebServer(LedController *ledController, ConfigManager *configManager) :
     m_ledController(ledController),
@@ -141,6 +146,71 @@ esp_err_t WebServer::postConfig(httpd_req_t *req)
     });
 }
 
+esp_err_t WebServer::getFile(httpd_req_t *req)
+{
+    char filepath[FILE_PATH_MAX];
+
+    if (req->uri[strlen(req->uri) - 1] == '/') {
+        strlcat(filepath, "/index.html", sizeof(filepath));
+    } else {
+        strlcat(filepath, req->uri, sizeof(filepath));
+    }
+    int fd = open(filepath, O_RDONLY, 0);
+    if (fd == -1) {
+        ESP_LOGE(WEBSERVER_LOG_TAG, "Failed to open file : %s", filepath);
+        /* Respond with 500 Internal Server Error */
+        httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "File not found");
+        return ESP_FAIL;
+    }
+
+    auto isFileExtension = [filepath](const char *ext)->bool {
+        return strcmp(&filepath[strlen(filepath) - strlen(ext)], ext) == 0;
+    };
+
+    const char *type = "text/plain";
+    if (isFileExtension(".html")) {
+        type = "text/html";
+    } else if (isFileExtension(".js")) {
+        type = "application/javascript";
+    } else if (isFileExtension(".css")) {
+        type = "text/css";
+    } else if (isFileExtension(".png")) {
+        type = "image/png";
+    } else if (isFileExtension(".ico")) {
+        type = "image/x-icon";
+    } else if (isFileExtension(".svg")) {
+        type = "text/xml";
+    }
+    httpd_resp_set_type(req, type);
+
+    char *chunk = m_readBuffer;
+    ssize_t read_bytes;
+    do {
+        /* Read file in chunks into the scratch buffer */
+        read_bytes = read(fd, chunk, READ_BUFFER_SIZE);
+        if (read_bytes == -1) {
+            ESP_LOGE(WEBSERVER_LOG_TAG, "Failed to read file : %s", filepath);
+        } else if (read_bytes > 0) {
+            /* Send the buffer contents as HTTP response chunk */
+            if (httpd_resp_send_chunk(req, chunk, read_bytes) != ESP_OK) {
+                close(fd);
+                ESP_LOGE(WEBSERVER_LOG_TAG, "File sending failed!");
+                /* Abort sending file */
+                httpd_resp_sendstr_chunk(req, nullptr);
+                /* Respond with 500 Internal Server Error */
+                httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to send file");
+                return ESP_FAIL;
+            }
+        }
+    } while (read_bytes > 0);
+    /* Close file after sending complete */
+    close(fd);
+    ESP_LOGI(WEBSERVER_LOG_TAG, "File sending complete");
+    /* Respond with an empty chunk to signal HTTP response completion */
+    httpd_resp_send_chunk(req, nullptr, 0);
+    return ESP_OK;
+}
+
 void WebServer::startServer()
 {
     if (m_hdnlServer != nullptr) {
@@ -149,7 +219,8 @@ void WebServer::startServer()
     }
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.max_uri_handlers = 9;
+    config.max_uri_handlers = 10;
+    config.uri_match_fn = httpd_uri_match_wildcard;
 
     ESP_LOGI(WEBSERVER_LOG_TAG, "Starting server on port: '%d'", config.server_port);
     if (httpd_start(&m_hdnlServer, &config) == ESP_OK) {
@@ -235,6 +306,13 @@ void WebServer::registerUriHandlers()
             .user_ctx = this
     };
     httpd_register_uri_handler(m_hdnlServer, &config_post_uri);
+
+    httpd_uri_t file_get_uri = {
+            .uri = "/*",
+            .method = HTTP_GET,
+            .handler = file_get_handler
+    };
+    httpd_register_uri_handler(m_hdnlServer, &file_get_uri);
 }
 
 esp_err_t WebServer::jsonResponse(cJSON *root, httpd_req_t *req)

@@ -29,6 +29,8 @@ public:
     esp_err_t getConfig(httpd_req_t *req);
     esp_err_t postConfig(httpd_req_t *req);
 
+    esp_err_t getFile(httpd_req_t *req);
+
     void startServer();
     void stopServer();
 
