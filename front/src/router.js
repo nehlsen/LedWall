@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Chart from './views/Chart.vue'
 import Light from './views/Light.vue'
+import LedWall from './views/LedWall'
 
 Vue.use(Router)
 
@@ -14,6 +15,11 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/ledwall',
+      name: 'ledwall',
+      component: LedWall
     },
     {
       path: '/chart',

@@ -6,19 +6,32 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    chart_value: [8, 2, 5, 9, 5, 11, 3, 5, 10, 0, 1, 8, 2, 9, 0, 13, 10, 7, 16],
+    power: null,
   },
   mutations: {
-    update_chart_value(state, new_value) {
-      state.chart_value.push(new_value);
-      state.chart_value.shift();
+    update_power(state, newValue) {
+      state.power = newValue;
     }
   },
   actions: {
-    update_chart_value({ commit }) {
-      axios.get("/api/v1/temp/raw")
+    get_power({commit}) {
+      axios
+        .get('/api/v1/led/power')
         .then(data => {
-          commit("update_chart_value", data.data.raw);
+          commit("update_power", data.data.power);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    set_power({commit}, newPowerValue) {
+      axios
+        .post('/api/v1/led/power', {
+          power: newPowerValue === true ? 1 : 0
+        })
+        .then(data => {
+          commit("update_power", newPowerValue);
+          console.log(data);
         })
         .catch(error => {
           console.log(error);

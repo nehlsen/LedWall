@@ -36,9 +36,9 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-toolbar color="red accent-4" dark fixed app clipped-left>
+    <v-toolbar color="blue accent-4" dark fixed app clipped-left>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>ESP Home</v-toolbar-title>
+      <v-toolbar-title>LED Wall</v-toolbar-title>
     </v-toolbar>
     <v-content>
       <v-container fluid fill-height>
