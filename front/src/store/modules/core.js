@@ -9,8 +9,8 @@ const getters = {}
 const actions = {
   get_power({commit}) {
     api.power.get()
-      .then(data => {
-        commit("update_power", data.data.power);
+      .then(response => {
+        commit("update_power", response.data.power === 1);
       })
       .catch(error => {
         console.log(error);
@@ -18,9 +18,9 @@ const actions = {
   },
   set_power({commit}, newPowerValue) {
     api.power.set({power: newPowerValue === true ? 1 : 0})
-      .then(data => {
+      .then(response => {
         commit("update_power", newPowerValue);
-        console.log(data);
+        console.log(response);
       })
       .catch(error => {
         console.log(error);
