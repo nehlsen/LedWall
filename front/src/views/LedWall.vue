@@ -30,12 +30,12 @@ export default {
         return this.$store.state.power;
       },
       set: function(newValue) {
-        this.$store.dispatch("set_power", newValue);
+        this.$store.dispatch("core/set_power", newValue);
       }
     }
   },
   created() {
-    this.$store.dispatch("get_power");
+    this.$store.dispatch("core/get_power");
   },
   mounted () {
     this.$ajax
