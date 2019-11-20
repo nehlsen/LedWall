@@ -10,6 +10,14 @@
             <v-list-tile-title>Home</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile to="/ledwall">
+          <v-list-tile-action>
+            <v-icon>lightbulb</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>LedWall</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
         <v-list-tile to="/chart">
           <v-list-tile-action>
             <v-icon>show_chart</v-icon>
@@ -37,8 +45,8 @@
         <router-view></router-view>
       </v-container>
     </v-content>
-    <v-footer color="red accent-4" app fixed>
-      <span class="white--text">&copy; ESPRESSIF SYSTEMS (SHANGHAI) CO., LTD. All rights reserved.</span>
+    <v-footer color="blue accent-4" app fixed>
+      <span class="white--text pl-2"><a class="white--text" href="https://github.com/nehlsen/LedWall">https://github.com/nehlsen/LedWall</a></span>
     </v-footer>
   </v-app>
 </template>
