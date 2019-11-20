@@ -18,81 +18,32 @@
 
 <script>
 export default {
-  data () {
-    return {
-      modes: [],
-      mode: null
-    }
-  },
   computed: {
     power: {
       get: function() {
-        return this.$store.state.power;
+        return this.$store.state.core.power;
       },
       set: function(newValue) {
         this.$store.dispatch("core/set_power", newValue);
       }
+    },
+    mode: {
+      get: function() {
+        return this.$store.state.mode.mode;
+      },
+      set: function(newValue) {
+        this.$store.dispatch("mode/set", newValue);
+      }
+    },
+    modes: function() {
+      return this.$store.state.mode.modes;
     }
   },
   created() {
     this.$store.dispatch("core/get_power");
-  },
-  mounted () {
-    this.$ajax
-      .get('/api/v1/led/modes')
-      .then(data => {
-        this.modes = data.data.modes;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-    this.$ajax
-      .get('/api/v1/led/mode')
-      .then(data => {
-        this.mode = data.data.index;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  },
-  watch: {
-    mode() {
-      this.set_mode();
-    }
-  },
-  methods: {
-    set_mode: function() {
-      this.$ajax
-        .post('/api/v1/led/mode', {
-          index: this.mode
-        })
-        .then(data => {
-          console.log(data);
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    }
+    this.$store.dispatch("mode/all");
+    this.$store.dispatch("mode/get");
   }
 };
-/*
-{
-"modes": [
-{
-  "index": 0,
-  "name": "Status"
-},
-{
-  "index": 1,
-  "name": "Sample"
-},
-{
-  "index": 2,
-  "name": "Hsiboy"
-}
-]
-}
- */
-
 </script>
 
