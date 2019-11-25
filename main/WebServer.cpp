@@ -2,6 +2,7 @@
 #include <cJSON.h>
 #include <esp_log.h>
 #include <fcntl.h>
+#include <esp_ota_ops.h>
 #include "esp_vfs.h"
 #include "LedController.h"
 #include "ConfigManager.h"
@@ -40,13 +41,19 @@ WebServer::WebServer(LedController *ledController, ConfigManager *configManager)
 esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
 {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddStringToObject(root, "version", IDF_VER);
+    cJSON_AddStringToObject(root, "idfVersion", IDF_VER);
 
     esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
     cJSON_AddNumberToObject(root, "cores", chip_info.cores);
 
     cJSON_AddNumberToObject(root, "restarts", m_configManager->getRestartCounter());
+
+    const esp_app_desc_t *app_desc = esp_ota_get_app_description();
+    cJSON_AddStringToObject(root, "projectName", app_desc->project_name);
+    cJSON_AddStringToObject(root, "projectVersion", app_desc->version);
+    cJSON_AddStringToObject(root, "compileTime", app_desc->time);
+    cJSON_AddStringToObject(root, "compileDate", app_desc->date);
 
     return jsonResponse(root, req);
 }
