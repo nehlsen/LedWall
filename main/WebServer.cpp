@@ -149,7 +149,7 @@ esp_err_t WebServer::postConfig(httpd_req_t *req)
             m_configManager->setLedModeAutoRestore(mode);
         }
 
-        return powerOnResetMode && ledModeAutoRestore;
+        return powerOnResetMode || ledModeAutoRestore;
     });
 }
 
