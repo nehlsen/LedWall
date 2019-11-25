@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
-import Chart from './views/Chart.vue'
-import Light from './views/Light.vue'
+import Home from './views/Home'
+import Chart from './views/Chart'
+import Light from './views/Light'
 import LedWall from './views/LedWall'
+import Config from './views/Config'
 
 Vue.use(Router)
 
@@ -30,6 +31,11 @@ export default new Router({
       path: '/light',
       name: 'light',
       component: Light
+    },
+    {
+      path: '/config',
+      name: 'config',
+      component: Config
     }
   ]
 })

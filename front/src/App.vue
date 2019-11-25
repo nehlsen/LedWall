@@ -34,6 +34,14 @@
             <v-list-tile-title>Light</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile to="/config">
+          <v-list-tile-action>
+            <v-icon>settings_applications</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Config</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
       </v-list>
     </v-navigation-drawer>
     <v-toolbar color="blue accent-4" dark fixed app clipped-left>
