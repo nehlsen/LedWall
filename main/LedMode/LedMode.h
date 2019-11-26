@@ -2,6 +2,7 @@
 #define LEDWALL_LEDMODE_H
 
 class CRGB;
+class cJSON;
 
 class LedMode
 {
@@ -10,6 +11,11 @@ public:
     virtual ~LedMode();
 
     virtual void update() = 0;
+
+    // read options from mode to JSON object
+    virtual void readOptions(cJSON *root);
+    // write options from JSON object to mode
+    virtual bool writeOptions(cJSON *root);
 
 protected:
     CRGB *m_leds;

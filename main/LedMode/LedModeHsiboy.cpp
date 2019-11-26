@@ -1,3 +1,4 @@
+#include <cJSON.h>
 #include "LedModeHsiboy.h"
 
 #define MAX_INT_VALUE 65536
@@ -58,6 +59,29 @@ void LedModeHsiboy::update()
     }
 
     m_frame += m_animateSpeed;
+}
+
+void LedModeHsiboy::readOptions(cJSON *root)
+{
+    cJSON_AddNumberToObject(root, "animateSpeed", m_animateSpeed);
+    cJSON_AddNumberToObject(root, "animation", m_animation);
+}
+
+bool LedModeHsiboy::writeOptions(cJSON *root)
+{
+    cJSON *const animateSpeed = cJSON_GetObjectItem(root, "animateSpeed");
+    if (animateSpeed) {
+        int speed = animateSpeed->valueint;
+        m_animateSpeed = speed < 0 ? 0 : speed > 255 ? 255 : speed;
+    }
+
+    cJSON *const animation = cJSON_GetObjectItem(root, "animation");
+    if (animation) {
+        int animationIndex = animation->valueint;
+        m_animation = animationIndex < 0 ? 0 : animationIndex > 9 ? 9 : animationIndex;
+    }
+
+    return animateSpeed || animation;
 }
 
 //#######################################################################################################

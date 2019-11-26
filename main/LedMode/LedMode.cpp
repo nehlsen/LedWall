@@ -6,3 +6,11 @@ LedMode::LedMode(CRGB *leds, int ledCount):
 
 LedMode::~LedMode()
 = default;
+
+void LedMode::readOptions(cJSON *root)
+{}
+
+bool LedMode::writeOptions(cJSON *root)
+{
+    return true;
+}

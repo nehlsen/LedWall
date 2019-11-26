@@ -32,10 +32,14 @@ public:
 
     void update() override;
 
+    void readOptions(cJSON *root) override;
+
+    bool writeOptions(cJSON *root) override;
+
 protected:
     uint16_t m_frame = 0;
     //Number of frames to increment per loop
-    const uint16_t m_animateSpeed = 255;
+    uint16_t m_animateSpeed = 255;
     //Active animation
     uint8_t m_animation = 9;
     //Global brightness percentage
