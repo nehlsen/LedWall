@@ -23,7 +23,6 @@ static const char *WEBSERVER_LOG_TAG = "WebServer";
     }
 
 CREATE_FUNCTION_TO_METHOD(system_info_get_handler, getSystemInfo);
-CREATE_FUNCTION_TO_METHOD(led_state_get_handler, getLedState);
 CREATE_FUNCTION_TO_METHOD(led_power_get_handler, getLedPower);
 CREATE_FUNCTION_TO_METHOD(led_power_post_handler, postLedPower);
 CREATE_FUNCTION_TO_METHOD(led_mode_get_handler, getLedMode);
@@ -55,16 +54,6 @@ esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
     cJSON_AddStringToObject(root, "projectVersion", app_desc->version);
     cJSON_AddStringToObject(root, "compileTime", app_desc->time);
     cJSON_AddStringToObject(root, "compileDate", app_desc->date);
-
-    return jsonResponse(root, req);
-}
-
-esp_err_t WebServer::getLedState(httpd_req_t *req)
-{
-    //FIXME seems obsolete
-    cJSON *root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "power", m_ledController->getPower());
-    cJSON_AddNumberToObject(root, "mode-index", m_ledController->getModeIndex());
 
     return jsonResponse(root, req);
 }
@@ -265,14 +254,6 @@ void WebServer::registerUriHandlers()
             .user_ctx = this
     };
     httpd_register_uri_handler(m_hdnlServer, &system_info_get_uri);
-
-    httpd_uri_t led_state_get_uri = {
-            .uri = "/api/v1/led/state",
-            .method = HTTP_GET,
-            .handler = led_state_get_handler,
-            .user_ctx = this
-    };
-    httpd_register_uri_handler(m_hdnlServer, &led_state_get_uri);
 
     httpd_uri_t led_power_get_uri = {
             .uri = "/api/v1/led/power",
