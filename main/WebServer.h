@@ -26,7 +26,6 @@ public:
     esp_err_t postLedMode(httpd_req_t *req);
     esp_err_t getLedModes(httpd_req_t *req);
 
-    esp_err_t getModeOptions(httpd_req_t *req);
     esp_err_t postModeOptions(httpd_req_t *req);
 
     esp_err_t getConfig(httpd_req_t *req);

@@ -29,7 +29,6 @@ CREATE_FUNCTION_TO_METHOD(led_power_post_handler, postLedPower);
 CREATE_FUNCTION_TO_METHOD(led_mode_get_handler, getLedMode);
 CREATE_FUNCTION_TO_METHOD(led_mode_post_handler, postLedMode);
 CREATE_FUNCTION_TO_METHOD(led_modes_get_handler, getLedModes);
-CREATE_FUNCTION_TO_METHOD(mode_options_get_handler, getModeOptions);
 CREATE_FUNCTION_TO_METHOD(mode_options_post_handler, postModeOptions);
 CREATE_FUNCTION_TO_METHOD(config_get_handler, getConfig);
 CREATE_FUNCTION_TO_METHOD(config_post_handler, postConfig);
@@ -98,6 +97,9 @@ esp_err_t WebServer::getLedMode(httpd_req_t *req)
     cJSON_AddNumberToObject(root, "index", m_ledController->getModeIndex());
     cJSON_AddStringToObject(root, "name", LedModes.at(m_ledController->getModeIndex()).name);
 
+    cJSON *options = cJSON_AddObjectToObject(root, "options");
+    m_ledController->getLedMode()->readOptions(options);
+
     return jsonResponse(root, req);
 }
 
@@ -124,14 +126,6 @@ esp_err_t WebServer::getLedModes(httpd_req_t *req)
         cJSON_AddStringToObject(modeDescription, "name", LedModes.at(idx).name);
         cJSON_AddItemToArray(modeList, modeDescription);
     }
-
-    return jsonResponse(root, req);
-}
-
-esp_err_t WebServer::getModeOptions(httpd_req_t *req)
-{
-    cJSON *root = cJSON_CreateObject();
-    m_ledController->getLedMode()->readOptions(root);
 
     return jsonResponse(root, req);
 }
@@ -244,7 +238,7 @@ void WebServer::startServer()
     }
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.max_uri_handlers = 12;
+    config.max_uri_handlers = 10;
     config.uri_match_fn = httpd_uri_match_wildcard;
 
     ESP_LOGI(WEBSERVER_LOG_TAG, "Starting server on port: '%d'", config.server_port);
@@ -317,13 +311,6 @@ void WebServer::registerUriHandlers()
     };
     httpd_register_uri_handler(m_hdnlServer, &led_modes_get_uri);
 
-    httpd_uri_t mode_options_get_uri = {
-            .uri = "/api/v1/mode/options",
-            .method = HTTP_GET,
-            .handler = mode_options_get_handler,
-            .user_ctx = this
-    };
-    httpd_register_uri_handler(m_hdnlServer, &mode_options_get_uri);
     httpd_uri_t mode_options_post_uri = {
             .uri = "/api/v1/mode/options",
             .method = HTTP_POST,
