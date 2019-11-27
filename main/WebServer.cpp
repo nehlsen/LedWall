@@ -68,8 +68,8 @@ esp_err_t WebServer::getLedPower(httpd_req_t *req)
 
 esp_err_t WebServer::postLedPower(httpd_req_t *req)
 {
-    return handlePost(req, [=](cJSON *root) -> bool {
-        cJSON *const powerObj = cJSON_GetObjectItem(root, "power");
+    return handlePost(req, [=](cJSON *request) -> bool {
+        cJSON *const powerObj = cJSON_GetObjectItem(request, "power");
         if (!powerObj) {
             return false;
         }
@@ -94,8 +94,8 @@ esp_err_t WebServer::getLedMode(httpd_req_t *req)
 
 esp_err_t WebServer::postLedMode(httpd_req_t *req)
 {
-    return handlePost(req, [=](cJSON *root) -> bool {
-        cJSON *const modeObj = cJSON_GetObjectItem(root, "index");
+    return handlePost(req, [=](cJSON *request) -> bool {
+        cJSON *const modeObj = cJSON_GetObjectItem(request, "index");
         if (!modeObj) {
             return false;
         }
@@ -121,8 +121,8 @@ esp_err_t WebServer::getLedModes(httpd_req_t *req)
 
 esp_err_t WebServer::postModeOptions(httpd_req_t *req)
 {
-    return handlePost(req, [=](cJSON *root) -> bool {
-        return m_ledController->getLedMode()->writeOptions(root);
+    return handlePost(req, [=](cJSON *request) -> bool {
+        return m_ledController->getLedMode()->writeOptions(request);
     });
 }
 
@@ -137,14 +137,14 @@ esp_err_t WebServer::getConfig(httpd_req_t *req)
 
 esp_err_t WebServer::postConfig(httpd_req_t *req)
 {
-    return handlePost(req, [=](cJSON *root) -> bool {
-        cJSON *const powerOnResetMode = cJSON_GetObjectItem(root, "PowerOnResetMode");
+    return handlePost(req, [=](cJSON *request) -> bool {
+        cJSON *const powerOnResetMode = cJSON_GetObjectItem(request, "PowerOnResetMode");
         if (powerOnResetMode) {
             int mode = powerOnResetMode->valueint;
             m_configManager->setPowerOnResetMode((ConfigManager::AutoPowerOn)mode);
         }
 
-        cJSON *const ledModeAutoRestore = cJSON_GetObjectItem(root, "LedModeAutoRestore");
+        cJSON *const ledModeAutoRestore = cJSON_GetObjectItem(request, "LedModeAutoRestore");
         if (ledModeAutoRestore) {
             int mode = ledModeAutoRestore->valueint;
             m_configManager->setLedModeAutoRestore(mode);
@@ -336,7 +336,7 @@ esp_err_t WebServer::jsonResponse(cJSON *root, httpd_req_t *req)
     return ESP_OK;
 }
 
-esp_err_t WebServer::handlePost(httpd_req_t *req, const std::function<bool(cJSON *root)>& jsonHandler)
+esp_err_t WebServer::handlePost(httpd_req_t *req, const std::function<bool(cJSON *request)>& jsonHandler)
 {
     int total_len = req->content_len;
     int cur_len = 0;
@@ -358,16 +358,19 @@ esp_err_t WebServer::handlePost(httpd_req_t *req, const std::function<bool(cJSON
     }
     buf[total_len] = '\0';
 
-    cJSON *root = cJSON_Parse(buf);
-    if (!root) {
+    cJSON *request = cJSON_Parse(buf);
+    if (!request) {
         httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Failed to parse JSON");
-    } else {
-        if (!jsonHandler(root)) {
-            httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "JSON is missing keys or has invalid values");
-        }
+        return ESP_FAIL;
     }
 
-    cJSON_Delete(root);
+    if (!jsonHandler(request)) {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "JSON is missing keys or has invalid values");
+        cJSON_Delete(request);
+        return ESP_FAIL;
+    }
+
+    cJSON_Delete(request);
     httpd_resp_sendstr(req, "Post control value successfully");
     return ESP_OK;
 }
