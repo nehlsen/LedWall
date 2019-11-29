@@ -44,7 +44,11 @@ protected:
     void registerUriHandlers();
 
     esp_err_t jsonResponse(cJSON *root, httpd_req_t *req);
-    esp_err_t handlePost(httpd_req_t *req, const std::function<bool(cJSON *root)>& jsonHandler);
+    esp_err_t handlePost(httpd_req_t *req, const std::function<bool(cJSON *request, cJSON **response)>& jsonHandler);
+
+    cJSON *createLedPowerData();
+    cJSON *createLedModeData();
+    cJSON *createConfigData();
 };
 
 #endif //LEDWALL_WEBSERVER_H

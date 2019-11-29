@@ -58,17 +58,22 @@ esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
     return jsonResponse(root, req);
 }
 
-esp_err_t WebServer::getLedPower(httpd_req_t *req)
+cJSON* WebServer::createLedPowerData()
 {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "power", m_ledController->getPower());
 
-    return jsonResponse(root, req);
+    return root;
+}
+
+esp_err_t WebServer::getLedPower(httpd_req_t *req)
+{
+    return jsonResponse(createLedPowerData(), req);
 }
 
 esp_err_t WebServer::postLedPower(httpd_req_t *req)
 {
-    return handlePost(req, [=](cJSON *request) -> bool {
+    return handlePost(req, [=](cJSON *request, cJSON **response) -> bool {
         cJSON *const powerObj = cJSON_GetObjectItem(request, "power");
         if (!powerObj) {
             return false;
@@ -76,11 +81,12 @@ esp_err_t WebServer::postLedPower(httpd_req_t *req)
 
         int power = powerObj->valueint;
         m_ledController->setPower(power);
+        *response = createLedPowerData();
         return true;
     });
 }
 
-esp_err_t WebServer::getLedMode(httpd_req_t *req)
+cJSON* WebServer::createLedModeData()
 {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "index", m_ledController->getModeIndex());
@@ -89,19 +95,26 @@ esp_err_t WebServer::getLedMode(httpd_req_t *req)
     cJSON *options = cJSON_AddObjectToObject(root, "options");
     m_ledController->getLedMode()->readOptions(options);
 
-    return jsonResponse(root, req);
+    return root;
+}
+
+esp_err_t WebServer::getLedMode(httpd_req_t *req)
+{
+    return jsonResponse(createLedModeData(), req);
 }
 
 esp_err_t WebServer::postLedMode(httpd_req_t *req)
 {
-    return handlePost(req, [=](cJSON *request) -> bool {
+    return handlePost(req, [=](cJSON *request, cJSON **response) -> bool {
         cJSON *const modeObj = cJSON_GetObjectItem(request, "index");
         if (!modeObj) {
             return false;
         }
 
         int mode = modeObj->valueint;
-        return m_ledController->setModeIndex(mode);
+        bool modeHasBeenSet = m_ledController->setModeIndex(mode);
+        *response = createLedModeData();
+        return modeHasBeenSet;
     });
 }
 
@@ -121,23 +134,28 @@ esp_err_t WebServer::getLedModes(httpd_req_t *req)
 
 esp_err_t WebServer::postModeOptions(httpd_req_t *req)
 {
-    return handlePost(req, [=](cJSON *request) -> bool {
+    return handlePost(req, [=](cJSON *request, cJSON **response) -> bool {
         return m_ledController->getLedMode()->writeOptions(request);
     });
 }
 
-esp_err_t WebServer::getConfig(httpd_req_t *req)
+cJSON* WebServer::createConfigData()
 {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "PowerOnResetMode", m_configManager->getPowerOnResetMode());
     cJSON_AddNumberToObject(root, "LedModeAutoRestore", m_configManager->getLedModeAutoRestore());
 
-    return jsonResponse(root, req);
+    return root;
+}
+
+esp_err_t WebServer::getConfig(httpd_req_t *req)
+{
+    return jsonResponse(createConfigData(), req);
 }
 
 esp_err_t WebServer::postConfig(httpd_req_t *req)
 {
-    return handlePost(req, [=](cJSON *request) -> bool {
+    return handlePost(req, [=](cJSON *request, cJSON **response) -> bool {
         cJSON *const powerOnResetMode = cJSON_GetObjectItem(request, "PowerOnResetMode");
         if (powerOnResetMode) {
             int mode = powerOnResetMode->valueint;
@@ -150,6 +168,7 @@ esp_err_t WebServer::postConfig(httpd_req_t *req)
             m_configManager->setLedModeAutoRestore(mode);
         }
 
+        *response = createConfigData();
         return powerOnResetMode || ledModeAutoRestore;
     });
 }
@@ -336,7 +355,7 @@ esp_err_t WebServer::jsonResponse(cJSON *root, httpd_req_t *req)
     return ESP_OK;
 }
 
-esp_err_t WebServer::handlePost(httpd_req_t *req, const std::function<bool(cJSON *request)>& jsonHandler)
+esp_err_t WebServer::handlePost(httpd_req_t *req, const std::function<bool(cJSON *request, cJSON **response)>& jsonHandler)
 {
     int total_len = req->content_len;
     int cur_len = 0;
@@ -364,13 +383,14 @@ esp_err_t WebServer::handlePost(httpd_req_t *req, const std::function<bool(cJSON
         return ESP_FAIL;
     }
 
-    if (!jsonHandler(request)) {
+    cJSON *response = nullptr;
+    if (!jsonHandler(request, &response)) {
         httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "JSON is missing keys or has invalid values");
         cJSON_Delete(request);
+        if (response) cJSON_Delete(response);
         return ESP_FAIL;
     }
 
     cJSON_Delete(request);
-    httpd_resp_sendstr(req, "Post control value successfully");
-    return ESP_OK;
+    return jsonResponse(response, req);
 }
