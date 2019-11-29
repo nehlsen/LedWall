@@ -39,7 +39,7 @@ static void initialise_mdns()
 esp_err_t init_fs(void)
 {
     esp_vfs_spiffs_conf_t conf = {
-            .base_path = "/",
+            .base_path = "",
             .partition_label = nullptr,
             .max_files = 5,
             .format_if_mount_failed = false
