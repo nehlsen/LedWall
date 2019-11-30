@@ -1,14 +1,12 @@
 #include "WebServer.h"
 #include <cJSON.h>
 #include <esp_log.h>
-#include <fcntl.h>
 #include <esp_ota_ops.h>
 #include "esp_vfs.h"
 #include "LedController.h"
 #include "ConfigManager.h"
 #include "LedMode/LedModes.h"
-
-#define FILE_PATH_MAX (ESP_VFS_PATH_MAX + 128)
+#include "WebServer/FileResponseHandler.h"
 
 static const char *WEBSERVER_LOG_TAG = "WebServer";
 
@@ -17,6 +15,7 @@ static const char *WEBSERVER_LOG_TAG = "WebServer";
     { \
         auto *server = (WebServer*)req->user_ctx; \
         if (!server) { \
+            ESP_LOGE(WEBSERVER_LOG_TAG, "Invalid use of Macro! Missing Server instance!"); \
             return ESP_FAIL; \
         } \
         return server->handler(req); \
@@ -175,67 +174,7 @@ esp_err_t WebServer::postConfig(httpd_req_t *req)
 
 esp_err_t WebServer::getFile(httpd_req_t *req)
 {
-    char filepath[FILE_PATH_MAX];
-
-    if (req->uri[strlen(req->uri) - 1] == '/') {
-        strlcat(filepath, "/index.html", sizeof(filepath));
-    } else {
-        strlcat(filepath, req->uri, sizeof(filepath));
-    }
-    int fd = open(filepath, O_RDONLY, 0);
-    if (fd == -1) {
-        ESP_LOGE(WEBSERVER_LOG_TAG, "Failed to open file : %s", filepath);
-        /* Respond with 500 Internal Server Error */
-        httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "File not found");
-        return ESP_FAIL;
-    }
-
-    auto isFileExtension = [filepath](const char *ext)->bool {
-        return strcmp(&filepath[strlen(filepath) - strlen(ext)], ext) == 0;
-    };
-
-    const char *type = "text/plain";
-    if (isFileExtension(".html")) {
-        type = "text/html";
-    } else if (isFileExtension(".js")) {
-        type = "application/javascript";
-    } else if (isFileExtension(".css")) {
-        type = "text/css";
-    } else if (isFileExtension(".png")) {
-        type = "image/png";
-    } else if (isFileExtension(".ico")) {
-        type = "image/x-icon";
-    } else if (isFileExtension(".svg")) {
-        type = "text/xml";
-    }
-    httpd_resp_set_type(req, type);
-
-    char *chunk = m_readBuffer;
-    ssize_t read_bytes;
-    do {
-        /* Read file in chunks into the scratch buffer */
-        read_bytes = read(fd, chunk, READ_BUFFER_SIZE);
-        if (read_bytes == -1) {
-            ESP_LOGE(WEBSERVER_LOG_TAG, "Failed to read file : %s", filepath);
-        } else if (read_bytes > 0) {
-            /* Send the buffer contents as HTTP response chunk */
-            if (httpd_resp_send_chunk(req, chunk, read_bytes) != ESP_OK) {
-                close(fd);
-                ESP_LOGE(WEBSERVER_LOG_TAG, "File sending failed!");
-                /* Abort sending file */
-                httpd_resp_sendstr_chunk(req, nullptr);
-                /* Respond with 500 Internal Server Error */
-                httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to send file");
-                return ESP_FAIL;
-            }
-        }
-    } while (read_bytes > 0);
-    /* Close file after sending complete */
-    close(fd);
-    ESP_LOGI(WEBSERVER_LOG_TAG, "File sending complete");
-    /* Respond with an empty chunk to signal HTTP response completion */
-    httpd_resp_send_chunk(req, nullptr, 0);
-    return ESP_OK;
+    return FileResponseHandler::handleRequest(req);
 }
 
 void WebServer::startServer()
@@ -337,7 +276,8 @@ void WebServer::registerUriHandlers()
     httpd_uri_t file_get_uri = {
             .uri = "/*",
             .method = HTTP_GET,
-            .handler = file_get_handler
+            .handler = file_get_handler,
+            .user_ctx = this
     };
     httpd_register_uri_handler(m_hdnlServer, &file_get_uri);
 }
@@ -359,7 +299,7 @@ esp_err_t WebServer::handlePost(httpd_req_t *req, const std::function<bool(cJSON
 {
     int total_len = req->content_len;
     int cur_len = 0;
-    char *buf = m_readBuffer;
+    char *buf = m_readBuffer; // FIXME refactor to use local buffer, drop m_readBuffer
     int received = 0;
     if (total_len >= READ_BUFFER_SIZE) {
         /* Respond with 500 Internal Server Error */

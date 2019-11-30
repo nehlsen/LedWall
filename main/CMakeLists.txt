@@ -9,6 +9,7 @@ set(COMPONENT_SRCS
         "LedMode/LedModeHsiboy.cpp"
         "LedMode/LedModes.cpp"
         "WebServer.cpp"
+        "WebServer/FileResponseHandler.cpp"
         "ConfigManager.cpp"
         )
 
