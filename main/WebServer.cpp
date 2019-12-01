@@ -121,7 +121,7 @@ esp_err_t WebServer::getLedModes(httpd_req_t *req)
 {
     cJSON *root = cJSON_CreateObject();
     cJSON *modeList = cJSON_AddArrayToObject(root, "modes");
-    for (int idx = 0; idx < LedModes.size(); ++idx) {
+    for (t_LedModes_size idx = 0; idx < LedModes.size(); ++idx) {
         cJSON *modeDescription = cJSON_CreateObject();
         cJSON_AddNumberToObject(modeDescription, "index", idx);
         cJSON_AddStringToObject(modeDescription, "name", LedModes.at(idx).name);

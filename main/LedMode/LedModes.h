@@ -13,5 +13,6 @@ typedef struct {
 } LedModeDef_t;
 
 extern std::vector<LedModeDef_t> LedModes;
+typedef std::vector<LedModeDef_t>::size_type t_LedModes_size;
 
 #endif //LEDWALL_LEDMODES_H
