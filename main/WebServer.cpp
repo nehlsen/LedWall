@@ -134,7 +134,9 @@ esp_err_t WebServer::getLedModes(httpd_req_t *req)
 esp_err_t WebServer::postModeOptions(httpd_req_t *req)
 {
     return handlePost(req, [=](cJSON *request, cJSON **response) -> bool {
-        return m_ledController->getLedMode()->writeOptions(request);
+        bool optionsHaveBeenSet = m_ledController->getLedMode()->writeOptions(request);
+        *response = createLedModeData();
+        return optionsHaveBeenSet;
     });
 }
 
