@@ -21,16 +21,16 @@ static const char *WEBSERVER_LOG_TAG = "WebServer";
         return server->handler(req); \
     }
 
-CREATE_FUNCTION_TO_METHOD(system_info_get_handler, getSystemInfo);
-CREATE_FUNCTION_TO_METHOD(led_power_get_handler, getLedPower);
-CREATE_FUNCTION_TO_METHOD(led_power_post_handler, postLedPower);
-CREATE_FUNCTION_TO_METHOD(led_mode_get_handler, getLedMode);
-CREATE_FUNCTION_TO_METHOD(led_mode_post_handler, postLedMode);
-CREATE_FUNCTION_TO_METHOD(led_modes_get_handler, getLedModes);
-CREATE_FUNCTION_TO_METHOD(mode_options_post_handler, postModeOptions);
-CREATE_FUNCTION_TO_METHOD(config_get_handler, getConfig);
-CREATE_FUNCTION_TO_METHOD(config_post_handler, postConfig);
-CREATE_FUNCTION_TO_METHOD(file_get_handler, getFile);
+CREATE_FUNCTION_TO_METHOD(system_info_get_handler, getSystemInfo)
+CREATE_FUNCTION_TO_METHOD(led_power_get_handler, getLedPower)
+CREATE_FUNCTION_TO_METHOD(led_power_post_handler, postLedPower)
+CREATE_FUNCTION_TO_METHOD(led_mode_get_handler, getLedMode)
+CREATE_FUNCTION_TO_METHOD(led_mode_post_handler, postLedMode)
+CREATE_FUNCTION_TO_METHOD(led_modes_get_handler, getLedModes)
+CREATE_FUNCTION_TO_METHOD(mode_options_post_handler, postModeOptions)
+CREATE_FUNCTION_TO_METHOD(config_get_handler, getConfig)
+CREATE_FUNCTION_TO_METHOD(config_post_handler, postConfig)
+CREATE_FUNCTION_TO_METHOD(file_get_handler, getFile)
 
 WebServer::WebServer(LedController *ledController, ConfigManager *configManager) :
     m_ledController(ledController),
