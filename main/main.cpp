@@ -5,12 +5,17 @@
 #include "esp_event.h"
 #include "tcpip_adapter.h"
 #include "esp_log.h"
-
 #include "wifi_connector.h"
 #include "LedController.h"
-#include "mqtt.h"
-#include "WebServer.h"
 #include "ConfigManager.h"
+
+#ifdef FEATURE_REST
+#include "WebServer.h"
+#endif
+
+#ifdef FEATURE_MQTT
+#include "mqtt.h"
+#endif
 
 static const char *APP_LOG_TAG = "LED_WALL";
 
@@ -89,13 +94,19 @@ void app_main()
     ESP_ERROR_CHECK(wifi_connector_start());
     ESP_ERROR_CHECK(init_fs());
 
-    ConfigManager *cfg = new ConfigManager;
+    auto *cfg = new ConfigManager;
     cfg->open();
-    LedController *controller = new LedController(cfg);
+    auto *controller = new LedController(cfg);
+
+    #ifdef FEATURE_MQTT
     mqtt_app_start(controller);
+    #endif
+
+    #ifdef FEATURE_REST
     // TODO the example creates (starts) the server once wifi is ready, stops and restarts on re-connects
-    WebServer *server = new WebServer(controller, cfg);
+    auto *server = new WebServer(controller, cfg);
     server->startServer();
+    #endif
 }
 
 #ifdef __cplusplus
