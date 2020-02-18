@@ -4,6 +4,8 @@ Drive a Matrix of WS2812 LEDs using the ESP32 as controller.
 
 There are a lot of Projects out there doing almost the same. The target of this Project however was to fully use the ESP32-IDF (and not some Arduino _bridges_/_ports_) and learn to use it.
 
+See companion at https://github.com/nehlsen/LedWall-Grafitti
+
 Features working so far
 - Connect to Wifi
 - Connect to MQTT Broker
@@ -23,7 +25,7 @@ Planned features / Wishlist
 - Presence detection using BT-LE
 
 Dependencies
-- ESP-IDF v4.1-dev-369-g4dac7c7df
+- ESP-IDF v4.1-dev-1086-g93a8603c5
 
 Used Hardware
 - ESP32 (https://www.aliexpress.com/item/33040503442.html)
