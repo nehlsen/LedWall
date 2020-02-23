@@ -43,21 +43,33 @@ static void initialise_mdns()
 
 esp_err_t init_fs(void)
 {
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_LOGW(APP_LOG_TAG, "NVS: No Free Pages or new NVS Version. Erasing and retrying...");
+        ret = nvs_flash_erase();
+        ret |= nvs_flash_init();
+    }
+    if (ret != ESP_OK) {
+        ESP_LOGE(APP_LOG_TAG, "NVS: Failed to initialize NVS");
+        return ret;
+    }
+    ESP_LOGI(APP_LOG_TAG, "NVS: Init complete");
+
     esp_vfs_spiffs_conf_t conf = {
             .base_path = "",
             .partition_label = nullptr,
             .max_files = 5,
             .format_if_mount_failed = false
     };
-    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+    ret = esp_vfs_spiffs_register(&conf);
 
     if (ret != ESP_OK) {
         if (ret == ESP_FAIL) {
-            ESP_LOGE(APP_LOG_TAG, "Failed to mount or format filesystem");
+            ESP_LOGE(APP_LOG_TAG, "SPIFFS: Failed to mount or format filesystem");
         } else if (ret == ESP_ERR_NOT_FOUND) {
-            ESP_LOGE(APP_LOG_TAG, "Failed to find SPIFFS partition");
+            ESP_LOGE(APP_LOG_TAG, "SPIFFS: Failed to find SPIFFS partition");
         } else {
-            ESP_LOGE(APP_LOG_TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+            ESP_LOGE(APP_LOG_TAG, "SPIFFS: Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
         }
         return ESP_FAIL;
     }
@@ -65,9 +77,9 @@ esp_err_t init_fs(void)
     size_t total = 0, used = 0;
     ret = esp_spiffs_info(nullptr, &total, &used);
     if (ret != ESP_OK) {
-        ESP_LOGE(APP_LOG_TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
+        ESP_LOGE(APP_LOG_TAG, "SPIFFS: Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
     } else {
-        ESP_LOGI(APP_LOG_TAG, "Partition size: total: %d, used: %d", total, used);
+        ESP_LOGI(APP_LOG_TAG, "SPIFFS: Partition size: total: %d, used: %d", total, used);
     }
     return ESP_OK;
 }
@@ -87,12 +99,11 @@ void app_main()
     esp_log_level_set("TRANSPORT", ESP_LOG_VERBOSE);
     esp_log_level_set("OUTBOX", ESP_LOG_VERBOSE);
 
-    ESP_ERROR_CHECK(nvs_flash_init());
+    ESP_ERROR_CHECK(init_fs());
     tcpip_adapter_init();
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     initialise_mdns();
     ESP_ERROR_CHECK(wifi_connector_start());
-    ESP_ERROR_CHECK(init_fs());
 
     auto *cfg = new ConfigManager;
     cfg->open();
