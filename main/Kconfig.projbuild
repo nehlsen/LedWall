@@ -1,18 +1,4 @@
 menu "LedWall Configuration"
-
-    config WIFI_SSID
-        string "WiFi SSID"
-        default "myssid"
-        help
-            SSID (network name) to connect to.
-
-    config WIFI_PASSWORD
-        string "WiFi Password"
-        default "mypassword"
-        help
-            WiFi password (WPA or WPA2) to use.
-            Can be left blank if the network has no security set.
-
     config PROVISION_POP
         string "Proof-of-Possession"
         default "abcd1234"
@@ -46,5 +32,4 @@ menu "LedWall Configuration"
     config NUM_LEDS
         int "Number of LEDs"
         default 16
-
 endmenu

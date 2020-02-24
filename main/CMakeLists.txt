@@ -1,6 +1,5 @@
 set(COMPONENT_SRCS
         "main.cpp"
-        "wifi_connector.c"
         "wifi_provisioning.c"
         "LedController.cpp"
         "LedMode/LedMode.cpp"
