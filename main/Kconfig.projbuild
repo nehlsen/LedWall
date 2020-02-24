@@ -13,6 +13,12 @@ menu "LedWall Configuration"
             WiFi password (WPA or WPA2) to use.
             Can be left blank if the network has no security set.
 
+    config PROVISION_POP
+        string "Proof-of-Possession"
+        default "abcd1234"
+        help
+            Auto provisioning Proof-of-Possession
+
     config MDNS_HOSTNAME
         string "mDNS Hostname"
         default "ledwall"

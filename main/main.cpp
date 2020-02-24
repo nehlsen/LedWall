@@ -5,7 +5,7 @@
 #include "esp_event.h"
 #include "tcpip_adapter.h"
 #include "esp_log.h"
-#include "wifi_connector.h"
+#include "wifi_provisioning.h"
 #include "LedController.h"
 #include "ConfigManager.h"
 
@@ -105,7 +105,7 @@ void app_main()
     tcpip_adapter_init();
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     initialise_mdns();
-    ESP_ERROR_CHECK(wifi_connector_start());
+    ESP_ERROR_CHECK(wifi_provisioning_start()); // asnync / non-blocking! The old wifi WAS blocking!
 
     auto *cfg = new ConfigManager;
     cfg->open();
@@ -120,6 +120,8 @@ void app_main()
     auto *server = new WebServer(controller, cfg);
     server->startServer();
     #endif
+
+//    FIXME factory reset using push button required - could be solved using ESP IDF config
 }
 
 #ifdef __cplusplus
