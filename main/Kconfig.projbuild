@@ -19,6 +19,14 @@ menu "LedWall Configuration"
         help
             Hostname to advertise via mDNS
 
+    config ENABLE_MQTT
+        bool "Enable MQTT Interface"
+        default false
+
+    config ENABLE_REST
+        bool "Enable http/REST Interface"
+        default false
+
     config BROKER_URL
         string "MQTT Broker URL"
         default "mqtt://iot.eclipse.org"

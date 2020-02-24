@@ -9,11 +9,13 @@
 #include "LedController.h"
 #include "ConfigManager.h"
 
-#ifdef FEATURE_REST
+#ifdef CONFIG_ENABLE_REST
+#pragma message "REST enabled"
 #include "WebServer.h"
 #endif
 
-#ifdef FEATURE_MQTT
+#ifdef CONFIG_ENABLE_MQTT
+#pragma message "MQTT enabled"
 #include "mqtt.h"
 #endif
 
@@ -109,11 +111,11 @@ void app_main()
     cfg->open();
     auto *controller = new LedController(cfg);
 
-    #ifdef FEATURE_MQTT
+    #ifdef CONFIG_ENABLE_MQTT
     mqtt_app_start(controller);
     #endif
 
-    #ifdef FEATURE_REST
+    #ifdef CONFIG_ENABLE_REST
     // TODO the example creates (starts) the server once wifi is ready, stops and restarts on re-connects
     auto *server = new WebServer(controller, cfg);
     server->startServer();
