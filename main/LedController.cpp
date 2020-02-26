@@ -1,3 +1,7 @@
+/**
+ * XY Code and safety pixel code from
+ * https://github.com/FastLED/FastLED/blob/master/examples/XYMatrix/XYMatrix.ino
+ */
 #include "LedController.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/event_groups.h>
@@ -12,7 +16,10 @@ static const char *LED_CONTROLLER_LOG_TAG = "LED_CONTROLLER";
 static TaskHandle_t led_update_task_hdnl;
 static EventGroupHandle_t led_update_task_event_group;
 
-CRGB leds[CONFIG_NUM_LEDS];
+#define CONFIG_NUM_LEDS (CONFIG_NUM_LEDS_HORIZONTAL * CONFIG_NUM_LEDS_VERTICAL)
+
+CRGB leds_plus_safety_pixel[CONFIG_NUM_LEDS + 1];
+CRGB* const leds(leds_plus_safety_pixel + 1);
 
 void led_update_task(void *pvParameter)
 {
@@ -139,5 +146,6 @@ void LedController::setLedUpdateTaskEnabled(bool enabled)
 
 void LedController::turnAllLedsOff()
 {
-    FastLED.showColor(CRGB::Black);
+//    FastLED.showColor(CRGB::Black);
+    FastLED.clear(true);
 }

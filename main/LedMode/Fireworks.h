@@ -1,7 +1,6 @@
 #ifndef LEDWALL_FIREWORKS_H
 #define LEDWALL_FIREWORKS_H
 
-#include "FastLED.h"
 #include "LedMode.h"
 
 class Fireworks: public LedMode

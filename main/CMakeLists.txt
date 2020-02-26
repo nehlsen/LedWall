@@ -8,6 +8,7 @@ set(COMPONENT_SRCS
         "LedMode/LedModeHsiboy.cpp"
         "LedMode/LedModes.cpp"
         "LedMode/Fireworks.cpp"
+        "LedMode/Bars.cpp"
         "ConfigManager.cpp"
         )
 

@@ -1,7 +1,8 @@
 #ifndef LEDWALL_LEDMODE_H
 #define LEDWALL_LEDMODE_H
 
-class CRGB;
+#include "FastLED.h"
+
 class cJSON;
 
 class LedMode
@@ -18,6 +19,8 @@ public:
     virtual bool writeOptions(cJSON *root);
 
 protected:
+    static uint16_t XY( uint8_t x, uint8_t y);
+
     CRGB *m_leds;
     int m_ledCount;
 };
