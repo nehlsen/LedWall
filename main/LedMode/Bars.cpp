@@ -56,8 +56,11 @@ void Bars::draw()
         case DrawHorizontal:
             drawHorizontalBar(m_lastBarAt);
             break;
-        case DrawDiagonal:
-            drawDiagonalBar(m_lastBarAt);
+        case DrawDiagonalBl:
+            drawDiagonalBarBl(m_lastBarAt);
+            break;
+        case DrawDiagonalBr:
+            drawDiagonalBarBr(m_lastBarAt);
             break;
     }
 }
@@ -75,11 +78,17 @@ void Bars::advanceDrawMode()
             break;
         case DrawHorizontal:
             if (m_lastBarAt >= CONFIG_NUM_LEDS_VERTICAL) {
-                m_drawMode = DrawDiagonal;
+                m_drawMode = DrawDiagonalBl;
                 m_lastBarAt = 0;
             }
             break;
-        case DrawDiagonal:
+        case DrawDiagonalBl:
+            if (m_lastBarAt >= CONFIG_NUM_LEDS_HORIZONTAL + CONFIG_NUM_LEDS_VERTICAL - 1) {
+                m_drawMode = DrawDiagonalBr;
+                m_lastBarAt = 0;
+            }
+            break;
+        case DrawDiagonalBr:
             if (m_lastBarAt >= CONFIG_NUM_LEDS_HORIZONTAL + CONFIG_NUM_LEDS_VERTICAL - 1) {
                 m_drawMode = DrawVertical;
                 m_lastBarAt = 0;
@@ -106,11 +115,20 @@ void Bars::drawHorizontalBar(uint8_t y)
     }
 }
 
-void Bars::drawDiagonalBar(uint8_t frame)
+void Bars::drawDiagonalBarBl(uint8_t frame)
 {
     uint8_t randomHue = random8();
 
     for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
-        m_leds[XY(frame-y, y)].setHSV(randomHue, 255, 255);
+        m_leds[XY(frame - y, y)].setHSV(randomHue, 255, 255);
+    }
+}
+
+void Bars::drawDiagonalBarBr(uint8_t frame)
+{
+    uint8_t randomHue = random8();
+
+    for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
+        m_leds[XY(CONFIG_NUM_LEDS_HORIZONTAL - frame - 1 + y, y)].setHSV(randomHue, 255, 255);
     }
 }
