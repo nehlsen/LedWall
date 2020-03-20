@@ -5,7 +5,7 @@
 
 #include "LedMode.h"
 
-typedef LedMode* (LedModeFactory)(CRGB *leds, int ledCount);
+typedef LedMode* (LedModeFactory)();
 
 typedef struct {
     const char name[16];

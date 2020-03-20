@@ -1,16 +1,12 @@
 #include "Bars.h"
+#include "utilities.h"
 
 #include <cJSON.h>
 
-uint16_t map(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max)
-{
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
 void Bars::update()
 {
-    for (int i = 0; i < m_ledCount; i++) {
-        m_leds[i].nscale8(m_fadeRate);
+    for (int i = 0; i < FastLED.size(); i++) {
+        FastLED.leds()[i].nscale8(m_fadeRate);
     }
 
     uint16_t delay = map(m_barsRate, 0, 255, 0, 1000);
@@ -102,7 +98,7 @@ void Bars::drawVerticalBar(uint8_t x)
     uint8_t randomHue = random8();
 
     for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
-        m_leds[XY(x, y)].setHSV(randomHue, 255, 255);
+        FastLED.leds()[xyToIndex(x, y)].setHSV(randomHue, 255, 255);
     }
 }
 
@@ -111,7 +107,7 @@ void Bars::drawHorizontalBar(uint8_t y)
     uint8_t randomHue = random8();
 
     for (uint8_t x = 0; x < CONFIG_NUM_LEDS_HORIZONTAL; ++x) {
-        m_leds[XY(x, y)].setHSV(randomHue, 255, 255);
+        FastLED.leds()[xyToIndex(x, y)].setHSV(randomHue, 255, 255);
     }
 }
 
@@ -120,7 +116,7 @@ void Bars::drawDiagonalBarBl(uint8_t frame)
     uint8_t randomHue = random8();
 
     for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
-        m_leds[XY(frame - y, y)].setHSV(randomHue, 255, 255);
+        FastLED.leds()[xyToIndex(frame - y, y)].setHSV(randomHue, 255, 255);
     }
 }
 
@@ -129,6 +125,6 @@ void Bars::drawDiagonalBarBr(uint8_t frame)
     uint8_t randomHue = random8();
 
     for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
-        m_leds[XY(CONFIG_NUM_LEDS_HORIZONTAL - frame - 1 + y, y)].setHSV(randomHue, 255, 255);
+        FastLED.leds()[xyToIndex(CONFIG_NUM_LEDS_HORIZONTAL - frame - 1 + y, y)].setHSV(randomHue, 255, 255);
     }
 }

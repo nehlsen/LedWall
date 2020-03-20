@@ -8,8 +8,8 @@ void Fireworks::update()
     uint8_t randomHue = random8();
     uint16_t randomLed = random16(); // not really the LED but a control value to choose a LED
 
-    for (int i = 0; i < m_ledCount; i++) {
-        m_leds[i].nscale8(m_fadeRate);
+    for (int i = 0; i < FastLED.size(); i++) {
+        FastLED.leds()[i].nscale8(m_fadeRate);
     }
 
     if (randomLed < (MAX_INT_VALUE / (256 - (constrain(m_sparkRate, 1, 256))))) {

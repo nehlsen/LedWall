@@ -133,7 +133,7 @@ void LedModeHsiboy::Bounce(uint16_t frame, uint8_t hue)
         pos16 = MAX_INT_VALUE - ((frame - (MAX_INT_VALUE/2))*2);
     }
 
-    int position = map(pos16, 0, MAX_INT_VALUE, 0, ((m_ledCount) * 16));
+    int position = map(pos16, 0, MAX_INT_VALUE, 0, ((FastLED.size()) * 16));
     drawFractionalBar(position, 3, hue,0);
 }
 
@@ -143,7 +143,7 @@ void LedModeHsiboy::Bounce(uint16_t frame, uint8_t hue)
 //*****************************************************
 void LedModeHsiboy::Ring(uint16_t frame, uint8_t hue)
 {
-    int pos16 = map(frame, 0, MAX_INT_VALUE, 0, ((m_ledCount) * 16));
+    int pos16 = map(frame, 0, MAX_INT_VALUE, 0, ((FastLED.size()) * 16));
     drawFractionalBar(pos16, 3, hue,1);
 }
 
@@ -158,13 +158,13 @@ void LedModeHsiboy::Wave(uint16_t frame, uint8_t hue)
     FastLED.clear();
     float deg;
     float value;
-    for (uint8_t i=0; i < m_ledCount; i++) {
-        deg = float(frame + ((MAX_INT_VALUE/m_ledCount)*i)) / (float(MAX_INT_VALUE)) * 360.0;
+    for (uint8_t i=0; i < FastLED.size(); i++) {
+        deg = float(frame + ((MAX_INT_VALUE/FastLED.size())*i)) / (float(MAX_INT_VALUE)) * 360.0;
         value = pow(sin(radians(deg)),8);    //Squeeeeeeze
 
         //Chop sine wave (no negative values)
         if (value >= 0) {
-            m_leds[i] += CHSV(hue, 255, value*256);
+            FastLED.leds()[i] += CHSV(hue, 255, value*256);
         }
     }
 }
@@ -179,10 +179,10 @@ void LedModeHsiboy::WaveInt(uint16_t frame, uint8_t hue)
 {
     FastLED.clear();
     uint8_t value;
-    for(uint8_t i=0; i<m_ledCount; i++) {
-        value = (sin16(frame+((MAX_INT_VALUE/m_ledCount)*i)) + (MAX_INT_VALUE/2))/256;
+    for(uint8_t i=0; i<FastLED.size(); i++) {
+        value = (sin16(frame+((MAX_INT_VALUE/FastLED.size())*i)) + (MAX_INT_VALUE/2))/256;
         if (value >= 0) {
-            m_leds[i] += CHSV(hue,255,value);
+            FastLED.leds()[i] += CHSV(hue,255,value);
         }
     }
 }
@@ -199,12 +199,12 @@ void LedModeHsiboy::Spark(uint8_t fade, uint8_t hue)
 {
     uint16_t rand = random16();
 
-    for (int i=0; i<m_ledCount; i++) {
-        m_leds[i].nscale8(fade);
+    for (int i=0; i<FastLED.size(); i++) {
+        FastLED.leds()[i].nscale8(fade);
     }
 
     if (rand < (MAX_INT_VALUE / (256 - (constrain(m_animateSpeed,1,256))))) {
-        m_leds[rand % m_ledCount].setHSV(hue,255,255);
+        FastLED.leds()[rand % FastLED.size()].setHSV(hue,255,255);
     }
 }
 
@@ -220,12 +220,12 @@ void LedModeHsiboy::Spark(uint8_t fade)
 {
     uint16_t rand = random16();
 
-    for (int i=0; i<m_ledCount; i++) {
-        m_leds[i].nscale8(fade);
+    for (int i=0; i<FastLED.size(); i++) {
+        FastLED.leds()[i].nscale8(fade);
     }
 
     if (rand < (MAX_INT_VALUE / (256 - (constrain(m_animateSpeed,1,255))))) {
-        m_leds[rand % m_ledCount].setHSV(0,0,255);
+        FastLED.leds()[rand % FastLED.size()].setHSV(0,0,255);
     }
 }
 
@@ -252,9 +252,9 @@ void LedModeHsiboy::drawFractionalBar(int pos16, int width, uint8_t hue, bool wr
             bright = 255;
         }
 
-        m_leds[i] += CHSV(hue, 255, bright );
+        FastLED.leds()[i] += CHSV(hue, 255, bright );
         i++;
-        if (i == m_ledCount) {
+        if (i == FastLED.size()) {
             if (wrap == 1) {
                 i = 0; // wrap around
             } else {

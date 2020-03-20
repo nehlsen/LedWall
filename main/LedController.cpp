@@ -95,7 +95,7 @@ bool LedController::setModeIndex(int modeIndex)
     }
 
     ESP_LOGI(LED_CONTROLLER_LOG_TAG, "setModeIndex: going to create mode:\"%s\"", LedModes.at(modeIndex).name);
-    LedMode *newMode = LedModes.at(modeIndex).factory(leds, CONFIG_NUM_LEDS);
+    LedMode *newMode = LedModes.at(modeIndex).factory();
 
     turnAllLedsOff();
     m_modeIndex = modeIndex;

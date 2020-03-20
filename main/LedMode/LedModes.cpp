@@ -6,11 +6,12 @@
 #include "LedModeSample.h"
 #include "LedModeHsiboy.h"
 
-LedMode *createModeStatus(CRGB *leds, int ledCount) { return new LedModeStatus(leds, ledCount); }
-LedMode *createModeBars(CRGB *leds, int ledCount) { return new Bars(leds, ledCount); }
-LedMode *createModeFireworks(CRGB *leds, int ledCount) { return new Fireworks(leds, ledCount); }
-LedMode *createModeSample(CRGB *leds, int ledCount) { return new LedModeSample(leds, ledCount); }
-LedMode *createModeHsiboy(CRGB *leds, int ledCount) { return new LedModeHsiboy(leds, ledCount); }
+LedMode *createModeStatus() { return new LedModeStatus(); }
+LedMode *createModeBars() { return new Bars(); }
+LedMode *createModeMultiBars() { return new MultiBars(); }
+LedMode *createModeFireworks() { return new Fireworks(); }
+LedMode *createModeSample() { return new LedModeSample(); }
+LedMode *createModeHsiboy() { return new LedModeHsiboy(); }
 
 LedModeDef_t modeStatusDef {"Status", &createModeStatus};
 LedModeDef_t modeBarsDef {"Bars", &createModeBars};

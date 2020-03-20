@@ -33,8 +33,8 @@ void LedModeSample::update()
     static uint8_t startIndex = 0;
     startIndex = startIndex + 1; /* motion speed */
 
-    for( int i = 0; i < m_ledCount; i++) {
-        m_leds[i] = ColorFromPalette(m_currentPalette, startIndex, 64, m_currentBlending);
+    for( int i = 0; i < FastLED.size(); i++) {
+        FastLED.leds()[i] = ColorFromPalette(m_currentPalette, startIndex, 64, m_currentBlending);
         startIndex += 3;
     }
 }

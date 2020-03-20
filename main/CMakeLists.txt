@@ -1,15 +1,19 @@
 set(COMPONENT_SRCS
         "main.cpp"
         "wifi_provisioning.c"
+        "ConfigManager.cpp"
+
         "LedController.cpp"
         "LedMode/LedMode.cpp"
+        "LedMode/LedModes.cpp"
+        "LedMode/utilities.c"
+
         "LedMode/LedModeStatus.cpp"
         "LedMode/LedModeSample.cpp"
         "LedMode/LedModeHsiboy.cpp"
-        "LedMode/LedModes.cpp"
         "LedMode/Fireworks.cpp"
         "LedMode/Bars.cpp"
-        "ConfigManager.cpp"
+        "LedMode/MultiBars.cpp"
         )
 
 if(CONFIG_ENABLE_REST)

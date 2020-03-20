@@ -8,6 +8,6 @@ void LedModeStatus::update()
     if(m_lastUpdate != currentSeconds) {
         m_lastUpdate = currentSeconds;
 
-        m_leds[0] = currentSeconds % 2 ? CRGB::Red : CRGB::Green;
+        FastLED.leds()[0] = currentSeconds % 2 ? CRGB::Red : CRGB::Green;
     }
 }
