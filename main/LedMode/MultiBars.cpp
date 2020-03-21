@@ -2,7 +2,6 @@
 #include "utilities.h"
 
 // delay new bars
-// make bars have a static color
 
 MultiBars::MultiBars()
 {
@@ -36,7 +35,7 @@ void MultiBars::update()
 void MultiBars::initBars()
 {
     for (int i = 0; i < NUMBER_OF_SIMULTANEOUS_BARS; ++i) {
-        m_bars[i] = new Bar(randomDrawMode(), randomDrawDirection());
+        m_bars[i] = new Bar(randomDrawMode(), randomDrawDirection(), m_barKeepsColor, m_blendColor);
     }
 }
 
@@ -50,12 +49,12 @@ MultiBars::Bar* MultiBars::createRandomBar()
 
         for (auto &bar : m_bars) {
             if (bar->mode != mode || bar->direction != direction) {
-                return new Bar(mode, direction);
+                return new Bar(mode, direction, m_barKeepsColor, m_blendColor);
             }
         }
 
         if (++breakCounter > 15) {
-            return new Bar(Bar::DrawVertical, Bar::DirectionForward);
+            return new Bar(Bar::DrawVertical, Bar::DirectionForward, m_barKeepsColor, m_blendColor);
         }
     }
 }
@@ -72,8 +71,9 @@ MultiBars::Bar::DrawDirection MultiBars::randomDrawDirection() const
 
 /* ******************************  ******************************  ******************************  ****************************** */
 
-MultiBars::Bar::Bar(MultiBars::Bar::DrawMode drawMode, MultiBars::Bar::DrawDirection drawDirection):
-    mode(drawMode), direction(drawDirection), currentFrame(0)
+MultiBars::Bar::Bar(MultiBars::Bar::DrawMode drawMode, MultiBars::Bar::DrawDirection drawDirection, bool constColor, bool blend):
+    mode(drawMode), direction(drawDirection), constantColor(constColor), blendColor(blend),
+    currentFrame(0), hue(random8())
 {
 //    ESP_LOGI("Bar", "New Bar mode:%d, direction: %d", mode, direction);
 }
@@ -128,80 +128,67 @@ void MultiBars::Bar::drawFrame()
 
 void MultiBars::Bar::drawVerticalBar(uint8_t x)
 {
-    uint8_t randomHue = random8();
-
-    auto draw = [x, randomHue](uint8_t y) {
-        FastLED.leds()[xyToIndex(x, y)].setHSV(randomHue, 255, 255);
-    };
-
     if (direction == DirectionForward) {
         for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
-            draw(y);
+            draw(x, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
         for (int8_t y = CONFIG_NUM_LEDS_VERTICAL-1; y >= 0; --y) {
-            draw(y);
+            draw(x, y);
         }
     }
 }
 
 void MultiBars::Bar::drawHorizontalBar(uint8_t y)
 {
-    uint8_t randomHue = random8();
-
-    auto draw = [y, randomHue](uint8_t x) {
-        FastLED.leds()[xyToIndex(x, y)].setHSV(randomHue, 255, 255);
-    };
-
     if (direction == DirectionForward) {
         for (uint8_t x = 0; x < CONFIG_NUM_LEDS_HORIZONTAL; ++x) {
-            draw(x);
+            draw(x, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
         for (int8_t x = CONFIG_NUM_LEDS_HORIZONTAL-1; x >= 0; --x) {
-            draw(x);
+            draw(x, y);
         }
     }
 }
 
 void MultiBars::Bar::drawDiagonalBarBl(uint8_t frame)
 {
-    uint8_t randomHue = random8();
-
-    auto draw = [frame, randomHue](uint8_t y) {
-        FastLED.leds()[xyToIndex(frame - y, y)].setHSV(randomHue, 255, 255);
-    };
-
     if (direction == DirectionForward) {
         for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
-            draw(y);
+            draw(frame - y, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
         for (int8_t y = CONFIG_NUM_LEDS_VERTICAL-1; y >= 0; --y) {
-            draw(y);
+            draw(frame - y, y);
         }
     }
 }
 
 void MultiBars::Bar::drawDiagonalBarBr(uint8_t frame)
 {
-    uint8_t randomHue = random8();
-
-    auto draw = [frame, randomHue](uint8_t y) {
-        FastLED.leds()[xyToIndex(CONFIG_NUM_LEDS_HORIZONTAL - frame - 1 + y, y)].setHSV(randomHue, 255, 255);
-    };
-
     if (direction == DirectionForward) {
         for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
-            draw(y);
+            draw(CONFIG_NUM_LEDS_HORIZONTAL - frame - 1 + y, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
         for (int8_t y = CONFIG_NUM_LEDS_VERTICAL-1; y >= 0; --y) {
-            draw(y);
+            draw(CONFIG_NUM_LEDS_HORIZONTAL - frame - 1 + y, y);
         }
+    }
+}
+
+void MultiBars::Bar::draw(uint8_t x, uint8_t y)
+{
+    auto color = CHSV(constantColor ? hue : random8(), 255, 255);
+
+    if (blendColor) {
+        FastLED.leds()[xyToIndex(x, y)] += color;
+    } else {
+        FastLED.leds()[xyToIndex(x, y)] = color;
     }
 }
