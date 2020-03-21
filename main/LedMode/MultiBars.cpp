@@ -49,7 +49,7 @@ MultiBars::Bar* MultiBars::createRandomBar()
 
         for (auto &bar : m_bars) {
             if (bar->mode != mode || bar->direction != direction) {
-                return new Bar(mode, direction, m_barKeepsColor, m_blendColor);
+                return new Bar(mode, direction, m_barKeepsColor, m_blendColor, random8(m_maximumFrameDelay));
             }
         }
 
@@ -71,15 +71,19 @@ MultiBars::Bar::DrawDirection MultiBars::randomDrawDirection() const
 
 /* ******************************  ******************************  ******************************  ****************************** */
 
-MultiBars::Bar::Bar(MultiBars::Bar::DrawMode drawMode, MultiBars::Bar::DrawDirection drawDirection, bool constColor, bool blend):
+MultiBars::Bar::Bar(MultiBars::Bar::DrawMode drawMode, MultiBars::Bar::DrawDirection drawDirection, bool constColor, bool blend, uint8_t emptyFrames):
     mode(drawMode), direction(drawDirection), constantColor(constColor), blendColor(blend),
-    currentFrame(0), hue(random8())
+    currentFrame(-1 * emptyFrames), hue(random8())
 {
-//    ESP_LOGI("Bar", "New Bar mode:%d, direction: %d", mode, direction);
+//    ESP_LOGI("Bar", "New Bar mode:%d, direction: %d, constColor: %d, blend: %d, emptyFrames: %d", mode, direction, constantColor, blendColor, emptyFrames);
 }
 
 bool MultiBars::Bar::canDrawFrame() const
 {
+    if (currentFrame < 0) {
+        return true;
+    }
+
     switch (mode) {
         case DrawVertical:
             return currentFrame < CONFIG_NUM_LEDS_HORIZONTAL;
@@ -88,7 +92,7 @@ bool MultiBars::Bar::canDrawFrame() const
 
         case DrawDiagonalBl:
         case DrawDiagonalBr:
-            return currentFrame < CONFIG_NUM_LEDS_HORIZONTAL + CONFIG_NUM_LEDS_VERTICAL - 1;
+            return currentFrame < CONFIG_NUM_LEDS_HORIZONTAL + CONFIG_NUM_LEDS_VERTICAL;
 
         default:
         case DrawModeCount:
@@ -100,6 +104,11 @@ bool MultiBars::Bar::canDrawFrame() const
 
 void MultiBars::Bar::drawFrame()
 {
+    if (currentFrame < 0) {
+        ++currentFrame;
+        return;
+    }
+
     if (!canDrawFrame()) {
         return;
     }
@@ -112,10 +121,10 @@ void MultiBars::Bar::drawFrame()
             drawHorizontalBar(direction == DirectionForward ? currentFrame : CONFIG_NUM_LEDS_VERTICAL - currentFrame - 1);
             break;
         case DrawDiagonalBl:
-            drawDiagonalBarBl(direction == DirectionForward ? currentFrame : CONFIG_NUM_LEDS_HORIZONTAL - currentFrame - 1);
+            drawDiagonalBarBl(direction == DirectionForward ? currentFrame : CONFIG_NUM_LEDS_HORIZONTAL + CONFIG_NUM_LEDS_VERTICAL - currentFrame - 1);
             break;
         case DrawDiagonalBr:
-            drawDiagonalBarBr(direction == DirectionForward ? currentFrame : CONFIG_NUM_LEDS_HORIZONTAL - currentFrame - 1);
+            drawDiagonalBarBr(direction == DirectionForward ? currentFrame : CONFIG_NUM_LEDS_HORIZONTAL + CONFIG_NUM_LEDS_VERTICAL - currentFrame - 1);
             break;
 
         default:

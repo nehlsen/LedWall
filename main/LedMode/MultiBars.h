@@ -4,6 +4,7 @@
 #include "LedMode.h"
 
 #define NUMBER_OF_SIMULTANEOUS_BARS 2
+#define MAX_FRAME_DELAY (CONFIG_NUM_LEDS_VERTICAL > CONFIG_NUM_LEDS_HORIZONTAL ? CONFIG_NUM_LEDS_VERTICAL : CONFIG_NUM_LEDS_HORIZONTAL)
 
 class MultiBars: public LedMode
 {
@@ -19,6 +20,7 @@ public:
 protected:
     uint8_t m_fadeRate = 200; // how fast to fade: 1-fast, 256-slow
     uint8_t m_barsRate = 60; // how many bars? 1-lots, 255-few
+    uint8_t m_maximumFrameDelay = MAX_FRAME_DELAY; // maximum frames to delay a new bar? 0-no pause, 5-up to 5 empty frames, ...
     bool m_barKeepsColor = true; // whether bars keep their color while moving or random color each frame
     bool m_blendColor = true; // whether each pixel blends or replaces current color
 
@@ -40,14 +42,14 @@ protected:
             DrawDirectionCount
         };
 
-        Bar(DrawMode drawMode, DrawDirection drawDirection, bool constantColor, bool blendColor);
+        Bar(DrawMode drawMode, DrawDirection drawDirection, bool constantColor, bool blendColor, uint8_t emptyFrames = 0);
 
         const DrawMode mode;
         const DrawDirection direction;
         const bool constantColor;
         const bool blendColor;
 
-        uint8_t currentFrame;
+        int8_t currentFrame;
         uint8_t hue;
 
         bool canDrawFrame() const;
