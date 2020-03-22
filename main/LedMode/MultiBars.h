@@ -1,10 +1,10 @@
 #ifndef LEDWALL_MULTI_BARS_H
 #define LEDWALL_MULTI_BARS_H
 
+#include <vector>
 #include "LedMode.h"
 
-#define NUMBER_OF_SIMULTANEOUS_BARS 2
-#define MAX_FRAME_DELAY (CONFIG_NUM_LEDS_VERTICAL > CONFIG_NUM_LEDS_HORIZONTAL ? CONFIG_NUM_LEDS_VERTICAL : CONFIG_NUM_LEDS_HORIZONTAL)
+#define DEFAULT_MAX_FRAME_DELAY (CONFIG_NUM_LEDS_VERTICAL > CONFIG_NUM_LEDS_HORIZONTAL ? CONFIG_NUM_LEDS_VERTICAL : CONFIG_NUM_LEDS_HORIZONTAL)
 
 class MultiBars: public LedMode
 {
@@ -13,14 +13,14 @@ public:
 
     void update() override;
 
-//    void readOptions(cJSON *root) override;
-
-//    bool writeOptions(cJSON *root) override;
+    void readOptions(cJSON *root) override;
+    bool writeOptions(cJSON *root) override;
 
 protected:
     uint8_t m_fadeRate = 200; // how fast to fade: 1-fast, 256-slow
-    uint8_t m_barsRate = 60; // how many bars? 1-lots, 255-few
-    uint8_t m_maximumFrameDelay = MAX_FRAME_DELAY; // maximum frames to delay a new bar? 0-no pause, 5-up to 5 empty frames, ...
+    uint8_t m_barTravelSpeed = 195; // how fast bars travel? 1-slow, 255-fast
+    uint8_t m_numberOfBars = 2; // absolute number of parallel bars
+    uint8_t m_maximumFrameDelay = DEFAULT_MAX_FRAME_DELAY; // maximum frames to delay a new bar? 0-no pause, 5-up to 5 empty frames, ...
     bool m_barKeepsColor = true; // whether bars keep their color while moving or random color each frame
     bool m_blendColor = true; // whether each pixel blends or replaces current color
 
@@ -62,8 +62,9 @@ protected:
         void draw(uint8_t x, uint8_t y);
     };
 
-    Bar* m_bars[NUMBER_OF_SIMULTANEOUS_BARS];
+    std::vector<Bar*> m_bars;
     void initBars();
+    void setNumberOfBars(uint8_t count);
 
     // semi random - already running config will be prevented
     Bar *createRandomBar();
