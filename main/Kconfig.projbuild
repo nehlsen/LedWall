@@ -29,17 +29,4 @@ menu "LedWall Configuration"
         int "Data PIN the LEDs are attached to"
         default 26
 
-    config NUM_LEDS_HORIZONTAL
-        int "Number of horizontal LEDs"
-        default 4
-
-    config NUM_LEDS_VERTICAL
-        int "Number of vertical LEDs"
-        default 4
-
-    config MATRIX_SERPENTINE_LAYOUT
-        bool "Matrix Serpentine Layout"
-        default true
-        help
-            Whether all pixels are laid out all running the same way or back-and-forth (serpentine mode)
 endmenu

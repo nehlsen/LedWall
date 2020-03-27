@@ -16,11 +16,6 @@ static const char *LED_CONTROLLER_LOG_TAG = "LED_CONTROLLER";
 static TaskHandle_t led_update_task_hdnl;
 static EventGroupHandle_t led_update_task_event_group;
 
-#define CONFIG_NUM_LEDS (CONFIG_NUM_LEDS_HORIZONTAL * CONFIG_NUM_LEDS_VERTICAL)
-
-CRGB leds_plus_safety_pixel[CONFIG_NUM_LEDS + 1];
-CRGB* const leds(leds_plus_safety_pixel + 1);
-
 void led_update_task(void *pvParameter)
 {
     ESP_LOGI(LED_CONTROLLER_LOG_TAG, "led_update_task...");
@@ -44,7 +39,20 @@ void led_update_task(void *pvParameter)
 LedController::LedController(ConfigManager *configManager):
     m_configManager(configManager)
 {
-    FastLED.addLeds<WS2812, CONFIG_DATA_PIN>(leds, CONFIG_NUM_LEDS).setCorrection(TypicalLEDStrip);
+    int matrixWidth = m_configManager->getMatrixWidth();
+    int matrixHeight = m_configManager->getMatrixHeight();
+    ESP_LOGI(LED_CONTROLLER_LOG_TAG, "matrixWidth: %d, matrixHeight: %d, total LEDs: %d", matrixWidth, matrixHeight, (matrixWidth*matrixHeight));
+    ESP_LOGD(LED_CONTROLLER_LOG_TAG, "memory/LED: %d, total memory: %d", sizeof(CRGB), (matrixWidth*matrixHeight) * sizeof(CRGB));
+    ESP_LOGD(LED_CONTROLLER_LOG_TAG, "Free memory (before alloc): %d bytes", esp_get_free_heap_size());
+    m_ledsWithSafety = (CRGB*)malloc((matrixWidth*matrixHeight) * sizeof(CRGB));
+    ESP_ERROR_CHECK(nullptr == m_ledsWithSafety ? ESP_ERR_NO_MEM : ESP_OK);
+    m_leds = m_ledsWithSafety + 1;
+    ESP_LOGD(LED_CONTROLLER_LOG_TAG, "Free memory (after alloc): %d bytes", esp_get_free_heap_size());
+
+    LedMode::setup(matrixWidth, matrixHeight, true);
+
+    /*auto &fastLedController = */CFastLED::addLeds<WS2812, CONFIG_DATA_PIN>(m_leds, (matrixWidth*matrixHeight));
+//    fastLedController.setCorrection(TypicalLEDStrip);
 //    FastLED.setBrightness(MAX_BRIGHTNESS);
     FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
     FastLED.clear();

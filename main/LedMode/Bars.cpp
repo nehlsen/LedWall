@@ -17,6 +17,7 @@ void Bars::update()
         m_lastBarTime = currentTime;
     }
 
+    // FIXME this should already be covered by the frame delay of LedController
     vTaskDelay(20 / portTICK_PERIOD_MS);
 }
 
@@ -67,25 +68,25 @@ void Bars::advanceDrawMode()
 
     switch (m_drawMode) {
         case DrawVertical:
-            if (m_lastBarAt >= CONFIG_NUM_LEDS_HORIZONTAL) {
+            if (m_lastBarAt >= matrixWidth) {
                 m_drawMode = DrawHorizontal;
                 m_lastBarAt = 0;
             }
             break;
         case DrawHorizontal:
-            if (m_lastBarAt >= CONFIG_NUM_LEDS_VERTICAL) {
+            if (m_lastBarAt >= matrixHeight) {
                 m_drawMode = DrawDiagonalBl;
                 m_lastBarAt = 0;
             }
             break;
         case DrawDiagonalBl:
-            if (m_lastBarAt >= CONFIG_NUM_LEDS_HORIZONTAL + CONFIG_NUM_LEDS_VERTICAL - 1) {
+            if (m_lastBarAt >= matrixWidth + matrixHeight - 1) {
                 m_drawMode = DrawDiagonalBr;
                 m_lastBarAt = 0;
             }
             break;
         case DrawDiagonalBr:
-            if (m_lastBarAt >= CONFIG_NUM_LEDS_HORIZONTAL + CONFIG_NUM_LEDS_VERTICAL - 1) {
+            if (m_lastBarAt >= matrixWidth + matrixHeight - 1) {
                 m_drawMode = DrawVertical;
                 m_lastBarAt = 0;
             }
@@ -97,7 +98,7 @@ void Bars::drawVerticalBar(uint8_t x)
 {
     uint8_t randomHue = random8();
 
-    for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
+    for (uint8_t y = 0; y < matrixHeight; ++y) {
         FastLED.leds()[xyToIndex(x, y)].setHSV(randomHue, 255, 255);
     }
 }
@@ -106,7 +107,7 @@ void Bars::drawHorizontalBar(uint8_t y)
 {
     uint8_t randomHue = random8();
 
-    for (uint8_t x = 0; x < CONFIG_NUM_LEDS_HORIZONTAL; ++x) {
+    for (uint8_t x = 0; x < matrixWidth; ++x) {
         FastLED.leds()[xyToIndex(x, y)].setHSV(randomHue, 255, 255);
     }
 }
@@ -115,7 +116,7 @@ void Bars::drawDiagonalBarBl(uint8_t frame)
 {
     uint8_t randomHue = random8();
 
-    for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
+    for (uint8_t y = 0; y < matrixHeight; ++y) {
         FastLED.leds()[xyToIndex(frame - y, y)].setHSV(randomHue, 255, 255);
     }
 }
@@ -124,7 +125,7 @@ void Bars::drawDiagonalBarBr(uint8_t frame)
 {
     uint8_t randomHue = random8();
 
-    for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
-        FastLED.leds()[xyToIndex(CONFIG_NUM_LEDS_HORIZONTAL - frame - 1 + y, y)].setHSV(randomHue, 255, 255);
+    for (uint8_t y = 0; y < matrixHeight; ++y) {
+        FastLED.leds()[xyToIndex(matrixWidth - frame - 1 + y, y)].setHSV(randomHue, 255, 255);
     }
 }

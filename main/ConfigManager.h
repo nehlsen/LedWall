@@ -13,11 +13,16 @@ public:
     void setAutoCommitEnabled(bool enabled = true);
     bool isAutoCommitEnabled() const;
 
-    // fixme refactor to template function?
-    int32_t getIntVal(const char *key, int32_t defaultValue);
+    // FIXME refactor to template function?
+    int32_t getIntVal(const char *key, int32_t defaultValue) const;
     bool setIntVal(const char *key, int32_t value);
 
     int32_t getRestartCounter();
+
+    uint8_t getMatrixWidth() const;
+    void setMatrixWidth(uint8_t width);
+    uint8_t getMatrixHeight() const;
+    void setMatrixHeight(uint8_t height);
 
     enum AutoPowerOn {
         ALWAYS_OFF = 0,

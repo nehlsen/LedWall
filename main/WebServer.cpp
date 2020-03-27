@@ -143,6 +143,8 @@ esp_err_t WebServer::postModeOptions(httpd_req_t *req)
 cJSON* WebServer::createConfigData()
 {
     cJSON *root = cJSON_CreateObject();
+    cJSON_AddNumberToObject(root, "MatrixWidth", m_configManager->getMatrixWidth());
+    cJSON_AddNumberToObject(root, "MatrixHeight", m_configManager->getMatrixHeight());
     cJSON_AddNumberToObject(root, "PowerOnResetMode", m_configManager->getPowerOnResetMode());
     cJSON_AddNumberToObject(root, "LedModeAutoRestore", m_configManager->getLedModeAutoRestore());
 
@@ -157,6 +159,18 @@ esp_err_t WebServer::getConfig(httpd_req_t *req)
 esp_err_t WebServer::postConfig(httpd_req_t *req)
 {
     return handlePost(req, [=](cJSON *request, cJSON **response) -> bool {
+        cJSON *const matrixWidth = cJSON_GetObjectItem(request, "MatrixWidth");
+        if (matrixWidth) {
+            uint8_t width = matrixWidth->valueint;
+            m_configManager->setMatrixWidth(constrain(width, 1, 100));
+        }
+
+        cJSON *const matrixHeight = cJSON_GetObjectItem(request, "MatrixHeight");
+        if (matrixHeight) {
+            uint8_t height = matrixHeight->valueint;
+            m_configManager->setMatrixHeight(constrain(height, 1, 100));
+        }
+
         cJSON *const powerOnResetMode = cJSON_GetObjectItem(request, "PowerOnResetMode");
         if (powerOnResetMode) {
             int mode = powerOnResetMode->valueint;
@@ -170,7 +184,7 @@ esp_err_t WebServer::postConfig(httpd_req_t *req)
         }
 
         *response = createConfigData();
-        return powerOnResetMode || ledModeAutoRestore;
+        return matrixWidth || matrixHeight || powerOnResetMode || ledModeAutoRestore;
     });
 }
 

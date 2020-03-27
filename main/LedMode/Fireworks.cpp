@@ -13,7 +13,8 @@ void Fireworks::update()
     }
 
     if (randomLed < (MAX_INT_VALUE / (256 - (constrain(m_sparkRate, 1, 256))))) {
-        m_leds[randomLed % m_ledCount].setHSV(randomHue, 255, 255);
+        // FIXME only every other LED works :(
+        FastLED.leds()[randomLed % FastLED.size()].setHSV(randomHue, 255, 255);
     }
 
     vTaskDelay(20 / portTICK_PERIOD_MS);

@@ -4,6 +4,8 @@
 #define NVS_NAMESPACE "led_wall_config"
 static const char *CONFIG_MANAGER_LOG_TAG = "CONFIG_MANAGER";
 
+#define MATRIX_WIDTH_KEY "matrix_width"
+#define MATRIX_HEIGHT_KEY "matrix_height"
 #define RESTART_COUNTER_KEY "restart_counter"
 #define POWER_LAST_STATE_KEY "power_state"
 #define POWER_BOOT_MODE_KEY "power_boot_into"
@@ -50,7 +52,7 @@ bool ConfigManager::commit()
     return true;
 }
 
-int32_t ConfigManager::getIntVal(const char *key, int32_t defaultValue)
+int32_t ConfigManager::getIntVal(const char *key, int32_t defaultValue) const
 {
     int32_t value = defaultValue;
     esp_err_t err = nvs_get_i32(m_nvsHandle, key, &value);
@@ -81,6 +83,26 @@ int32_t ConfigManager::getRestartCounter()
     }
     
     return m_restartCounter;
+}
+
+uint8_t ConfigManager::getMatrixWidth() const
+{
+    return getIntVal(MATRIX_WIDTH_KEY, 4);
+}
+
+void ConfigManager::setMatrixWidth(uint8_t width)
+{
+    setIntVal(MATRIX_WIDTH_KEY, width);
+}
+
+uint8_t ConfigManager::getMatrixHeight() const
+{
+    return getIntVal(MATRIX_HEIGHT_KEY, 4);
+}
+
+void ConfigManager::setMatrixHeight(uint8_t height)
+{
+    setIntVal(MATRIX_HEIGHT_KEY, height);
 }
 
 void ConfigManager::setPowerOnResetMode(ConfigManager::AutoPowerOn mode)

@@ -4,8 +4,6 @@
 #include <vector>
 #include "LedMode.h"
 
-#define DEFAULT_MAX_FRAME_DELAY (CONFIG_NUM_LEDS_VERTICAL > CONFIG_NUM_LEDS_HORIZONTAL ? CONFIG_NUM_LEDS_VERTICAL : CONFIG_NUM_LEDS_HORIZONTAL)
-
 class MultiBars: public LedMode
 {
 public:
@@ -20,7 +18,7 @@ protected:
     uint8_t m_fadeRate = 200; // how fast to fade: 1-fast, 256-slow
     uint8_t m_barTravelSpeed = 195; // how fast bars travel? 1-slow, 255-fast
     uint8_t m_numberOfBars = 2; // absolute number of parallel bars
-    uint8_t m_maximumFrameDelay = DEFAULT_MAX_FRAME_DELAY; // maximum frames to delay a new bar? 0-no pause, 5-up to 5 empty frames, ...
+    uint8_t m_maximumFrameDelay = 4; // maximum frames to delay a new bar? 0-no pause, 5-up to 5 empty frames, ...
     bool m_barKeepsColor = true; // whether bars keep their color while moving or random color each frame
     bool m_blendColor = true; // whether each pixel blends or replaces current color
 

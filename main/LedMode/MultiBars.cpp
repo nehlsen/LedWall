@@ -33,6 +33,7 @@ void MultiBars::update()
         m_lastFrame = currentTime;
     }
 
+    // FIXME this should already be covered by the frame delay of LedController
     vTaskDelay(20 / portTICK_PERIOD_MS);
 }
 
@@ -161,13 +162,13 @@ bool MultiBars::Bar::canDrawFrame() const
 
     switch (mode) {
         case DrawVertical:
-            return currentFrame < CONFIG_NUM_LEDS_HORIZONTAL;
+            return currentFrame < matrixWidth;
         case DrawHorizontal:
-            return currentFrame < CONFIG_NUM_LEDS_VERTICAL;
+            return currentFrame < matrixHeight;
 
         case DrawDiagonalBl:
         case DrawDiagonalBr:
-            return currentFrame < CONFIG_NUM_LEDS_HORIZONTAL + CONFIG_NUM_LEDS_VERTICAL;
+            return currentFrame < matrixWidth + matrixHeight;
 
         default:
         case DrawModeCount:
@@ -190,16 +191,16 @@ void MultiBars::Bar::drawFrame()
 
     switch (mode) {
         case DrawVertical:
-            drawVerticalBar(direction == DirectionForward ? currentFrame : CONFIG_NUM_LEDS_HORIZONTAL - currentFrame - 1);
+            drawVerticalBar(direction == DirectionForward ? currentFrame : matrixWidth - currentFrame - 1);
             break;
         case DrawHorizontal:
-            drawHorizontalBar(direction == DirectionForward ? currentFrame : CONFIG_NUM_LEDS_VERTICAL - currentFrame - 1);
+            drawHorizontalBar(direction == DirectionForward ? currentFrame : matrixHeight - currentFrame - 1);
             break;
         case DrawDiagonalBl:
-            drawDiagonalBarBl(direction == DirectionForward ? currentFrame : CONFIG_NUM_LEDS_HORIZONTAL + CONFIG_NUM_LEDS_VERTICAL - currentFrame - 1);
+            drawDiagonalBarBl(direction == DirectionForward ? currentFrame : matrixWidth + matrixHeight - currentFrame - 1);
             break;
         case DrawDiagonalBr:
-            drawDiagonalBarBr(direction == DirectionForward ? currentFrame : CONFIG_NUM_LEDS_HORIZONTAL + CONFIG_NUM_LEDS_VERTICAL - currentFrame - 1);
+            drawDiagonalBarBr(direction == DirectionForward ? currentFrame : matrixWidth + matrixHeight - currentFrame - 1);
             break;
 
         default:
@@ -213,12 +214,12 @@ void MultiBars::Bar::drawFrame()
 void MultiBars::Bar::drawVerticalBar(uint8_t x)
 {
     if (direction == DirectionForward) {
-        for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
+        for (uint8_t y = 0; y < matrixHeight; ++y) {
             draw(x, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t y = CONFIG_NUM_LEDS_VERTICAL-1; y >= 0; --y) {
+        for (int8_t y = matrixHeight-1; y >= 0; --y) {
             draw(x, y);
         }
     }
@@ -227,12 +228,12 @@ void MultiBars::Bar::drawVerticalBar(uint8_t x)
 void MultiBars::Bar::drawHorizontalBar(uint8_t y)
 {
     if (direction == DirectionForward) {
-        for (uint8_t x = 0; x < CONFIG_NUM_LEDS_HORIZONTAL; ++x) {
+        for (uint8_t x = 0; x < matrixWidth; ++x) {
             draw(x, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t x = CONFIG_NUM_LEDS_HORIZONTAL-1; x >= 0; --x) {
+        for (int8_t x = matrixWidth-1; x >= 0; --x) {
             draw(x, y);
         }
     }
@@ -241,12 +242,12 @@ void MultiBars::Bar::drawHorizontalBar(uint8_t y)
 void MultiBars::Bar::drawDiagonalBarBl(uint8_t frame)
 {
     if (direction == DirectionForward) {
-        for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
+        for (uint8_t y = 0; y < matrixHeight; ++y) {
             draw(frame - y, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t y = CONFIG_NUM_LEDS_VERTICAL-1; y >= 0; --y) {
+        for (int8_t y = matrixHeight-1; y >= 0; --y) {
             draw(frame - y, y);
         }
     }
@@ -255,13 +256,13 @@ void MultiBars::Bar::drawDiagonalBarBl(uint8_t frame)
 void MultiBars::Bar::drawDiagonalBarBr(uint8_t frame)
 {
     if (direction == DirectionForward) {
-        for (uint8_t y = 0; y < CONFIG_NUM_LEDS_VERTICAL; ++y) {
-            draw(CONFIG_NUM_LEDS_HORIZONTAL - frame - 1 + y, y);
+        for (uint8_t y = 0; y < matrixHeight; ++y) {
+            draw(matrixWidth - frame - 1 + y, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t y = CONFIG_NUM_LEDS_VERTICAL-1; y >= 0; --y) {
-            draw(CONFIG_NUM_LEDS_HORIZONTAL - frame - 1 + y, y);
+        for (int8_t y = matrixHeight-1; y >= 0; --y) {
+            draw(matrixWidth - frame - 1 + y, y);
         }
     }
 }
