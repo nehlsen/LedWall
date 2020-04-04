@@ -54,6 +54,8 @@ esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
     cJSON_AddStringToObject(root, "compileTime", app_desc->time);
     cJSON_AddStringToObject(root, "compileDate", app_desc->date);
 
+    cJSON_AddNumberToObject(root, "ledPin", CONFIG_DATA_PIN);
+
     return jsonResponse(root, req);
 }
 
