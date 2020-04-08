@@ -2,6 +2,7 @@ set(COMPONENT_SRCS
         "main.cpp"
         "wifi_provisioning.c"
         "ConfigManager.cpp"
+        "OtaUpdater.cpp"
 
         "LedController.cpp"
         "LedMode/LedMode.cpp"
@@ -41,3 +42,6 @@ register_component(
         SRCS ${COMPONENT_SRCS}
         INCLUDE_DIRS "."
 )
+
+set(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../data")
+spiffs_create_partition_image(data ${DATA_DIR} FLASH_IN_PROJECT)

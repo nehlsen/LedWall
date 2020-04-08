@@ -2,9 +2,9 @@
 #include <cJSON.h>
 #include <esp_log.h>
 #include <esp_ota_ops.h>
-#include "esp_vfs.h"
 #include "LedController.h"
 #include "ConfigManager.h"
+#include "OtaUpdater.h"
 #include "LedMode/LedModes.h"
 #include "WebServer/FileResponseHandler.h"
 
@@ -30,11 +30,13 @@ CREATE_FUNCTION_TO_METHOD(led_modes_get_handler, getLedModes)
 CREATE_FUNCTION_TO_METHOD(mode_options_post_handler, postModeOptions)
 CREATE_FUNCTION_TO_METHOD(config_get_handler, getConfig)
 CREATE_FUNCTION_TO_METHOD(config_post_handler, postConfig)
+CREATE_FUNCTION_TO_METHOD(ota_post_handler, postOta)
 CREATE_FUNCTION_TO_METHOD(file_get_handler, getFile)
 
-WebServer::WebServer(LedController *ledController, ConfigManager *configManager) :
+WebServer::WebServer(LedController *ledController, ConfigManager *configManager, OtaUpdater *otaUpdater):
     m_ledController(ledController),
-    m_configManager(configManager)
+    m_configManager(configManager),
+    m_otaUpdater(otaUpdater)
 {}
 
 esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
@@ -190,6 +192,31 @@ esp_err_t WebServer::postConfig(httpd_req_t *req)
     });
 }
 
+esp_err_t WebServer::postOta(httpd_req_t *req)
+{
+    return handlePost(req, [=](cJSON *request, cJSON **response) -> bool {
+        cJSON *const otaUrl = cJSON_GetObjectItem(request, "url");
+        if (!otaUrl || !cJSON_IsString(otaUrl) || strlen(otaUrl->valuestring) <= 4) {
+            return false;
+        }
+
+        if (!m_otaUpdater) {
+            return false;
+        }
+        m_otaUpdater->setUpdateUrl(otaUrl->valuestring);
+
+        *response = cJSON_CreateObject();
+        if (m_otaUpdater->startUpdate()) {
+            cJSON_AddStringToObject(*response, "msg", "update started");
+            return true;
+        } else {
+            cJSON_AddStringToObject(*response, "msg", "update failed");
+            cJSON_AddNumberToObject(*response, "code", m_otaUpdater->getLastError());
+            return false;
+        }
+    });
+}
+
 esp_err_t WebServer::getFile(httpd_req_t *req)
 {
     return FileResponseHandler::handleRequest(req);
@@ -203,7 +230,7 @@ void WebServer::startServer()
     }
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.max_uri_handlers = 10;
+    config.max_uri_handlers = 11;
     config.uri_match_fn = httpd_uri_match_wildcard;
 
     ESP_LOGI(WEBSERVER_LOG_TAG, "Starting server on port: '%d'", config.server_port);
@@ -290,6 +317,14 @@ void WebServer::registerUriHandlers()
             .user_ctx = this
     };
     httpd_register_uri_handler(m_hdnlServer, &config_post_uri);
+
+    httpd_uri_t ota_post_uri = {
+            .uri = "/api/v1/ota",
+            .method = HTTP_POST,
+            .handler = ota_post_handler,
+            .user_ctx = this
+    };
+    httpd_register_uri_handler(m_hdnlServer, &ota_post_uri);
 
     httpd_uri_t file_get_uri = {
             .uri = "/*",

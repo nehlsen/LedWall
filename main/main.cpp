@@ -8,6 +8,7 @@
 #include "wifi_provisioning.h"
 #include "LedController.h"
 #include "ConfigManager.h"
+#include "OtaUpdater.h"
 
 #ifdef CONFIG_ENABLE_REST
 #pragma message "REST enabled"
@@ -121,9 +122,11 @@ void app_main()
     initialise_mdns();
     ESP_ERROR_CHECK(wifi_provisioning_start()); // asnync / non-blocking! The old wifi WAS blocking!
 
-    auto *cfg = new ConfigManager;
+    auto cfg = new ConfigManager;
     cfg->open();
-    auto *controller = new LedController(cfg);
+    auto controller = new LedController(cfg);
+
+    auto updater = new OtaUpdater;
 
     #ifdef CONFIG_ENABLE_MQTT
     mqtt_app_start(controller);
@@ -131,7 +134,7 @@ void app_main()
 
     #ifdef CONFIG_ENABLE_REST
     // TODO the example creates (starts) the server once wifi is ready, stops and restarts on re-connects
-    auto *server = new WebServer(controller, cfg);
+    auto *server = new WebServer(controller, cfg, updater);
     server->startServer();
     #endif
 

@@ -11,3 +11,5 @@ CONFIG_BT_ENABLED=y
 # CONFIG_ENABLE_MQTT is not set
 CONFIG_ENABLE_REST=y
 
+# for development purposes we allow updates over HTTP without certificate checks etc
+CONFIG_OTA_ALLOW_HTTP=y

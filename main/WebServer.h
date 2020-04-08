@@ -7,13 +7,14 @@
 class LedController;
 class cJSON;
 class ConfigManager;
+class OtaUpdater;
 
 #define READ_BUFFER_SIZE 1024 * 5
 
 class WebServer
 {
 public:
-    WebServer(LedController *ledController, ConfigManager *configManager);
+    WebServer(LedController *ledController, ConfigManager *configManager, OtaUpdater *otaUpdater);
 
     esp_err_t getSystemInfo(httpd_req_t *req);
 
@@ -29,6 +30,8 @@ public:
     esp_err_t getConfig(httpd_req_t *req);
     esp_err_t postConfig(httpd_req_t *req);
 
+    esp_err_t postOta(httpd_req_t *req);
+
     esp_err_t getFile(httpd_req_t *req);
 
     void startServer();
@@ -37,6 +40,7 @@ public:
 protected:
     LedController *m_ledController;
     ConfigManager *m_configManager;
+    OtaUpdater *m_otaUpdater;
 
     httpd_handle_t m_hdnlServer = nullptr;
     char m_readBuffer[READ_BUFFER_SIZE];
