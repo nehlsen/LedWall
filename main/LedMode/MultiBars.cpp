@@ -17,7 +17,6 @@ void MultiBars::update()
     for (int i = 0; i < FastLED.size(); i++) {
         FastLED.leds()[i].nscale8(m_fadeRate);
     }
-
     uint16_t delay = map(0xff - m_barTravelSpeed, 0, 255, 0, 1000);
     int64_t currentTime = esp_timer_get_time() / 1000;
     if (currentTime - m_lastFrame > delay || currentTime < 1) {
@@ -32,9 +31,6 @@ void MultiBars::update()
         }
         m_lastFrame = currentTime;
     }
-
-    // FIXME this should already be covered by the frame delay of LedController
-    vTaskDelay(20 / portTICK_PERIOD_MS);
 }
 
 void MultiBars::readOptions(cJSON *root)

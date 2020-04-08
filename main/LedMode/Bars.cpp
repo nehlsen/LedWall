@@ -16,9 +16,6 @@ void Bars::update()
         advanceDrawMode();
         m_lastBarTime = currentTime;
     }
-
-    // FIXME this should already be covered by the frame delay of LedController
-    vTaskDelay(20 / portTICK_PERIOD_MS);
 }
 
 void Bars::readOptions(cJSON *root)

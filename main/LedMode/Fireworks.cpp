@@ -16,8 +16,6 @@ void Fireworks::update()
         // FIXME only every other LED works :(
         FastLED.leds()[randomLed % FastLED.size()].setHSV(randomHue, 255, 255);
     }
-
-    vTaskDelay(20 / portTICK_PERIOD_MS);
 }
 
 void Fireworks::readOptions(cJSON *root)
