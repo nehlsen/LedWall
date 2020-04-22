@@ -1,5 +1,5 @@
-#ifndef LEDWALL_LEDCONTROLLER_H
-#define LEDWALL_LEDCONTROLLER_H
+#ifndef LEDWALL_MODECONTROLLER_H
+#define LEDWALL_MODECONTROLLER_H
 
 #include <list>
 
@@ -9,10 +9,10 @@ class ConfigManager;
 
 typedef void (*change_handler_t)();
 
-class LedController
+class ModeController
 {
 public:
-    explicit LedController(ConfigManager *configManager);
+    explicit ModeController(ConfigManager *configManager);
 
     void setPower(bool power);
     bool getPower() const;
@@ -42,4 +42,4 @@ protected:
     static void turnAllLedsOff();
 };
 
-#endif //LEDWALL_LEDCONTROLLER_H
+#endif //LEDWALL_MODECONTROLLER_H

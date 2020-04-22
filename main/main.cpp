@@ -6,7 +6,7 @@
 #include "tcpip_adapter.h"
 #include "esp_log.h"
 #include "wifi_provisioning.h"
-#include "LedController.h"
+#include "ModeController.h"
 #include "ConfigManager.h"
 #include "OtaUpdater.h"
 
@@ -124,7 +124,7 @@ void app_main()
 
     auto cfg = new ConfigManager;
     cfg->open();
-    auto controller = new LedController(cfg);
+    auto controller = new ModeController(cfg);
 
     auto updater = new OtaUpdater;
 

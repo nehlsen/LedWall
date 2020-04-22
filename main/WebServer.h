@@ -4,7 +4,7 @@
 #include <esp_http_server.h>
 #include <functional>
 
-class LedController;
+class ModeController;
 class cJSON;
 class ConfigManager;
 class OtaUpdater;
@@ -14,7 +14,7 @@ class OtaUpdater;
 class WebServer
 {
 public:
-    WebServer(LedController *ledController, ConfigManager *configManager, OtaUpdater *otaUpdater);
+    WebServer(ModeController *controller, ConfigManager *configManager, OtaUpdater *otaUpdater);
 
     esp_err_t getSystemInfo(httpd_req_t *req);
 
@@ -38,7 +38,7 @@ public:
     void stopServer();
 
 protected:
-    LedController *m_ledController;
+    ModeController *m_controller;
     ConfigManager *m_configManager;
     OtaUpdater *m_otaUpdater;
 

@@ -2,7 +2,7 @@
  * XY Code and safety pixel code from
  * https://github.com/FastLED/FastLED/blob/master/examples/XYMatrix/XYMatrix.ino
  */
-#include "LedController.h"
+#include "ModeController.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/event_groups.h>
 #include <freertos/task.h>
@@ -10,7 +10,7 @@
 #include "LedMode/LedModes.h"
 #include "ConfigManager.h"
 
-static const char *LOG_TAG = "LED_CONTROLLER";
+static const char *LOG_TAG = "ModeController";
 
 #define LED_WALL_ENABLED_BIT BIT0
 static TaskHandle_t led_update_task_hdnl;
@@ -20,7 +20,7 @@ void led_update_task(void *pvParameter)
 {
     ESP_LOGI(LOG_TAG, "led_update_task...");
 
-    auto *controller = (LedController*)pvParameter;
+    auto *controller = (ModeController*)pvParameter;
 
 //    int delay = (1000/ledMode->fps()) / portTICK_PERIOD_MS;
     int delay = (1000/25) / portTICK_PERIOD_MS;
@@ -36,7 +36,7 @@ void led_update_task(void *pvParameter)
     }
 }
 
-LedController::LedController(ConfigManager *configManager):
+ModeController::ModeController(ConfigManager *configManager):
     m_configManager(configManager)
 {
     int matrixWidth = m_configManager->getMatrixWidth();
@@ -52,7 +52,6 @@ LedController::LedController(ConfigManager *configManager):
     LedMode::setup(matrixWidth, matrixHeight, true);
 
     ESP_LOGI(LOG_TAG, "Using PIN %d for LEDs", CONFIG_DATA_PIN);
-
     /*auto &fastLedController = */CFastLED::addLeds<WS2812, CONFIG_DATA_PIN>(m_leds, (matrixWidth*matrixHeight));
 //    fastLedController.setCorrection(TypicalLEDStrip);
     ESP_LOGI(LOG_TAG, "Setting Brightness to %d%%", (m_configManager->getBrightness()/255)*100);
@@ -76,7 +75,7 @@ LedController::LedController(ConfigManager *configManager):
             );
 }
 
-void LedController::setPower(bool power)
+void ModeController::setPower(bool power)
 {
     ESP_LOGI(LOG_TAG, "setPower: %d", power);
 
@@ -90,12 +89,12 @@ void LedController::setPower(bool power)
     m_configManager->setPowerState(m_power);
 }
 
-bool LedController::getPower() const
+bool ModeController::getPower() const
 {
     return m_power;
 }
 
-bool LedController::setModeIndex(int modeIndex)
+bool ModeController::setModeIndex(int modeIndex)
 {
     ESP_LOGI(LOG_TAG, "setModeIndex: modeIndex:%d", modeIndex);
 
@@ -117,22 +116,22 @@ bool LedController::setModeIndex(int modeIndex)
     return true;
 }
 
-int LedController::getModeIndex() const
+int ModeController::getModeIndex() const
 {
     return m_modeIndex;
 }
 
-LedMode* LedController::getLedMode() const
+LedMode* ModeController::getLedMode() const
 {
     return m_ledMode;
 }
 
-void LedController::setChangeHandler(change_handler_t change_handler)
+void ModeController::setChangeHandler(change_handler_t change_handler)
 {
     m_change_handler = change_handler;
 }
 
-void LedController::onChanged()
+void ModeController::onChanged()
 {
     if (m_change_handler == nullptr) {
         return;
@@ -141,7 +140,7 @@ void LedController::onChanged()
     m_change_handler();
 }
 
-void LedController::setLedUpdateTaskEnabled(bool enabled)
+void ModeController::setLedUpdateTaskEnabled(bool enabled)
 {
     if (!led_update_task_hdnl) {
         return;
@@ -154,9 +153,8 @@ void LedController::setLedUpdateTaskEnabled(bool enabled)
     }
 }
 
-void LedController::turnAllLedsOff()
+void ModeController::turnAllLedsOff()
 {
-//    FastLED.showColor(CRGB::Black);
     FastLED.clear(true);
-    FastLED.show();
+    FastLED.delay(1);
 }

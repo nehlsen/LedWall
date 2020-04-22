@@ -4,7 +4,7 @@ set(COMPONENT_SRCS
         "ConfigManager.cpp"
         "OtaUpdater.cpp"
 
-        "LedController.cpp"
+        "ModeController.cpp"
         "LedMode/LedMode.cpp"
         "LedMode/LedModes.cpp"
         "LedMode/utilities.c"

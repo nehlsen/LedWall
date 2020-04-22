@@ -2,7 +2,7 @@
 #include <cJSON.h>
 #include <esp_log.h>
 #include <esp_ota_ops.h>
-#include "LedController.h"
+#include "ModeController.h"
 #include "ConfigManager.h"
 #include "OtaUpdater.h"
 #include "LedMode/LedModes.h"
@@ -33,10 +33,8 @@ CREATE_FUNCTION_TO_METHOD(config_post_handler, postConfig)
 CREATE_FUNCTION_TO_METHOD(ota_post_handler, postOta)
 CREATE_FUNCTION_TO_METHOD(file_get_handler, getFile)
 
-WebServer::WebServer(LedController *ledController, ConfigManager *configManager, OtaUpdater *otaUpdater):
-    m_ledController(ledController),
-    m_configManager(configManager),
-    m_otaUpdater(otaUpdater)
+WebServer::WebServer(ModeController *controller, ConfigManager *configManager, OtaUpdater *otaUpdater):
+    m_controller(controller), m_configManager(configManager), m_otaUpdater(otaUpdater)
 {}
 
 esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
@@ -64,7 +62,7 @@ esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
 cJSON* WebServer::createLedPowerData()
 {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "power", m_ledController->getPower());
+    cJSON_AddNumberToObject(root, "power", m_controller->getPower());
 
     return root;
 }
@@ -83,7 +81,7 @@ esp_err_t WebServer::postLedPower(httpd_req_t *req)
         }
 
         int power = powerObj->valueint;
-        m_ledController->setPower(power);
+        m_controller->setPower(power);
         *response = createLedPowerData();
         return true;
     });
@@ -92,11 +90,11 @@ esp_err_t WebServer::postLedPower(httpd_req_t *req)
 cJSON* WebServer::createLedModeData()
 {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "index", m_ledController->getModeIndex());
-    cJSON_AddStringToObject(root, "name", LedModes.at(m_ledController->getModeIndex()).name);
+    cJSON_AddNumberToObject(root, "index", m_controller->getModeIndex());
+    cJSON_AddStringToObject(root, "name", LedModes.at(m_controller->getModeIndex()).name);
 
     cJSON *options = cJSON_AddObjectToObject(root, "options");
-    m_ledController->getLedMode()->readOptions(options);
+    m_controller->getLedMode()->readOptions(options);
 
     return root;
 }
@@ -115,7 +113,7 @@ esp_err_t WebServer::postLedMode(httpd_req_t *req)
         }
 
         int mode = modeObj->valueint;
-        bool modeHasBeenSet = m_ledController->setModeIndex(mode);
+        bool modeHasBeenSet = m_controller->setModeIndex(mode);
         *response = createLedModeData();
         return modeHasBeenSet;
     });
@@ -138,7 +136,7 @@ esp_err_t WebServer::getLedModes(httpd_req_t *req)
 esp_err_t WebServer::postModeOptions(httpd_req_t *req)
 {
     return handlePost(req, [=](cJSON *request, cJSON **response) -> bool {
-        bool optionsHaveBeenSet = m_ledController->getLedMode()->writeOptions(request);
+        bool optionsHaveBeenSet = m_controller->getLedMode()->writeOptions(request);
         *response = createLedModeData();
         return optionsHaveBeenSet;
     });

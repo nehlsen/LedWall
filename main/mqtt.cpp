@@ -1,5 +1,5 @@
-#include "LedController.h"
-static LedController *ledController;
+#include "ModeController.h"
+static ModeController *ledController;
 
 #ifdef __cplusplus
 extern "C" {
@@ -133,7 +133,7 @@ void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event
     }
 }
 
-esp_mqtt_client_handle_t mqtt_app_start(LedController *controller)
+esp_mqtt_client_handle_t mqtt_app_start(ModeController *controller)
 {
     ledController = controller;
     ledController->setChangeHandler(&publish_status);
