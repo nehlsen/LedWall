@@ -24,6 +24,9 @@ public:
     uint8_t getMatrixHeight() const;
     void setMatrixHeight(uint8_t height);
 
+    uint8_t getBrightness() const;
+    void setBrightness(uint8_t brightness);
+
     enum AutoPowerOn {
         ALWAYS_OFF = 0,
         ALWAYS_ON = 1,

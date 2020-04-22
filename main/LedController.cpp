@@ -10,7 +10,7 @@
 #include "LedMode/LedModes.h"
 #include "ConfigManager.h"
 
-static const char *LED_CONTROLLER_LOG_TAG = "LED_CONTROLLER";
+static const char *LOG_TAG = "LED_CONTROLLER";
 
 #define LED_WALL_ENABLED_BIT BIT0
 static TaskHandle_t led_update_task_hdnl;
@@ -18,7 +18,7 @@ static EventGroupHandle_t led_update_task_event_group;
 
 void led_update_task(void *pvParameter)
 {
-    ESP_LOGI(LED_CONTROLLER_LOG_TAG, "led_update_task...");
+    ESP_LOGI(LOG_TAG, "led_update_task...");
 
     auto *controller = (LedController*)pvParameter;
 
@@ -41,21 +41,23 @@ LedController::LedController(ConfigManager *configManager):
 {
     int matrixWidth = m_configManager->getMatrixWidth();
     int matrixHeight = m_configManager->getMatrixHeight();
-    ESP_LOGI(LED_CONTROLLER_LOG_TAG, "matrixWidth: %d, matrixHeight: %d, total LEDs: %d", matrixWidth, matrixHeight, (matrixWidth*matrixHeight));
-    ESP_LOGD(LED_CONTROLLER_LOG_TAG, "memory/LED: %d, total memory: %d", sizeof(CRGB), (matrixWidth*matrixHeight) * sizeof(CRGB));
-    ESP_LOGD(LED_CONTROLLER_LOG_TAG, "Free memory (before alloc): %d bytes", esp_get_free_heap_size());
+    ESP_LOGI(LOG_TAG, "matrixWidth: %d, matrixHeight: %d, total LEDs: %d", matrixWidth, matrixHeight, (matrixWidth * matrixHeight));
+    ESP_LOGD(LOG_TAG, "memory/LED: %d, total memory: %d", sizeof(CRGB), (matrixWidth * matrixHeight) * sizeof(CRGB));
+    ESP_LOGD(LOG_TAG, "Free memory (before alloc): %d bytes", esp_get_free_heap_size());
     m_ledsWithSafety = (CRGB*)malloc((matrixWidth*matrixHeight) * sizeof(CRGB));
     ESP_ERROR_CHECK(nullptr == m_ledsWithSafety ? ESP_ERR_NO_MEM : ESP_OK);
     m_leds = m_ledsWithSafety + 1;
-    ESP_LOGD(LED_CONTROLLER_LOG_TAG, "Free memory (after alloc): %d bytes", esp_get_free_heap_size());
+    ESP_LOGD(LOG_TAG, "Free memory (after alloc): %d bytes", esp_get_free_heap_size());
 
     LedMode::setup(matrixWidth, matrixHeight, true);
 
+    ESP_LOGI(LOG_TAG, "Using PIN %d for LEDs", CONFIG_DATA_PIN);
+
     /*auto &fastLedController = */CFastLED::addLeds<WS2812, CONFIG_DATA_PIN>(m_leds, (matrixWidth*matrixHeight));
 //    fastLedController.setCorrection(TypicalLEDStrip);
-//    FastLED.setBrightness(MAX_BRIGHTNESS);
-    FastLED.setMaxPowerInVoltsAndMilliamps(5,1000);
-    FastLED.clear();
+    ESP_LOGI(LOG_TAG, "Setting Brightness to %d%%", (m_configManager->getBrightness()/255)*100);
+    FastLED.setBrightness(m_configManager->getBrightness());
+    turnAllLedsOff();
 
     led_update_task_event_group = xEventGroupCreate();
     xEventGroupSetBits(led_update_task_event_group, LED_WALL_ENABLED_BIT);
@@ -76,7 +78,7 @@ LedController::LedController(ConfigManager *configManager):
 
 void LedController::setPower(bool power)
 {
-    ESP_LOGI(LED_CONTROLLER_LOG_TAG, "setPower: %d", power);
+    ESP_LOGI(LOG_TAG, "setPower: %d", power);
 
     m_power = power;
     if (!m_power) {
@@ -95,14 +97,14 @@ bool LedController::getPower() const
 
 bool LedController::setModeIndex(int modeIndex)
 {
-    ESP_LOGI(LED_CONTROLLER_LOG_TAG, "setModeIndex: modeIndex:%d", modeIndex);
+    ESP_LOGI(LOG_TAG, "setModeIndex: modeIndex:%d", modeIndex);
 
     if (modeIndex < 0 || modeIndex >= LedModes.size()) {
-        ESP_LOGE(LED_CONTROLLER_LOG_TAG, "setModeIndex: Failed to set Mode: Invalid Index");
+        ESP_LOGE(LOG_TAG, "setModeIndex: Failed to set Mode: Invalid Index");
         return false;
     }
 
-    ESP_LOGI(LED_CONTROLLER_LOG_TAG, "setModeIndex: going to create mode:\"%s\"", LedModes.at(modeIndex).name);
+    ESP_LOGI(LOG_TAG, "setModeIndex: going to create mode:\"%s\"", LedModes.at(modeIndex).name);
     LedMode *newMode = LedModes.at(modeIndex).factory();
 
     turnAllLedsOff();
@@ -156,4 +158,5 @@ void LedController::turnAllLedsOff()
 {
 //    FastLED.showColor(CRGB::Black);
     FastLED.clear(true);
+    FastLED.show();
 }

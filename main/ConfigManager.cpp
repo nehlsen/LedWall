@@ -6,6 +6,7 @@ static const char *CONFIG_MANAGER_LOG_TAG = "CONFIG_MANAGER";
 
 #define MATRIX_WIDTH_KEY "matrix_width"
 #define MATRIX_HEIGHT_KEY "matrix_height"
+#define MATRIX_BRIGHTNESS_KEY "matrix_brightness"
 #define RESTART_COUNTER_KEY "restart_counter"
 #define POWER_LAST_STATE_KEY "power_state"
 #define POWER_BOOT_MODE_KEY "power_boot_into"
@@ -103,6 +104,16 @@ uint8_t ConfigManager::getMatrixHeight() const
 void ConfigManager::setMatrixHeight(uint8_t height)
 {
     setIntVal(MATRIX_HEIGHT_KEY, height);
+}
+
+uint8_t ConfigManager::getBrightness() const
+{
+    return getIntVal(MATRIX_BRIGHTNESS_KEY, 255);
+}
+
+void ConfigManager::setBrightness(uint8_t brightness)
+{
+    setIntVal(MATRIX_BRIGHTNESS_KEY, brightness);
 }
 
 void ConfigManager::setPowerOnResetMode(ConfigManager::AutoPowerOn mode)

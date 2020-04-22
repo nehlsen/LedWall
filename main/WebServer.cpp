@@ -149,6 +149,7 @@ cJSON* WebServer::createConfigData()
     cJSON *root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "MatrixWidth", m_configManager->getMatrixWidth());
     cJSON_AddNumberToObject(root, "MatrixHeight", m_configManager->getMatrixHeight());
+    cJSON_AddNumberToObject(root, "Brightness", m_configManager->getBrightness());
     cJSON_AddNumberToObject(root, "PowerOnResetMode", m_configManager->getPowerOnResetMode());
     cJSON_AddNumberToObject(root, "LedModeAutoRestore", m_configManager->getLedModeAutoRestore());
 
@@ -175,6 +176,11 @@ esp_err_t WebServer::postConfig(httpd_req_t *req)
             m_configManager->setMatrixHeight(constrain(height, 1, 100));
         }
 
+        cJSON *const brightness = cJSON_GetObjectItem(request, "Brightness");
+        if (brightness) {
+            m_configManager->setBrightness(constrain(brightness->valueint, 0, 255));
+        }
+
         cJSON *const powerOnResetMode = cJSON_GetObjectItem(request, "PowerOnResetMode");
         if (powerOnResetMode) {
             int mode = powerOnResetMode->valueint;
@@ -188,7 +194,7 @@ esp_err_t WebServer::postConfig(httpd_req_t *req)
         }
 
         *response = createConfigData();
-        return matrixWidth || matrixHeight || powerOnResetMode || ledModeAutoRestore;
+        return matrixWidth || matrixHeight || brightness || powerOnResetMode || ledModeAutoRestore;
     });
 }
 
