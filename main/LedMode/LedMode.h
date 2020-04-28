@@ -9,8 +9,7 @@ class cJSON;
 class LedMode
 {
 public:
-    static void setup(LedMatrix* matrix);
-
+    explicit LedMode(LedMatrix& matrix);
     virtual ~LedMode() = default;
 
     virtual void update() = 0;
@@ -21,7 +20,7 @@ public:
     virtual bool writeOptions(cJSON *root);
 
 protected:
-    static LedMatrix* matrix;
+    LedMatrix& m_matrix;
 };
 
 #endif //LEDWALL_LEDMODE_H

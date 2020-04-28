@@ -7,7 +7,8 @@
 // it is not possible to have more than this bars
 #define ABSOLUTE_MAX_BARS 10
 
-MultiBars::MultiBars()
+MultiBars::MultiBars(LedMatrix& matrix):
+    LedMode(matrix)
 {
     initBars();
 }
@@ -87,7 +88,7 @@ void MultiBars::initBars()
     m_bars.resize(m_numberOfBars);
 
     for (int i = 0; i < m_numberOfBars; ++i) {
-        m_bars[i] = new Bar(randomDrawMode(), randomDrawDirection(), m_barKeepsColor, m_blendColor);
+        m_bars[i] = new Bar(m_matrix, randomDrawMode(), randomDrawDirection(), m_barKeepsColor, m_blendColor);
     }
 }
 
@@ -121,12 +122,12 @@ MultiBars::Bar* MultiBars::createRandomBar()
 
         for (auto &bar : m_bars) {
             if (bar->mode != mode || bar->direction != direction) {
-                return new Bar(mode, direction, m_barKeepsColor, m_blendColor, random8(m_maximumFrameDelay));
+                return new Bar(m_matrix, mode, direction, m_barKeepsColor, m_blendColor, random8(m_maximumFrameDelay));
             }
         }
 
         if (++breakCounter > 15) {
-            return new Bar(Bar::DrawVertical, Bar::DirectionForward, m_barKeepsColor, m_blendColor);
+            return new Bar(m_matrix, Bar::DrawVertical, Bar::DirectionForward, m_barKeepsColor, m_blendColor);
         }
     }
 }
@@ -143,8 +144,8 @@ MultiBars::Bar::DrawDirection MultiBars::randomDrawDirection() const
 
 /* ******************************  ******************************  ******************************  ****************************** */
 
-MultiBars::Bar::Bar(MultiBars::Bar::DrawMode drawMode, MultiBars::Bar::DrawDirection drawDirection, bool constColor, bool blend, uint8_t emptyFrames):
-    mode(drawMode), direction(drawDirection), constantColor(constColor), blendColor(blend),
+MultiBars::Bar::Bar(LedMatrix& pMatrix, MultiBars::Bar::DrawMode drawMode, MultiBars::Bar::DrawDirection drawDirection, bool constColor, bool blend, uint8_t emptyFrames):
+    matrix(pMatrix), mode(drawMode), direction(drawDirection), constantColor(constColor), blendColor(blend),
     currentFrame(-1 * emptyFrames), hue(random8())
 {
 //    ESP_LOGI("Bar", "New Bar mode:%d, direction: %d, constColor: %d, blend: %d, emptyFrames: %d", mode, direction, constantColor, blendColor, emptyFrames);
@@ -158,13 +159,13 @@ bool MultiBars::Bar::canDrawFrame() const
 
     switch (mode) {
         case DrawVertical:
-            return currentFrame < matrix->getWidth();
+            return currentFrame < matrix.getWidth();
         case DrawHorizontal:
-            return currentFrame < matrix->getHeight();
+            return currentFrame < matrix.getHeight();
 
         case DrawDiagonalBl:
         case DrawDiagonalBr:
-            return currentFrame < matrix->getWidth() + matrix->getHeight();
+            return currentFrame < matrix.getWidth() + matrix.getHeight();
 
         default:
         case DrawModeCount:
@@ -187,16 +188,16 @@ void MultiBars::Bar::drawFrame()
 
     switch (mode) {
         case DrawVertical:
-            drawVerticalBar(direction == DirectionForward ? currentFrame : matrix->getWidth() - currentFrame - 1);
+            drawVerticalBar(direction == DirectionForward ? currentFrame : matrix.getWidth() - currentFrame - 1);
             break;
         case DrawHorizontal:
-            drawHorizontalBar(direction == DirectionForward ? currentFrame : matrix->getHeight() - currentFrame - 1);
+            drawHorizontalBar(direction == DirectionForward ? currentFrame : matrix.getHeight() - currentFrame - 1);
             break;
         case DrawDiagonalBl:
-            drawDiagonalBarBl(direction == DirectionForward ? currentFrame : matrix->getWidth() + matrix->getHeight() - currentFrame - 1);
+            drawDiagonalBarBl(direction == DirectionForward ? currentFrame : matrix.getWidth() + matrix.getHeight() - currentFrame - 1);
             break;
         case DrawDiagonalBr:
-            drawDiagonalBarBr(direction == DirectionForward ? currentFrame : matrix->getWidth() + matrix->getHeight() - currentFrame - 1);
+            drawDiagonalBarBr(direction == DirectionForward ? currentFrame : matrix.getWidth() + matrix.getHeight() - currentFrame - 1);
             break;
 
         default:
@@ -210,12 +211,12 @@ void MultiBars::Bar::drawFrame()
 void MultiBars::Bar::drawVerticalBar(uint8_t x)
 {
     if (direction == DirectionForward) {
-        for (uint8_t y = 0; y < matrix->getHeight(); ++y) {
+        for (uint8_t y = 0; y < matrix.getHeight(); ++y) {
             draw(x, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t y = matrix->getHeight()-1; y >= 0; --y) {
+        for (int8_t y = matrix.getHeight()-1; y >= 0; --y) {
             draw(x, y);
         }
     }
@@ -224,12 +225,12 @@ void MultiBars::Bar::drawVerticalBar(uint8_t x)
 void MultiBars::Bar::drawHorizontalBar(uint8_t y)
 {
     if (direction == DirectionForward) {
-        for (uint8_t x = 0; x < matrix->getWidth(); ++x) {
+        for (uint8_t x = 0; x < matrix.getWidth(); ++x) {
             draw(x, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t x = matrix->getWidth()-1; x >= 0; --x) {
+        for (int8_t x = matrix.getWidth()-1; x >= 0; --x) {
             draw(x, y);
         }
     }
@@ -238,12 +239,12 @@ void MultiBars::Bar::drawHorizontalBar(uint8_t y)
 void MultiBars::Bar::drawDiagonalBarBl(uint8_t frame)
 {
     if (direction == DirectionForward) {
-        for (uint8_t y = 0; y < matrix->getHeight(); ++y) {
+        for (uint8_t y = 0; y < matrix.getHeight(); ++y) {
             draw(frame - y, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t y = matrix->getHeight()-1; y >= 0; --y) {
+        for (int8_t y = matrix.getHeight()-1; y >= 0; --y) {
             draw(frame - y, y);
         }
     }
@@ -252,13 +253,13 @@ void MultiBars::Bar::drawDiagonalBarBl(uint8_t frame)
 void MultiBars::Bar::drawDiagonalBarBr(uint8_t frame)
 {
     if (direction == DirectionForward) {
-        for (uint8_t y = 0; y < matrix->getHeight(); ++y) {
-            draw(matrix->getWidth() - frame - 1 + y, y);
+        for (uint8_t y = 0; y < matrix.getHeight(); ++y) {
+            draw(matrix.getWidth() - frame - 1 + y, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t y = matrix->getHeight()-1; y >= 0; --y) {
-            draw(matrix->getWidth() - frame - 1 + y, y);
+        for (int8_t y = matrix.getHeight()-1; y >= 0; --y) {
+            draw(matrix.getWidth() - frame - 1 + y, y);
         }
     }
 }
@@ -268,8 +269,8 @@ void MultiBars::Bar::draw(uint8_t x, uint8_t y)
     auto color = CHSV(constantColor ? hue : random8(), 255, 255);
 
     if (blendColor) {
-        matrix->pixel(x, y) += color;
+        matrix.pixel(x, y) += color;
     } else {
-        matrix->pixel(x, y) = color;
+        matrix.pixel(x, y) = color;
     }
 }

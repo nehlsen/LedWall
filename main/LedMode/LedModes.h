@@ -2,10 +2,9 @@
 #define LEDWALL_LEDMODES_H
 
 #include <vector>
-
 #include "LedMode.h"
 
-typedef LedMode* (LedModeFactory)();
+typedef LedMode* (LedModeFactory)(LedMatrix& matrix);
 
 typedef struct {
     const char name[16];

@@ -7,7 +7,7 @@
 class MultiBars: public LedMode
 {
 public:
-    MultiBars();
+    explicit MultiBars(LedMatrix& matrix);
 
     void update() override;
 
@@ -40,8 +40,9 @@ protected:
             DrawDirectionCount
         };
 
-        Bar(DrawMode drawMode, DrawDirection drawDirection, bool constantColor, bool blendColor, uint8_t emptyFrames = 0);
+        Bar(LedMatrix& matrix, DrawMode drawMode, DrawDirection drawDirection, bool constantColor, bool blendColor, uint8_t emptyFrames = 0);
 
+        LedMatrix& matrix;
         const DrawMode mode;
         const DrawDirection direction;
         const bool constantColor;

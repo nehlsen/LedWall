@@ -50,8 +50,7 @@ ModeController::ModeController(ConfigManager *configManager):
     ESP_LOGI(LOG_TAG, "Setting Brightness to %d%%", (m_configManager->getBrightness()/255)*100);
     FastLED.setBrightness(m_configManager->getBrightness());
 
-    auto matrix = new LedMatrix(fastLedController, matrixWidth, matrixHeight, MatrixInvertHorizontal);
-    LedMode::setup(matrix);
+    m_matrix = new LedMatrix(fastLedController, matrixWidth, matrixHeight, MatrixInvertHorizontal);
 
     turnAllLedsOff();
 
@@ -101,7 +100,7 @@ bool ModeController::setModeIndex(int modeIndex)
     }
 
     ESP_LOGI(LOG_TAG, "setModeIndex: going to create mode:\"%s\"", LedModes.at(modeIndex).name);
-    LedMode *newMode = LedModes.at(modeIndex).factory();
+    LedMode *newMode = LedModes.at(modeIndex).factory(*m_matrix);
 
     turnAllLedsOff();
     m_modeIndex = modeIndex;

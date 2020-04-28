@@ -1,9 +1,8 @@
 #include "LedMode.h"
 
-void LedMode::setup(LedMatrix *pMatrix)
-{
-    matrix = pMatrix;
-}
+LedMode::LedMode(LedMatrix &matrix):
+    m_matrix(matrix)
+{}
 
 void LedMode::readOptions(cJSON *root)
 {}

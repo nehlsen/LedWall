@@ -7,12 +7,12 @@
 #include "LedModeSample.h"
 #include "LedModeHsiboy.h"
 
-LedMode *createModeStatus() { return new LedModeStatus(); }
-LedMode *createModeBars() { return new Bars(); }
-LedMode *createModeMultiBars() { return new MultiBars(); }
-LedMode *createModeFireworks() { return new Fireworks(); }
-LedMode *createModeSample() { return new LedModeSample(); }
-LedMode *createModeHsiboy() { return new LedModeHsiboy(); }
+LedMode *createModeStatus(LedMatrix& matrix) { return new LedModeStatus(matrix); }
+LedMode *createModeBars(LedMatrix& matrix) { return new Bars(matrix); }
+LedMode *createModeMultiBars(LedMatrix& matrix) { return new MultiBars(matrix); }
+LedMode *createModeFireworks(LedMatrix& matrix) { return new Fireworks(matrix); }
+LedMode *createModeSample(LedMatrix& matrix) { return new LedModeSample(matrix); }
+LedMode *createModeHsiboy(LedMatrix& matrix) { return new LedModeHsiboy(matrix); }
 
 LedModeDef_t modeStatusDef {"Status", &createModeStatus};
 LedModeDef_t modeBarsDef {"Bars", &createModeBars};

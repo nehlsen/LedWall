@@ -8,6 +8,6 @@ void LedModeStatus::update()
     if(m_lastUpdate != currentSeconds) {
         m_lastUpdate = currentSeconds;
 
-        matrix->pixel(0, 0) = currentSeconds % 2 ? CRGB::Red : CRGB::Green;
+        m_matrix.pixel(0, 0) = currentSeconds % 2 ? CRGB::Red : CRGB::Green;
     }
 }
