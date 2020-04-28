@@ -1,12 +1,8 @@
-/**
- * XY Code and safety pixel code from
- * https://github.com/FastLED/FastLED/blob/master/examples/XYMatrix/XYMatrix.ino
- */
 #include "ModeController.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/event_groups.h>
 #include <freertos/task.h>
-#include "FastLED.h"
+#include <LedMatrix.h>
 #include "LedMode/LedModes.h"
 #include "ConfigManager.h"
 
@@ -39,23 +35,24 @@ void led_update_task(void *pvParameter)
 ModeController::ModeController(ConfigManager *configManager):
     m_configManager(configManager)
 {
-    int matrixWidth = m_configManager->getMatrixWidth();
-    int matrixHeight = m_configManager->getMatrixHeight();
+    const int matrixWidth = m_configManager->getMatrixWidth();
+    const int matrixHeight = m_configManager->getMatrixHeight();
     ESP_LOGI(LOG_TAG, "matrixWidth: %d, matrixHeight: %d, total LEDs: %d", matrixWidth, matrixHeight, (matrixWidth * matrixHeight));
-    ESP_LOGD(LOG_TAG, "memory/LED: %d, total memory: %d", sizeof(CRGB), (matrixWidth * matrixHeight) * sizeof(CRGB));
+    ESP_LOGD(LOG_TAG, "memory/LED: %d, total memory: %d", (int)sizeof(CRGB), (matrixWidth * matrixHeight) * (int)sizeof(CRGB));
     ESP_LOGD(LOG_TAG, "Free memory (before alloc): %d bytes", esp_get_free_heap_size());
-    m_ledsWithSafety = (CRGB*)malloc((matrixWidth*matrixHeight) * sizeof(CRGB));
-    ESP_ERROR_CHECK(nullptr == m_ledsWithSafety ? ESP_ERR_NO_MEM : ESP_OK);
-    m_leds = m_ledsWithSafety + 1;
+    m_leds = (CRGB*)malloc((matrixWidth*matrixHeight) * sizeof(CRGB));
+    ESP_ERROR_CHECK(nullptr == m_leds ? ESP_ERR_NO_MEM : ESP_OK);
     ESP_LOGD(LOG_TAG, "Free memory (after alloc): %d bytes", esp_get_free_heap_size());
 
-    LedMode::setup(matrixWidth, matrixHeight, true);
-
     ESP_LOGI(LOG_TAG, "Using PIN %d for LEDs", CONFIG_DATA_PIN);
-    /*auto &fastLedController = */CFastLED::addLeds<WS2812, CONFIG_DATA_PIN>(m_leds, (matrixWidth*matrixHeight));
+    auto &fastLedController = CFastLED::addLeds<WS2812, CONFIG_DATA_PIN>(m_leds, (matrixWidth*matrixHeight));
 //    fastLedController.setCorrection(TypicalLEDStrip);
     ESP_LOGI(LOG_TAG, "Setting Brightness to %d%%", (m_configManager->getBrightness()/255)*100);
     FastLED.setBrightness(m_configManager->getBrightness());
+
+    auto matrix = new LedMatrix(fastLedController, matrixWidth, matrixHeight, MatrixInvertHorizontal);
+    LedMode::setup(matrix);
+
     turnAllLedsOff();
 
     led_update_task_event_group = xEventGroupCreate();

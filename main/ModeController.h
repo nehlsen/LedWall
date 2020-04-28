@@ -26,7 +26,6 @@ public:
     void setChangeHandler(change_handler_t change_handler);
 
 protected:
-    CRGB* m_ledsWithSafety;
     CRGB* m_leds;
 
     ConfigManager *m_configManager;

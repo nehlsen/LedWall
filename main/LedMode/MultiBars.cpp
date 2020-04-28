@@ -158,13 +158,13 @@ bool MultiBars::Bar::canDrawFrame() const
 
     switch (mode) {
         case DrawVertical:
-            return currentFrame < matrixWidth;
+            return currentFrame < matrix->getWidth();
         case DrawHorizontal:
-            return currentFrame < matrixHeight;
+            return currentFrame < matrix->getHeight();
 
         case DrawDiagonalBl:
         case DrawDiagonalBr:
-            return currentFrame < matrixWidth + matrixHeight;
+            return currentFrame < matrix->getWidth() + matrix->getHeight();
 
         default:
         case DrawModeCount:
@@ -187,16 +187,16 @@ void MultiBars::Bar::drawFrame()
 
     switch (mode) {
         case DrawVertical:
-            drawVerticalBar(direction == DirectionForward ? currentFrame : matrixWidth - currentFrame - 1);
+            drawVerticalBar(direction == DirectionForward ? currentFrame : matrix->getWidth() - currentFrame - 1);
             break;
         case DrawHorizontal:
-            drawHorizontalBar(direction == DirectionForward ? currentFrame : matrixHeight - currentFrame - 1);
+            drawHorizontalBar(direction == DirectionForward ? currentFrame : matrix->getHeight() - currentFrame - 1);
             break;
         case DrawDiagonalBl:
-            drawDiagonalBarBl(direction == DirectionForward ? currentFrame : matrixWidth + matrixHeight - currentFrame - 1);
+            drawDiagonalBarBl(direction == DirectionForward ? currentFrame : matrix->getWidth() + matrix->getHeight() - currentFrame - 1);
             break;
         case DrawDiagonalBr:
-            drawDiagonalBarBr(direction == DirectionForward ? currentFrame : matrixWidth + matrixHeight - currentFrame - 1);
+            drawDiagonalBarBr(direction == DirectionForward ? currentFrame : matrix->getWidth() + matrix->getHeight() - currentFrame - 1);
             break;
 
         default:
@@ -210,12 +210,12 @@ void MultiBars::Bar::drawFrame()
 void MultiBars::Bar::drawVerticalBar(uint8_t x)
 {
     if (direction == DirectionForward) {
-        for (uint8_t y = 0; y < matrixHeight; ++y) {
+        for (uint8_t y = 0; y < matrix->getHeight(); ++y) {
             draw(x, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t y = matrixHeight-1; y >= 0; --y) {
+        for (int8_t y = matrix->getHeight()-1; y >= 0; --y) {
             draw(x, y);
         }
     }
@@ -224,12 +224,12 @@ void MultiBars::Bar::drawVerticalBar(uint8_t x)
 void MultiBars::Bar::drawHorizontalBar(uint8_t y)
 {
     if (direction == DirectionForward) {
-        for (uint8_t x = 0; x < matrixWidth; ++x) {
+        for (uint8_t x = 0; x < matrix->getWidth(); ++x) {
             draw(x, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t x = matrixWidth-1; x >= 0; --x) {
+        for (int8_t x = matrix->getWidth()-1; x >= 0; --x) {
             draw(x, y);
         }
     }
@@ -238,12 +238,12 @@ void MultiBars::Bar::drawHorizontalBar(uint8_t y)
 void MultiBars::Bar::drawDiagonalBarBl(uint8_t frame)
 {
     if (direction == DirectionForward) {
-        for (uint8_t y = 0; y < matrixHeight; ++y) {
+        for (uint8_t y = 0; y < matrix->getHeight(); ++y) {
             draw(frame - y, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t y = matrixHeight-1; y >= 0; --y) {
+        for (int8_t y = matrix->getHeight()-1; y >= 0; --y) {
             draw(frame - y, y);
         }
     }
@@ -252,13 +252,13 @@ void MultiBars::Bar::drawDiagonalBarBl(uint8_t frame)
 void MultiBars::Bar::drawDiagonalBarBr(uint8_t frame)
 {
     if (direction == DirectionForward) {
-        for (uint8_t y = 0; y < matrixHeight; ++y) {
-            draw(matrixWidth - frame - 1 + y, y);
+        for (uint8_t y = 0; y < matrix->getHeight(); ++y) {
+            draw(matrix->getWidth() - frame - 1 + y, y);
         }
     } else {
         // signed to be able to reach -1 for abort condition
-        for (int8_t y = matrixHeight-1; y >= 0; --y) {
-            draw(matrixWidth - frame - 1 + y, y);
+        for (int8_t y = matrix->getHeight()-1; y >= 0; --y) {
+            draw(matrix->getWidth() - frame - 1 + y, y);
         }
     }
 }
@@ -268,8 +268,8 @@ void MultiBars::Bar::draw(uint8_t x, uint8_t y)
     auto color = CHSV(constantColor ? hue : random8(), 255, 255);
 
     if (blendColor) {
-        FastLED.leds()[xyToIndex(x, y)] += color;
+        matrix->pixel(x, y) += color;
     } else {
-        FastLED.leds()[xyToIndex(x, y)] = color;
+        matrix->pixel(x, y) = color;
     }
 }
