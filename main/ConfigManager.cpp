@@ -4,20 +4,22 @@
 #define NVS_NAMESPACE "led_wall_config"
 static const char *CONFIG_MANAGER_LOG_TAG = "CONFIG_MANAGER";
 
-#define MATRIX_WIDTH_KEY "matrix_width"
-#define MATRIX_HEIGHT_KEY "matrix_height"
-#define MATRIX_BRIGHTNESS_KEY "matrix_brightness"
-#define RESTART_COUNTER_KEY "restart_counter"
-#define POWER_LAST_STATE_KEY "power_state"
-#define POWER_BOOT_MODE_KEY "power_boot_into"
+// NOTE keys are limited to 15 characters
+#define MATRIX_WIDTH_KEY        "matrix_width"
+#define MATRIX_HEIGHT_KEY       "matrix_height"
+#define MATRIX_BRIGHTNESS_KEY   "matrix_brghtnss"
+#define RESTART_COUNTER_KEY     "restart_counter"
+#define POWER_LAST_STATE_KEY    "power_state"
+#define POWER_BOOT_MODE_KEY     "power_boot_into"
 #define LED_MODE_LAST_STATE_KEY "led_mode_state"
-#define LED_MODE_BOOT_MODE_KEY "led_mode_boot_into"
+#define LED_MODE_BOOT_MODE_KEY  "led_mode_boot"
 
-#define MQTT_BROKER_KEY "mqtt_broker"
+#define MQTT_BROKER_KEY         "mqtt_broker"
+#define MQTT_DEVICE_TOPIC_KEY   "mqtt_device_tpc"
+#define MQTT_GROUP_TOPIC_KEY    "mqtt_group_tpc"
+
 #define MQTT_BROKER_DEFAULT "mqtt://iot.eclipse.org"
-#define MQTT_DEVICE_TOPIC_KEY "mqtt_device_topic"
 #define MQTT_DEVICE_TOPIC_DEFAULT "a-led-wall"
-#define MQTT_GROUP_TOPIC_KEY "mqtt_group_topic"
 #define MQTT_GROUP_TOPIC_DEFAULT "ledwalls"
 
 bool ConfigManager::open()
