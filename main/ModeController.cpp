@@ -49,7 +49,7 @@ ModeController::ModeController(ConfigManager *configManager):
     ESP_LOGI(LOG_TAG, "Using PIN %d for LEDs", CONFIG_DATA_PIN);
     auto &fastLedController = CFastLED::addLeds<WS2812, CONFIG_DATA_PIN>(m_leds, (matrixWidth*matrixHeight));
 //    fastLedController.setCorrection(TypicalLEDStrip);
-    ESP_LOGI(LOG_TAG, "Setting Brightness to %d%%", (m_configManager->getBrightness()/255)*100);
+    ESP_LOGI(LOG_TAG, "Setting Brightness to %.0f%%", (m_configManager->getBrightness()/255.0)*100.0);
     FastLED.setBrightness(m_configManager->getBrightness());
 
     m_matrix = new LedMatrix(fastLedController, matrixWidth, matrixHeight, MatrixInvertHorizontal);
