@@ -13,6 +13,13 @@ static const char *CONFIG_MANAGER_LOG_TAG = "CONFIG_MANAGER";
 #define LED_MODE_LAST_STATE_KEY "led_mode_state"
 #define LED_MODE_BOOT_MODE_KEY "led_mode_boot_into"
 
+#define MQTT_BROKER_KEY "mqtt_broker"
+#define MQTT_BROKER_DEFAULT "mqtt://iot.eclipse.org"
+#define MQTT_DEVICE_TOPIC_KEY "mqtt_device_topic"
+#define MQTT_DEVICE_TOPIC_DEFAULT "a-led-wall"
+#define MQTT_GROUP_TOPIC_KEY "mqtt_group_topic"
+#define MQTT_GROUP_TOPIC_DEFAULT "ledwalls"
+
 bool ConfigManager::open()
 {
     esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &m_nvsHandle);
@@ -68,6 +75,43 @@ int32_t ConfigManager::getIntVal(const char *key, int32_t defaultValue) const
 bool ConfigManager::setIntVal(const char *key, int32_t value)
 {
     esp_err_t err = nvs_set_i32(m_nvsHandle, key, value);
+
+    if (err != ESP_OK) {
+        ESP_LOGE(CONFIG_MANAGER_LOG_TAG, "NVS write Error (%s), key:\"%s\"", esp_err_to_name(err), key);
+        return false;
+    }
+
+    return autoCommit();
+}
+
+std::string ConfigManager::getStringVal(const char *key, const std::string &defaultValue) const
+{
+    size_t required_size;
+    esp_err_t err = nvs_get_str(m_nvsHandle, key, NULL, &required_size);
+    if (err != ESP_OK) {
+        ESP_LOGW(CONFIG_MANAGER_LOG_TAG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key);
+        return defaultValue;
+    }
+    if (required_size >= 64) {
+        ESP_LOGW(CONFIG_MANAGER_LOG_TAG, "NVS read failed - max size exceeded, key:\"%s\"", key);
+        return defaultValue;
+    }
+
+    char* value = (char*)malloc(required_size);
+    err = nvs_get_str(m_nvsHandle, key, value, &required_size);
+    if (err != ESP_OK) {
+        ESP_LOGW(CONFIG_MANAGER_LOG_TAG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key);
+        return defaultValue;
+    }
+
+    auto ret = std::string(value);
+    free(value);
+    return ret;
+}
+
+bool ConfigManager::setStringVal(const char *key, const std::string &value)
+{
+    esp_err_t err = nvs_set_str(m_nvsHandle, key, value.c_str());
 
     if (err != ESP_OK) {
         ESP_LOGE(CONFIG_MANAGER_LOG_TAG, "NVS write Error (%s), key:\"%s\"", esp_err_to_name(err), key);
@@ -152,7 +196,7 @@ void ConfigManager::setLedModeAutoRestore(int autoRestoreMode)
     setIntVal(LED_MODE_BOOT_MODE_KEY, autoRestoreMode);
 }
 
-int ConfigManager::getLedModeAutoRestore()
+int ConfigManager::getLedModeAutoRestore() const
 {
     return getIntVal(LED_MODE_BOOT_MODE_KEY, -1);
 }
@@ -162,7 +206,7 @@ void ConfigManager::setLedMode(int currentModeIndex)
     setIntVal(LED_MODE_LAST_STATE_KEY, currentModeIndex);
 }
 
-int ConfigManager::getBootIntoMode()
+int ConfigManager::getBootIntoMode() const
 {
     auto ledModeAutoRestore = getLedModeAutoRestore();
 
@@ -172,6 +216,36 @@ int ConfigManager::getBootIntoMode()
     }
 
     return ledModeAutoRestore;
+}
+
+std::string ConfigManager::getMqttBroker() const
+{
+    return getStringVal(MQTT_BROKER_KEY, MQTT_BROKER_DEFAULT);
+}
+
+void ConfigManager::setMqttBroker(const std::string& brokerUrl)
+{
+    setStringVal(MQTT_BROKER_KEY, brokerUrl);
+}
+
+std::string ConfigManager::getMqttDeviceTopic() const
+{
+    return getStringVal(MQTT_DEVICE_TOPIC_KEY, MQTT_DEVICE_TOPIC_DEFAULT);
+}
+
+void ConfigManager::setMqttDeviceTopic(const std::string& topic)
+{
+    setStringVal(MQTT_DEVICE_TOPIC_KEY, topic);
+}
+
+std::string ConfigManager::getMqttGroupTopic() const
+{
+    return getStringVal(MQTT_GROUP_TOPIC_KEY, MQTT_GROUP_TOPIC_DEFAULT);
+}
+
+void ConfigManager::setMqttGroupTopic(const std::string& topic)
+{
+    setStringVal(MQTT_GROUP_TOPIC_KEY, topic);
 }
 
 bool ConfigManager::autoCommit()

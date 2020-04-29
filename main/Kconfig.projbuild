@@ -19,12 +19,6 @@ menu "LedWall Configuration"
         bool "Enable http/REST Interface"
         default false
 
-    config BROKER_URL
-        string "MQTT Broker URL"
-        default "mqtt://iot.eclipse.org"
-        help
-            URL of the MQTT broker to connect to
-
     config DATA_PIN
         int "Data PIN the LEDs are attached to"
         default 26

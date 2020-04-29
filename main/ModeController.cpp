@@ -5,6 +5,7 @@
 #include <LedMatrix.h>
 #include "LedMode/LedModes.h"
 #include "ConfigManager.h"
+#include "events.h"
 
 static const char *LOG_TAG = "ModeController";
 
@@ -16,7 +17,8 @@ void led_update_task(void *pvParameter)
 {
     ESP_LOGI(LOG_TAG, "led_update_task...");
 
-    auto *controller = (ModeController*)pvParameter;
+    auto *controller = static_cast<ModeController*>(pvParameter);
+    ESP_ERROR_CHECK(nullptr == controller ? ESP_FAIL : ESP_OK);
 
 //    int delay = (1000/ledMode->fps()) / portTICK_PERIOD_MS;
     int delay = (1000/25) / portTICK_PERIOD_MS;
@@ -81,8 +83,8 @@ void ModeController::setPower(bool power)
     }
     setLedUpdateTaskEnabled(m_power);
     
-    onChanged();
     m_configManager->setPowerState(m_power);
+    esp_event_post(LEDWALL_EVENTS, LEDWALL_EVENT_POWER_CHANGED, (void*)&m_power, sizeof(m_power), portMAX_DELAY);
 }
 
 bool ModeController::getPower() const
@@ -106,9 +108,10 @@ bool ModeController::setModeIndex(int modeIndex)
     m_modeIndex = modeIndex;
     delete m_ledMode;
     m_ledMode = newMode;
-    
-    onChanged();
+
     m_configManager->setLedMode(m_modeIndex);
+    esp_event_post(LEDWALL_EVENTS, LEDWALL_EVENT_MODE_CHANGED, (void*)&m_modeIndex, sizeof(m_modeIndex), portMAX_DELAY);
+
     return true;
 }
 
@@ -120,20 +123,6 @@ int ModeController::getModeIndex() const
 LedMode* ModeController::getLedMode() const
 {
     return m_ledMode;
-}
-
-void ModeController::setChangeHandler(change_handler_t change_handler)
-{
-    m_change_handler = change_handler;
-}
-
-void ModeController::onChanged()
-{
-    if (m_change_handler == nullptr) {
-        return;
-    }
-
-    m_change_handler();
 }
 
 void ModeController::setLedUpdateTaskEnabled(bool enabled)

@@ -2,6 +2,7 @@
 #define LEDWALL_CONFIGMANAGER_H
 
 #include <nvs.h>
+#include <string>
 
 class ConfigManager
 {
@@ -16,6 +17,9 @@ public:
     // FIXME refactor to template function?
     int32_t getIntVal(const char *key, int32_t defaultValue) const;
     bool setIntVal(const char *key, int32_t value);
+    // NOTE value is limited to 64 characters!
+    std::string getStringVal(const char *key, const std::string &defaultValue) const;
+    bool setStringVal(const char *key, const std::string &value);
 
     int32_t getRestartCounter();
 
@@ -40,9 +44,16 @@ public:
 //    void setBootIntoMode(); // set mode to boot into, disables restore
 //    void setAutoRestoreModeEnabled(); // enable auto restore mode
     void setLedModeAutoRestore(int autoRestoreMode); // -1 auto restore, >=0 boot in this mode (ignores remembered mode)
-    int getLedModeAutoRestore();
+    int getLedModeAutoRestore() const;
     void setLedMode(int currentModeIndex); // remember current mode
-    int getBootIntoMode();
+    int getBootIntoMode() const;
+
+    std::string getMqttBroker() const;
+    void setMqttBroker(const std::string& brokerUrl);
+    std::string getMqttDeviceTopic() const;
+    void setMqttDeviceTopic(const std::string& topic);
+    std::string getMqttGroupTopic() const;
+    void setMqttGroupTopic(const std::string& topic);
 
 protected:
     bool m_autoCommitEnabled = true;

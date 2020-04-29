@@ -31,7 +31,7 @@ endif()
 if(CONFIG_ENABLE_MQTT)
     set(COMPONENT_SRCS
             ${COMPONENT_SRCS}
-            "mqtt.cpp"
+            "mqtt/Mqtt.cpp"
             )
     message(STATUS "LedWall: MQTT Interface enabled")
 else()

@@ -151,6 +151,10 @@ cJSON* WebServer::createConfigData()
     cJSON_AddNumberToObject(root, "PowerOnResetMode", m_configManager->getPowerOnResetMode());
     cJSON_AddNumberToObject(root, "LedModeAutoRestore", m_configManager->getLedModeAutoRestore());
 
+    cJSON_AddStringToObject(root, "MqttBroker", m_configManager->getMqttBroker().c_str());
+    cJSON_AddStringToObject(root, "MqttDeviceTopic", m_configManager->getMqttDeviceTopic().c_str());
+    cJSON_AddStringToObject(root, "MqttGroupTopic", m_configManager->getMqttGroupTopic().c_str());
+
     return root;
 }
 
@@ -191,8 +195,23 @@ esp_err_t WebServer::postConfig(httpd_req_t *req)
             m_configManager->setLedModeAutoRestore(mode);
         }
 
+        cJSON *const mqttBroker = cJSON_GetObjectItem(request, "MqttBroker");
+        if (mqttBroker && cJSON_IsString(mqttBroker) && strlen(mqttBroker->string) > 0 && strlen(mqttBroker->string) < 64) {
+            m_configManager->setMqttBroker(mqttBroker->string);
+        }
+
+        cJSON *const mqttDeviceTopic = cJSON_GetObjectItem(request, "MqttDeviceTopic");
+        if (mqttDeviceTopic && cJSON_IsString(mqttDeviceTopic) && strlen(mqttDeviceTopic->string) > 0 && strlen(mqttDeviceTopic->string) < 64) {
+            m_configManager->setMqttDeviceTopic(mqttDeviceTopic->string);
+        }
+
+        cJSON *const mqttGroupTopic = cJSON_GetObjectItem(request, "MqttGroupTopic");
+        if (mqttGroupTopic && cJSON_IsString(mqttGroupTopic) && strlen(mqttGroupTopic->string) > 0 && strlen(mqttGroupTopic->string) < 64) {
+            m_configManager->setMqttGroupTopic(mqttGroupTopic->string);
+        }
+
         *response = createConfigData();
-        return matrixWidth || matrixHeight || brightness || powerOnResetMode || ledModeAutoRestore;
+        return matrixWidth || matrixHeight || brightness || powerOnResetMode || ledModeAutoRestore || mqttBroker || mqttDeviceTopic || mqttGroupTopic;
     });
 }
 

@@ -23,9 +23,6 @@ public:
 
     LedMode *getLedMode() const;
 
-    // called every time something changes, e.g. power-on/off, mode
-    void setChangeHandler(change_handler_t change_handler);
-
 protected:
     CRGB* m_leds;
     LedMatrix* m_matrix;
@@ -35,9 +32,6 @@ protected:
     bool m_power = true;
     int m_modeIndex = -1;
     LedMode *m_ledMode = nullptr;
-
-    void onChanged();
-    change_handler_t m_change_handler = nullptr;
 
     static void setLedUpdateTaskEnabled(bool enabled);
     static void turnAllLedsOff();

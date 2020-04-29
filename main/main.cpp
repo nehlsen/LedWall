@@ -17,8 +17,10 @@
 
 #ifdef CONFIG_ENABLE_MQTT
 #pragma message "MQTT enabled"
-#include "mqtt.h"
+#include "mqtt/Mqtt.h"
 #endif
+
+ESP_EVENT_DEFINE_BASE(LEDWALL_EVENTS);
 
 static const char *APP_LOG_TAG = "LED_WALL";
 
@@ -129,7 +131,8 @@ void app_main()
     auto updater = new OtaUpdater;
 
     #ifdef CONFIG_ENABLE_MQTT
-    mqtt_app_start(controller);
+    auto mqtt = new Mqtt(controller, cfg);
+    mqtt->start();
     #endif
 
     #ifdef CONFIG_ENABLE_REST
