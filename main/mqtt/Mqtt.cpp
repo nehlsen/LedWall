@@ -112,5 +112,5 @@ void Mqtt::publishState(const std::string &state, const std::string &value)
 {
     std::string topic = "/" + m_configManager->getMqttDeviceTopic() + "/state/" + state;
 
-    esp_mqtt_client_publish(m_client, topic.c_str(), value.c_str(), 0, 1, 0);
+    esp_mqtt_client_publish(m_client, topic.c_str(), value.c_str(), 0, 0, 0);
 }
