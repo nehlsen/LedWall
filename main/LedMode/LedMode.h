@@ -13,6 +13,7 @@ public:
     virtual ~LedMode() = default;
 
     virtual void update() = 0;
+    virtual int frameDelay() const;
 
     // read options from mode to JSON object
     virtual void readOptions(cJSON *root);

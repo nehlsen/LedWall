@@ -20,16 +20,13 @@ void led_update_task(void *pvParameter)
     auto *controller = static_cast<ModeController*>(pvParameter);
     ESP_ERROR_CHECK(nullptr == controller ? ESP_FAIL : ESP_OK);
 
-//    int delay = (1000/ledMode->fps()) / portTICK_PERIOD_MS;
-    int delay = (1000/25) / portTICK_PERIOD_MS;
-
     while (true) {
         LedMode *ledMode = controller->getLedMode();
         if (ledMode) ledMode->update();
 
         FastLED.show();
 
-        vTaskDelay(delay);
+        vTaskDelay(ledMode->frameDelay());
         xEventGroupWaitBits(led_update_task_event_group, LED_WALL_ENABLED_BIT, false, false, portMAX_DELAY);
     }
 }
