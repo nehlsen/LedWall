@@ -18,6 +18,8 @@ public:
 
     esp_err_t getSystemInfo(httpd_req_t *req);
 
+    esp_err_t postSystemReboot(httpd_req_t *req);
+
     esp_err_t getLedPower(httpd_req_t *req);
     esp_err_t postLedPower(httpd_req_t *req);
 

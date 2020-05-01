@@ -88,6 +88,12 @@ bool ModeController::getPower() const
     return m_power;
 }
 
+void ModeController::triggerSystemReboot()
+{
+    ESP_LOGI(LOG_TAG, "SYSTEM REBOOT TRIGGERED!");
+    esp_restart();
+}
+
 void ModeController::setBrightness(uint8_t brightness)
 {
     ESP_LOGI(LOG_TAG, "Set Brightness %.0f%%", (brightness/255.0)*100.0);

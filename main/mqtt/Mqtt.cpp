@@ -79,6 +79,9 @@ void Mqtt::onMqttData(esp_mqtt_event_handle_t event)
     if (nullptr != strstr(event->topic, "/mode") && event->data_len >= 1) {
         m_controller->setModeIndex(atoi(event->data));
     }
+    if (nullptr != strstr(event->topic, "/reboot")) {
+        m_controller->triggerSystemReboot();
+    }
 }
 
 void Mqtt::onLedWallEvent(int32_t event_id, void *event_data)
@@ -113,6 +116,7 @@ void Mqtt::setupSubscriptions(const std::string &baseTopic)
     };
 
     subscribeToCommand("power");
+    subscribeToCommand("reboot");
     subscribeToCommand("brightness");
     subscribeToCommand("mode");
 }

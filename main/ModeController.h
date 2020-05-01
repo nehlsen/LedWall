@@ -18,6 +18,7 @@ public:
 
     void setPower(bool power);
     bool getPower() const;
+    void triggerSystemReboot();
 
     void setBrightness(uint8_t brightness);
     uint8_t getBrightness() const;

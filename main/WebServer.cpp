@@ -22,6 +22,7 @@ static const char *WEBSERVER_LOG_TAG = "WebServer";
     }
 
 CREATE_FUNCTION_TO_METHOD(system_info_get_handler, getSystemInfo)
+CREATE_FUNCTION_TO_METHOD(system_reboot_post_handler, postSystemReboot)
 CREATE_FUNCTION_TO_METHOD(led_power_get_handler, getLedPower)
 CREATE_FUNCTION_TO_METHOD(led_power_post_handler, postLedPower)
 CREATE_FUNCTION_TO_METHOD(led_mode_get_handler, getLedMode)
@@ -57,6 +58,13 @@ esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
     cJSON_AddNumberToObject(root, "ledPin", CONFIG_DATA_PIN);
 
     return jsonResponse(root, req);
+}
+
+esp_err_t WebServer::postSystemReboot(httpd_req_t *req)
+{
+    m_controller->triggerSystemReboot();
+
+    return ESP_OK;
 }
 
 cJSON* WebServer::createLedPowerData()
@@ -253,7 +261,7 @@ void WebServer::startServer()
     }
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.max_uri_handlers = 11;
+    config.max_uri_handlers = 12;
     config.uri_match_fn = httpd_uri_match_wildcard;
 
     ESP_LOGI(WEBSERVER_LOG_TAG, "Starting server on port: '%d'", config.server_port);
@@ -280,6 +288,14 @@ void WebServer::registerUriHandlers()
             .user_ctx = this
     };
     httpd_register_uri_handler(m_hdnlServer, &system_info_get_uri);
+
+    httpd_uri_t system_reboot_post_uri = {
+            .uri = "/api/v1/system/reboot",
+            .method = HTTP_POST,
+            .handler = system_reboot_post_handler,
+            .user_ctx = this
+    };
+    httpd_register_uri_handler(m_hdnlServer, &system_reboot_post_uri);
 
     httpd_uri_t led_power_get_uri = {
             .uri = "/api/v1/led/power",
