@@ -47,7 +47,7 @@ protected:
 
     void registerUriHandlers();
 
-    esp_err_t jsonResponse(cJSON *root, httpd_req_t *req);
+    esp_err_t jsonResponse(cJSON *root, httpd_req_t *req, const char* status = "200");
     esp_err_t handlePost(httpd_req_t *req, const std::function<bool(cJSON *request, cJSON **response)>& jsonHandler);
 
     cJSON *createLedPowerData();

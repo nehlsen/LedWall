@@ -358,8 +358,9 @@ void WebServer::registerUriHandlers()
     httpd_register_uri_handler(m_hdnlServer, &file_get_uri);
 }
 
-esp_err_t WebServer::jsonResponse(cJSON *root, httpd_req_t *req)
+esp_err_t WebServer::jsonResponse(cJSON *root, httpd_req_t *req, const char* status)
 {
+    httpd_resp_set_status(req, status);
     httpd_resp_set_type(req, "application/json");
 
     const char *responsePayload = cJSON_Print(root);
@@ -401,7 +402,11 @@ esp_err_t WebServer::handlePost(httpd_req_t *req, const std::function<bool(cJSON
 
     cJSON *response = nullptr;
     if (!jsonHandler(request, &response)) {
-        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "JSON is missing keys or has invalid values");
+        if (response == nullptr) {
+            httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "JSON is missing keys or has invalid values");
+        } else {
+            jsonResponse(response, req, "400 Bad Request");
+        }
         cJSON_Delete(request);
         if (response) cJSON_Delete(response);
         return ESP_FAIL;
