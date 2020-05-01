@@ -2,6 +2,7 @@
 #define LEDWALL_MODECONTROLLER_H
 
 #include <list>
+#include <stdint.h>
 
 class CRGB;
 class LedMode;
@@ -17,6 +18,9 @@ public:
 
     void setPower(bool power);
     bool getPower() const;
+
+    void setBrightness(uint8_t brightness);
+    uint8_t getBrightness() const;
 
     bool setModeIndex(int modeIndex);
     int getModeIndex() const;

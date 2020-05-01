@@ -73,6 +73,9 @@ void Mqtt::onMqttData(esp_mqtt_event_handle_t event)
     if (nullptr != strstr(event->topic, "/power") && event->data_len >= 1) {
         m_controller->setPower(event->data[0] == '1');
     }
+    if (nullptr != strstr(event->topic, "/brightness") && event->data_len >= 1) {
+        m_controller->setBrightness(atoi(event->data));
+    }
     if (nullptr != strstr(event->topic, "/mode") && event->data_len >= 1) {
         m_controller->setModeIndex(atoi(event->data));
     }
@@ -87,6 +90,12 @@ void Mqtt::onLedWallEvent(int32_t event_id, void *event_data)
             break;
         }
 
+        case LEDWALL_EVENT_BRIGHTNESS_CHANGED: {
+            uint8_t *brightness = static_cast<uint8_t *>(event_data);
+            publishState("brightness", std::to_string(*brightness));
+            break;
+        }
+
         case LEDWALL_EVENT_MODE_CHANGED: {
             int *modeIndex = static_cast<int *>(event_data);
             publishState("mode", std::to_string(*modeIndex));
@@ -97,15 +106,15 @@ void Mqtt::onLedWallEvent(int32_t event_id, void *event_data)
 
 void Mqtt::setupSubscriptions(const std::string &baseTopic)
 {
-    std::string topic;
+    auto subscribeToCommand = [baseTopic, this](const std::string &command) {
+        std::string topic = "/" + baseTopic + "/cmd/" + command;
+        esp_mqtt_client_subscribe(m_client, topic.c_str(), 0);
+        ESP_LOGI(LOG_TAG, "Subscribed to \"%s\"", topic.c_str());
+    };
 
-    topic = "/" + baseTopic + "/cmd/power";
-    esp_mqtt_client_subscribe(m_client, topic.c_str(), 0);
-    ESP_LOGI(LOG_TAG, "Subscribed to \"%s\"", topic.c_str());
-
-    topic = "/" + baseTopic + "/cmd/mode";
-    esp_mqtt_client_subscribe(m_client, topic.c_str(), 0);
-    ESP_LOGI(LOG_TAG, "Subscribed to \"%s\"", topic.c_str());
+    subscribeToCommand("power");
+    subscribeToCommand("brightness");
+    subscribeToCommand("mode");
 }
 
 void Mqtt::publishState(const std::string &state, const std::string &value)

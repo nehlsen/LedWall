@@ -46,8 +46,6 @@ ModeController::ModeController(ConfigManager *configManager):
     ESP_LOGI(LOG_TAG, "Using PIN %d for LEDs", CONFIG_DATA_PIN);
     auto &fastLedController = CFastLED::addLeds<WS2812, CONFIG_DATA_PIN>(m_leds, (matrixWidth*matrixHeight));
 //    fastLedController.setCorrection(TypicalLEDStrip);
-    ESP_LOGI(LOG_TAG, "Setting Brightness to %.0f%%", (m_configManager->getBrightness()/255.0)*100.0);
-    FastLED.setBrightness(m_configManager->getBrightness());
 
     m_matrix = new LedMatrix(fastLedController, matrixWidth, matrixHeight, MatrixInvertHorizontal);
 
@@ -57,6 +55,7 @@ ModeController::ModeController(ConfigManager *configManager):
     xEventGroupSetBits(led_update_task_event_group, LED_WALL_ENABLED_BIT);
 
     setPower(m_configManager->isPoweredOnBoot());
+    setBrightness(m_configManager->getBrightness());
     setModeIndex(m_configManager->getBootIntoMode());
 
     xTaskCreatePinnedToCore(
@@ -87,6 +86,20 @@ void ModeController::setPower(bool power)
 bool ModeController::getPower() const
 {
     return m_power;
+}
+
+void ModeController::setBrightness(uint8_t brightness)
+{
+    ESP_LOGI(LOG_TAG, "Set Brightness %.0f%%", (brightness/255.0)*100.0);
+    FastLED.setBrightness(brightness);
+
+    m_configManager->setBrightness(brightness);
+    esp_event_post(LEDWALL_EVENTS, LEDWALL_EVENT_BRIGHTNESS_CHANGED, (void*)&brightness, sizeof(brightness), portMAX_DELAY);
+}
+
+uint8_t ModeController::getBrightness() const
+{
+    return FastLED.getBrightness();
 }
 
 bool ModeController::setModeIndex(int modeIndex)
