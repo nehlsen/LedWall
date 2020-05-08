@@ -6,6 +6,7 @@ LedMode::LedMode(LedMatrix &matrix):
 
 int LedMode::frameDelay() const
 {
+    // FIXME fire normally uses 60fps
     return (1000/25) / portTICK_PERIOD_MS;
 }
 

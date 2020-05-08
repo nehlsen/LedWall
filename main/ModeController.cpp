@@ -21,6 +21,8 @@ void led_update_task(void *pvParameter)
     ESP_ERROR_CHECK(nullptr == controller ? ESP_FAIL : ESP_OK);
 
     while (true) {
+        random16_add_entropy(random());
+
         LedMode *ledMode = controller->getLedMode();
         if (ledMode) ledMode->update();
 
@@ -44,7 +46,7 @@ ModeController::ModeController(ConfigManager *configManager):
     ESP_LOGD(LOG_TAG, "Free memory (after alloc): %d bytes", esp_get_free_heap_size());
 
     ESP_LOGI(LOG_TAG, "Using PIN %d for LEDs", CONFIG_DATA_PIN);
-    auto &fastLedController = CFastLED::addLeds<WS2812, CONFIG_DATA_PIN>(m_leds, (matrixWidth*matrixHeight));
+    auto &fastLedController = CFastLED::addLeds<WS2812, CONFIG_DATA_PIN, GRB>(m_leds, (matrixWidth*matrixHeight));
 //    fastLedController.setCorrection(TypicalLEDStrip);
 
     m_matrix = new LedMatrix(fastLedController, matrixWidth, matrixHeight, MatrixInvertHorizontal);
@@ -91,6 +93,7 @@ bool ModeController::getPower() const
 void ModeController::triggerSystemReboot()
 {
     ESP_LOGI(LOG_TAG, "SYSTEM REBOOT TRIGGERED!");
+    turnAllLedsOff();
     esp_restart();
 }
 

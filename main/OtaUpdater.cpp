@@ -47,13 +47,14 @@ public:
                 lastError = esp_https_ota_perform(otaHandle);
                 if (lastError != ESP_ERR_HTTPS_OTA_IN_PROGRESS) {
                     // something failed. e.g. download failed, failed to write to flash, ...
+                    // OR: ESP_OK: download complete
                     break;
                 }
             }
         }
 
         // cleanup broken update OR finish successful update
-        esp_err_t ota_finish_err = esp_https_ota_finish(otaHandle);
+        esp_err_t ota_finish_err = esp_https_ota_finish(otaHandle); // free's otaHandle
         otaHandle = nullptr;
 
         if (lastError == ESP_OK) {

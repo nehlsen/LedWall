@@ -1,6 +1,5 @@
 #include "Bars.h"
 #include "utilities.h"
-
 #include <cJSON.h>
 
 void Bars::update()

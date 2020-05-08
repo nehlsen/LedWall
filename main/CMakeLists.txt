@@ -15,6 +15,7 @@ set(COMPONENT_SRCS
         "LedMode/Fireworks.cpp"
         "LedMode/Bars.cpp"
         "LedMode/MultiBars.cpp"
+        "LedMode/Fire.cpp"
         )
 
 if(CONFIG_ENABLE_REST)

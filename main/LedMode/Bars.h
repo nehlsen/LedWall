@@ -3,7 +3,7 @@
 
 #include "LedMode.h"
 
-class Bars: public LedMode
+class Bars : public LedMode
 {
 public:
     using LedMode::LedMode;
