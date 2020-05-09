@@ -16,6 +16,7 @@ set(COMPONENT_SRCS
         "LedMode/Bars.cpp"
         "LedMode/MultiBars.cpp"
         "LedMode/Fire.cpp"
+        "LedMode/Camera.cpp"
         )
 
 if(CONFIG_ENABLE_REST)

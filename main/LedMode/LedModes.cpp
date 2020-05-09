@@ -7,6 +7,7 @@
 #include "LedModeSample.h"
 #include "LedModeHsiboy.h"
 #include "Fire.h"
+#include "Camera.h"
 
 LedMode *createModeStatus(LedMatrix& matrix) { return new LedModeStatus(matrix); }
 LedMode *createModeBars(LedMatrix& matrix) { return new Bars(matrix); }
@@ -15,6 +16,7 @@ LedMode *createModeFireworks(LedMatrix& matrix) { return new Fireworks(matrix); 
 LedMode *createModeSample(LedMatrix& matrix) { return new LedModeSample(matrix); }
 LedMode *createModeHsiboy(LedMatrix& matrix) { return new LedModeHsiboy(matrix); }
 LedMode *createModeFire(LedMatrix& matrix) { return new Fire(matrix); }
+LedMode *createModeCamera(LedMatrix& matrix) { return new Camera(matrix); }
 
 LedModeDef_t modeStatusDef {"Status", &createModeStatus};
 LedModeDef_t modeBarsDef {"Bars", &createModeBars};
@@ -23,6 +25,7 @@ LedModeDef_t modeFireworksDef {"Fireworks", &createModeFireworks};
 LedModeDef_t modeSampleDef {"Sample", &createModeSample};
 LedModeDef_t modeHsiboyDef {"Hsiboy", &createModeHsiboy};
 LedModeDef_t modeFireDef {"Fire", &createModeFire};
+LedModeDef_t modeCameraDef {"Camera", &createModeCamera};
 
 std::vector<LedModeDef_t> LedModes {
         modeStatusDef,
@@ -32,4 +35,5 @@ std::vector<LedModeDef_t> LedModes {
         modeSampleDef,
         modeHsiboyDef,
         modeFireDef,
+        modeCameraDef,
 };
