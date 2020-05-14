@@ -94,7 +94,7 @@ void ModeController::triggerSystemReboot()
 {
     ESP_LOGI(LOG_TAG, "SYSTEM REBOOT TRIGGERED!");
     turnAllLedsOff();
-    esp_restart();
+    esp_restart(); // FIXME give e.g. http time to send a response!
 }
 
 void ModeController::setBrightness(uint8_t brightness)

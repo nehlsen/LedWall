@@ -424,7 +424,6 @@ esp_err_t WebServer::handlePost(httpd_req_t *req, const std::function<bool(cJSON
             jsonResponse(response, req, "400 Bad Request");
         }
         cJSON_Delete(request);
-        if (response) cJSON_Delete(response);
         return ESP_FAIL;
     }
 
