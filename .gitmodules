@@ -1,3 +1,6 @@
 [submodule "components/FastLedIdf"]
 	path = components/FastLedIdf
 	url = git@github.com:nehlsen/FastLedIdf.git
+[submodule "components/Mates-for-LEDs"]
+	path = components/Mates-for-LEDs
+	url = git@github.com:nehlsen/Mates-for-LEDs.git

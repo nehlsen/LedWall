@@ -7,17 +7,19 @@ There are a lot of Projects out there doing almost the same. The target of this 
 See companion at https://github.com/nehlsen/LedWall-Grafitti
 
 Features working so far
-- Connect to Wifi
+- Connect to Wifi, wifi provisioning using the espressif sample app
 - Connect to MQTT Broker
-- Control _Power State_ over MQTT
-- Control _Mode_ over MQTT 
+  - Control _Power State_
+  - Control _Mode_ 
 - Provide a RESTful API
-- Control _Power State_ over REST
-- Control _Mode_ over REST
+  - Control _Power State_
+  - Control _Mode_
+  - Read and Set various configuration parameters
+  - Read and Set various led-mode options
+  - Trigger OTA
 
 Planned features / Wishlist
 - Embedded WebUI
-- Wifi provisioning
 - Temp, Humidity, Atmospheric Pressure and ambient Light Sensor Data via MQTT
 - More hard-programmed animations
 - Manual animations or pixmaps via MQTT or REST
@@ -25,6 +27,8 @@ Planned features / Wishlist
 - Presence detection using BT-LE
 
 Dependencies
+- https://github.com/nehlsen/FastLedIdf
+- https://github.com/nehlsen/Mates-for-LEDs
 - ESP-IDF v4.1-dev-1086-g93a8603c5
 
 Used Hardware
