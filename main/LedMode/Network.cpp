@@ -4,9 +4,54 @@
 #define NET_LOG_TAG "LedMode:Network"
 #define PORT 47011
 
+struct PixelData {
+    uint8_t x;
+    uint8_t y;
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
+
+static void readPixelStreamData(char *data, int length, QueueHandle_t receiveQueue)
+{
+    int bytesHandled = 0;
+
+    for (int pixel = 0; pixel < (length-2)/5; ++pixel) {
+        // 5 byte per pixel -> pixel * 5
+        // 2 byte header    -> +2
+        // actual data      -> +0 to +4
+
+        PixelData pixelData = {
+                (uint8_t)data[pixel*5 +2 +0],
+                (uint8_t)data[pixel*5 +2 +1],
+                (uint8_t)data[pixel*5 +2 +2],
+                (uint8_t)data[pixel*5 +2 +3],
+                (uint8_t)data[pixel*5 +2 +4]
+        };
+        if (errQUEUE_FULL == xQueueSendToBack(receiveQueue, &pixelData, 0)) {
+            ESP_LOGW(NET_LOG_TAG, "Failed to write to Queue! Queue full!");
+        } else {
+            bytesHandled += 5;
+        }
+    }
+
+    ESP_LOGI(NET_LOG_TAG, "readPixelStreamData, handled %d of %d bytes", bytesHandled, length);
+}
+
+static void readNetworkData(char *data, int length, QueueHandle_t receiveQueue)
+{
+    if (length < 7) {
+        return;
+    }
+
+    if (data[0] == 0x10) {
+        readPixelStreamData(data, length, receiveQueue);
+    }
+}
+
 static void udp_server_task(void *pvParameters)
 {
-    Network *net = static_cast<Network*>(pvParameters);
+    QueueHandle_t receiveQueue = static_cast<QueueHandle_t>(pvParameters);
 
     char rx_buffer[128];
     int addr_family;
@@ -34,7 +79,7 @@ static void udp_server_task(void *pvParameters)
         ESP_LOGI(NET_LOG_TAG, "Socket bound, port %d", PORT);
 
         while (true) {
-            ESP_LOGI(NET_LOG_TAG, "Waiting for data");
+            ESP_LOGD(NET_LOG_TAG, "Waiting for data");
             int len = recv(sock, rx_buffer, sizeof(rx_buffer) - 1, 0);
 
             // Error occurred during receiving
@@ -43,10 +88,10 @@ static void udp_server_task(void *pvParameters)
                 break;
             } else {
                 // Data received
-                ESP_LOGI(NET_LOG_TAG, "Received %d bytes", len);
+                ESP_LOGD(NET_LOG_TAG, "Received %d bytes", len);
 
-                if (len >= 7 && net != nullptr) {
-                    net->onNetworkData(rx_buffer, len);
+                if (len >= 7 && receiveQueue) {
+                    readNetworkData(rx_buffer, len, receiveQueue);
                 }
             }
         }
@@ -62,37 +107,55 @@ static void udp_server_task(void *pvParameters)
 
 Network::Network(LedMatrix &matrix) : LedMode(matrix)
 {
-    TaskHandle_t udpServerTask = nullptr; // TODO remember to stop it in DTOR
-    xTaskCreate(udp_server_task, "udp_server", 4096, this, 5, &udpServerTask);
+    m_receiveQueue = xQueueCreate(matrix.getWidth()*matrix.getHeight(), sizeof(PixelData));
+    if (m_receiveQueue == nullptr) {
+        ESP_LOGE(NET_LOG_TAG, "Failed to create Queue!");
+    } else {
+        ESP_LOGI(NET_LOG_TAG, "Queue created, starting udp-server task...");
+        xTaskCreate(udp_server_task, "udp_server", 4096, m_receiveQueue, 5, &m_udpServerTask);
+    }
+}
+
+Network::~Network()
+{
+    vTaskDelete(m_udpServerTask);
 }
 
 void Network::update()
 {
-    m_buffer.render(m_matrix);
-}
+    UBaseType_t cnt = uxQueueMessagesWaiting(m_receiveQueue);
+    if (cnt > 0)
+        ESP_LOGI(NET_LOG_TAG, "update, %d messages on queue", cnt);
 
-void Network::onNetworkData(char *data, int length)
-{
-    if (length < 7) {
-        return;
-    }
-
-    if (data[0] == 0x10) {
-        handlePixelStreamData(data, length);
+    if (readQueue()) {
+        m_buffer.render(m_matrix);
     }
 }
 
-void Network::handlePixelStreamData(char *data, int length)
+bool Network::readQueue()
 {
-    for (int pixel = 0; pixel < (length-2)/5; ++pixel) {
-        uint8_t x = data[pixel*5 +2 +0];
-        uint8_t y = data[pixel*5 +2 +1];
-        uint8_t r = data[pixel*5 +2 +2];
-        uint8_t g = data[pixel*5 +2 +3];
-        uint8_t b = data[pixel*5 +2 +4];
-
-        ESP_LOGI(NET_LOG_TAG, "pixel: %d,%d -> %d,%d,%d", x, y, r, g, b);
-
-        m_buffer.merge(Pixel(x, y, CRGB(r, g, b)));
+    if (m_receiveQueue == nullptr) {
+        ESP_LOGW(NET_LOG_TAG, "Queue not ready!");
+        return false;
     }
+
+    uint8_t countNewPixels = 0;
+    auto *readBuffer = new PixelData;
+    Pixels newPixels;
+    do {
+        if(xQueueReceive(m_receiveQueue, readBuffer, 0)) {
+            newPixels.push_back(Pixel(readBuffer->x, readBuffer->y, CRGB(readBuffer->r, readBuffer->g, readBuffer->b)));
+
+            ++countNewPixels;
+        } else {
+            // queue is empty. stop for now
+            break;
+        }
+    } while (true);
+    delete readBuffer;
+
+    m_buffer.merge(newPixels);
+    if (countNewPixels > 0) ESP_LOGI(NET_LOG_TAG, "readQueue, received %d new pixels", countNewPixels);
+
+    return countNewPixels > 0;
 }

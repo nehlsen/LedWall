@@ -8,15 +8,16 @@ class Network : public LedMode
 {
 public:
     explicit Network(LedMatrix& matrix);
+    ~Network() override;
 
     void update() override;
 
-    void onNetworkData(char *data, int length);
-
 protected:
-    GfxPrimitive m_buffer;
+    QueueHandle_t m_receiveQueue;
+    TaskHandle_t m_udpServerTask;
 
-    void handlePixelStreamData(char *data, int length);
+    bool readQueue();
+    GfxPrimitive m_buffer;
 };
 
 #endif //LEDWALL_NETWORK_H
