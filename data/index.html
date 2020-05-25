@@ -1,0 +1,238 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>LedWall</title>
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <link rel="shortcut icon" type="image/png" href="ledwall-16.png">
+
+    <style type="text/css">
+        html {
+            background-color: rgb(225, 225, 225);
+        }
+        .box {
+            background-color: #fff;
+            border-radius: 6px;
+            box-shadow: 0 0.5em 1em -0.125em rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.02);
+            color: #4a4a4a;
+            display: block;
+            padding: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="columns">
+        <div class="column is-full">
+            <div class="box"><h1 class="title"><img src="ledwall-16.png" alt="ICO"> LedWall</h1></div>
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column is-one-third">
+            <div class="box">
+<!--                TODO current mode ?! -->
+                <h2 class="title"><i class="fa fas fa-tasks"></i> Modes</h2>
+                <p class="help">Click to activate...</p>
+                <div class="menu">
+                    <ul id="modes-list" class="menu-list">
+                        <li id="modes-list-placeholder" class="has-text-grey">Loading...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="column is-one-third">
+            <div class="box">
+                <h2 class="title"><i class="fa fas fa-toolbox"></i> System Info</h2>
+                <table class="table">
+                    <tr>
+                        <th>idfVersion</th>
+                        <td id="sys-info-idfVersion"><em class="has-text-grey">loading...</em></td>
+                    </tr>
+                    <tr>
+                        <th>cores</th>
+                        <td id="sys-info-cores"><em class="has-text-grey">loading...</em></td>
+                    </tr>
+                    <tr>
+                        <th>restarts</th>
+                        <td id="sys-info-restarts"><em class="has-text-grey">loading...</em></td>
+                    </tr>
+                    <tr>
+                        <th>projectName</th>
+                        <td id="sys-info-projectName"><em class="has-text-grey">loading...</em></td>
+                    </tr>
+                    <tr>
+                        <th>projectVersion</th>
+                        <td id="sys-info-projectVersion"><em class="has-text-grey">loading...</em></td>
+                    </tr>
+                    <tr>
+                        <th>compileTime</th>
+                        <td id="sys-info-compileTime"><em class="has-text-grey">loading...</em></td>
+                    </tr>
+                    <tr>
+                        <th>compileDate</th>
+                        <td id="sys-info-compileDate"><em class="has-text-grey">loading...</em></td>
+                    </tr>
+                    <tr>
+                        <th>ledPin</th>
+                        <td id="sys-info-ledPin"><em class="has-text-grey">loading...</em></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="column is-one-third">
+            <div class="box">
+                <div>
+                    <h2 class="title"><i class="fa fas fa-cogs"></i> config</h2>
+                    <p class="help">Fields marked with * require a reboot for the config to apply</p>
+                </div>
+
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal">
+                        <label class="label">MatrixWidth*</label>
+                    </div>
+                    <div class="field-body"><div class="field">
+                        <p class="control"><input class="input" type="number" min="1" max="255" step="1" placeholder="loading..." id="config-MatrixWidth" /></p>
+                    </div></div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class="label">MatrixHeight*</label></div>
+                    <div class="field-body">
+                        <p class="control"><input class="input" type="number" min="1" max="255" step="1" placeholder="loading..." id="config-MatrixHeight" /></p>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class="label">Brightness</label></div>
+                    <div class="field-body">
+                        <div class="control">
+                            <input class="input" type="number" min="1" max="255" step="1" placeholder="loading..." id="config-Brightness" />
+                        </div>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class="label">PowerOnResetMode*</label></div>
+                    <div class="field-body">
+                        <div class="control">
+                            <input class="input" type="text" placeholder="loading..." id="config-PowerOnResetMode" />
+                        </div>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class="label">LedModeAutoRestore*</label></div>
+                    <div class="field-body">
+                        <div class="control">
+                            <input class="input" type="text" placeholder="loading..." id="config-LedModeAutoRestore" />
+                        </div>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class="label">MqttBroker*</label></div>
+                    <div class="field-body">
+                        <div class="control">
+                            <input class="input" type="text" placeholder="loading..." id="config-MqttBroker" />
+                        </div>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class="label">MqttDeviceTopic*</label></div>
+                    <div class="field-body">
+                        <div class="control">
+                            <input class="input" type="text" placeholder="loading..." id="config-MqttDeviceTopic" />
+                        </div>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class="label">MqttGroupTopic*</label></div>
+                    <div class="field-body">
+                        <div class="control">
+                            <input class="input" type="text" placeholder="loading..." id="config-MqttGroupTopic" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button class="button is-primary" id="config-save">Save</button>
+                    </div>
+
+                    <div class="control">
+                        <button class="button is-danger" id="action-reboot">Reboot</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="application/javascript">
+    $('document').ready(function () {
+        $.getJSON("/api/v1/led/modes", function (modesResponse) {
+            console.log(modesResponse);
+            let modesList = $('#modes-list');
+            modesResponse.modes.forEach(mode => {
+                modesList.append(`<li><a href='#' onclick='return false;' data-mode-index='${mode.index}' class='mode-link'>${mode.name}</a></li>`);
+            });
+            $('#modes-list-placeholder').hide();
+            $('.mode-link').click(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: "/api/v1/led/mode",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        index: $(this).data('modeIndex')
+                    }),
+                });
+            });
+        });
+        $.getJSON("/api/v1/system/info", function (sysInfo) {
+            console.log(sysInfo);
+            $('#sys-info-idfVersion').html(sysInfo.idfVersion);
+            $('#sys-info-cores').html(sysInfo.cores);
+            $('#sys-info-restarts').html(sysInfo.restarts);
+            $('#sys-info-projectName').html(sysInfo.projectName);
+            $('#sys-info-projectVersion').html(sysInfo.projectVersion);
+            $('#sys-info-compileTime').html(sysInfo.compileTime);
+            $('#sys-info-compileDate').html(sysInfo.compileDate);
+            $('#sys-info-ledPin').html(sysInfo.ledPin);
+        });
+        $.getJSON("/api/v1/config", function (config) {
+            console.log(config);
+            $('#config-MatrixWidth').val(config.MatrixWidth);
+            $('#config-MatrixHeight').val(config.MatrixHeight);
+            $('#config-Brightness').val(config.Brightness);
+            $('#config-PowerOnResetMode').val(config.PowerOnResetMode);
+            $('#config-LedModeAutoRestore').val(config.LedModeAutoRestore);
+            $('#config-MqttBroker').val(config.MqttBroker);
+            $('#config-MqttDeviceTopic').val(config.MqttDeviceTopic);
+            $('#config-MqttGroupTopic').val(config.MqttGroupTopic);
+        });
+
+        $('#config-save').click(function () {
+            $.ajax("/api/v1/config", {
+                data: {
+                    MatrixWidth: $('#config-MatrixWidth').val(),
+                    MatrixHeight: $('#config-MatrixHeight').val(),
+                    Brightness: $('#config-Brightness').val(),
+                    PowerOnResetMode: $('#config-PowerOnResetMode').val(),
+                    LedModeAutoRestore: $('#config-LedModeAutoRestore').val(),
+                    MqttBroker: $('#config-MqttBroker').val(),
+                    MqttDeviceTopic: $('#config-MqttDeviceTopic').val(),
+                    MqttGroupTopic: $('#config-MqttGroupTopic').val(),
+                },
+                contentType: 'application/json',
+                type: 'POST'
+            });
+        });
+        $('#action-reboot').click(function () {
+            $.post("/api/v1/system/reboot");
+        });
+
+    });
+</script>
+
+</body>
+</html>
