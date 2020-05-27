@@ -9,8 +9,6 @@ class LedMode;
 class LedMatrix;
 class ConfigManager;
 
-typedef void (*change_handler_t)();
-
 class ModeController
 {
 public:
