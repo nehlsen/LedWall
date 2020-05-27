@@ -4,6 +4,9 @@
 #include "FastLED.h"
 #include "LedMode.h"
 
+namespace LedWall {
+namespace Mode {
+
 // samples from https://github.com/eshkrab/fastLED-idf
 class LedModeSample: public LedMode
 {
@@ -30,5 +33,8 @@ protected:
     CRGBPalette16 m_currentPalette;
     TBlendType m_currentBlending;
 };
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_LEDMODESAMPLE_H

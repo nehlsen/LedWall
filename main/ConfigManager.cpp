@@ -1,6 +1,8 @@
 #include <esp_log.h>
 #include "ConfigManager.h"
 
+namespace LedWall {
+
 #define NVS_NAMESPACE "led_wall_config"
 static const char *CONFIG_MANAGER_LOG_TAG = "CONFIG_MANAGER";
 
@@ -272,3 +274,5 @@ void ConfigManager::updateRestartCounter()
         m_restartCounter = newCount;
     }
 }
+
+} // namespace LedWall

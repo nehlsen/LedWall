@@ -25,6 +25,10 @@
 //			FastLED.show();
 //			frame += animateSpeed;
 //		}
+
+namespace LedWall {
+namespace Mode {
+
 class LedModeHsiboy: public LedMode
 {
 public:
@@ -62,5 +66,8 @@ protected:
     void Spark(uint8_t fade);
     void drawFractionalBar(int pos16, int width, uint8_t hue, bool wrap);
 };
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_LEDMODEHSIBOY_H

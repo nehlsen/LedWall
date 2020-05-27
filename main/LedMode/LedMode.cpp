@@ -1,5 +1,8 @@
 #include "LedMode.h"
 
+namespace LedWall {
+namespace Mode {
+
 LedMode::LedMode(LedMatrix &matrix):
     m_matrix(matrix)
 {}
@@ -17,3 +20,6 @@ bool LedMode::writeOptions(cJSON *root)
 {
     return true;
 }
+
+} // namespace Mode
+} // namespace LedWall

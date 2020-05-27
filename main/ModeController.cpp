@@ -7,6 +7,8 @@
 #include "ConfigManager.h"
 #include "events.h"
 
+namespace LedWall {
+
 static const char *LOG_TAG = "ModeController";
 
 #define LED_WALL_ENABLED_BIT BIT0
@@ -23,7 +25,7 @@ void led_update_task(void *pvParameter)
     while (true) {
         random16_add_entropy(random());
 
-        LedMode *ledMode = controller->getLedMode();
+        Mode::LedMode *ledMode = controller->getLedMode();
         if (ledMode) ledMode->update();
 
         FastLED.show();
@@ -115,13 +117,13 @@ bool ModeController::setModeIndex(int modeIndex)
 {
     ESP_LOGI(LOG_TAG, "setModeIndex: modeIndex:%d", modeIndex);
 
-    if (modeIndex < 0 || modeIndex >= LedModes.size()) {
+    if (modeIndex < 0 || modeIndex >= Mode::LedModes.size()) {
         ESP_LOGE(LOG_TAG, "setModeIndex: Failed to set Mode: Invalid Index");
         return false;
     }
 
-    ESP_LOGI(LOG_TAG, "setModeIndex: going to create mode:\"%s\"", LedModes.at(modeIndex).name);
-    LedMode *newMode = LedModes.at(modeIndex).factory(*m_matrix);
+    ESP_LOGI(LOG_TAG, "setModeIndex: going to create mode:\"%s\"", Mode::LedModes.at(modeIndex).name);
+    Mode::LedMode *newMode = Mode::LedModes.at(modeIndex).factory(*m_matrix);
 
     turnAllLedsOff();
     m_modeIndex = modeIndex;
@@ -139,7 +141,7 @@ int ModeController::getModeIndex() const
     return m_modeIndex;
 }
 
-LedMode* ModeController::getLedMode() const
+Mode::LedMode* ModeController::getLedMode() const
 {
     return m_ledMode;
 }
@@ -162,3 +164,5 @@ void ModeController::turnAllLedsOff()
     FastLED.clear(true);
     FastLED.delay(1);
 }
+
+} // namespace LedWall

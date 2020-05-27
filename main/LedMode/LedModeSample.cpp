@@ -1,5 +1,8 @@
 #include "LedModeSample.h"
 
+namespace LedWall {
+namespace Mode {
+
 // This example shows how to set up a static color palette
 // which is stored in PROGMEM (flash), which is almost always more
 // plentiful than RAM.  A static PROGMEM palette like this
@@ -90,3 +93,6 @@ void LedModeSample::setupPurpleAndGreenPalette()
             green,  green,  black,  black,
             purple, purple, black,  black );
 }
+
+} // namespace Mode
+} // namespace LedWall

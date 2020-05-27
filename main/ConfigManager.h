@@ -4,6 +4,8 @@
 #include <nvs.h>
 #include <string>
 
+namespace LedWall {
+
 class ConfigManager
 {
 public:
@@ -64,5 +66,7 @@ protected:
     void updateRestartCounter();
     int32_t m_restartCounter = 0;
 };
+
+} // namespace LedWall
 
 #endif //LEDWALL_CONFIGMANAGER_H

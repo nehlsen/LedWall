@@ -4,6 +4,9 @@
 #include <vector>
 #include "LedMode.h"
 
+namespace LedWall {
+namespace Mode {
+
 typedef LedMode* (LedModeFactory)(LedMatrix& matrix);
 
 typedef struct {
@@ -13,5 +16,8 @@ typedef struct {
 
 extern std::vector<LedModeDef_t> LedModes;
 typedef std::vector<LedModeDef_t>::size_type t_LedModes_size;
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_LEDMODES_H

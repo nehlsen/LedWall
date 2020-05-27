@@ -4,8 +4,10 @@
 #include <esp_http_server.h>
 #include <functional>
 
-class ModeController;
 class cJSON;
+
+namespace LedWall {
+class ModeController;
 class ConfigManager;
 class OtaUpdater;
 
@@ -56,5 +58,7 @@ protected:
     cJSON *createLedModeData();
     cJSON *createConfigData();
 };
+
+} // namespace LedWall
 
 #endif //LEDWALL_WEBSERVER_H

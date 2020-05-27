@@ -124,11 +124,11 @@ void app_main()
     initialise_mdns();
     ESP_ERROR_CHECK(wifi_provisioning_start()); // asnync / non-blocking! The old wifi WAS blocking!
 
-    auto cfg = new ConfigManager;
+    auto cfg = new LedWall::ConfigManager;
     cfg->open();
-    auto controller = new ModeController(cfg);
+    auto controller = new LedWall::ModeController(cfg);
 
-    auto updater = new OtaUpdater;
+    auto updater = new LedWall::OtaUpdater;
 
     #ifdef CONFIG_ENABLE_MQTT
     auto mqtt = new Mqtt(controller, cfg);
@@ -137,7 +137,7 @@ void app_main()
 
     #ifdef CONFIG_ENABLE_REST
     // TODO the example creates (starts) the server once wifi is ready, stops and restarts on re-connects
-    auto *server = new WebServer(controller, cfg, updater);
+    auto *server = new LedWall::WebServer(controller, cfg, updater);
     server->startServer();
     #endif
 

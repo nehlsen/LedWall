@@ -5,6 +5,9 @@
 
 #include "LedMode.h"
 
+namespace LedWall {
+namespace Mode {
+
 class LedModeStatus: public LedMode
 {
 public:
@@ -15,5 +18,8 @@ public:
 protected:
     uint8_t m_lastUpdate = 99;
 };
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_LEDMODESTATUS_H

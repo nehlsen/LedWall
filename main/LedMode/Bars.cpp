@@ -2,6 +2,9 @@
 #include "utilities.h"
 #include <cJSON.h>
 
+namespace LedWall {
+namespace Mode {
+
 void Bars::update()
 {
     for (int i = 0; i < FastLED.size(); i++) {
@@ -125,3 +128,6 @@ void Bars::drawDiagonalBarBr(uint8_t frame)
         m_matrix.pixel(m_matrix.getWidth() - frame - 1 + y, y).setHSV(randomHue, 255, 255);
     }
 }
+
+} // namespace Mode
+} // namespace LedWall

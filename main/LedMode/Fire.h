@@ -8,6 +8,9 @@
 
 #include "LedMode.h"
 
+namespace LedWall {
+namespace Mode {
+
 class Fire : public LedMode
 {
 public:
@@ -39,5 +42,8 @@ protected:
 
     void updateColumn(uint8_t x);
 };
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_FIRE_H

@@ -6,6 +6,9 @@
 
 class cJSON;
 
+namespace LedWall {
+namespace Mode {
+
 class LedMode
 {
 public:
@@ -23,5 +26,8 @@ public:
 protected:
     LedMatrix& m_matrix;
 };
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_LEDMODE_H

@@ -11,6 +11,9 @@
 #include "Network.h"
 #include "Breathe.h"
 
+namespace LedWall {
+namespace Mode {
+
 LedMode *createModeStatus(LedMatrix& matrix) { return new LedModeStatus(matrix); }
 LedMode *createModeBars(LedMatrix& matrix) { return new Bars(matrix); }
 LedMode *createModeMultiBars(LedMatrix& matrix) { return new MultiBars(matrix); }
@@ -45,3 +48,6 @@ std::vector<LedModeDef_t> LedModes {
         modeNetworkDef,
         modeBreatheDef,
 };
+
+} // namespace Mode
+} // namespace LedWall

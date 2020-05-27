@@ -1,6 +1,9 @@
 #include <cJSON.h>
 #include "LedModeHsiboy.h"
 
+namespace LedWall {
+namespace Mode {
+
 #define MAX_INT_VALUE 65536
 long map(long x, long in_min, long in_max, long out_min, long out_max)
 {
@@ -263,3 +266,6 @@ void LedModeHsiboy::drawFractionalBar(int pos16, int width, uint8_t hue, bool wr
         }
     }
 }
+
+} // namespace Mode
+} // namespace LedWall

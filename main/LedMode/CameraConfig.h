@@ -3,6 +3,9 @@
 
 #include <esp_camera.h>
 
+namespace LedWall {
+namespace Mode {
+
 #define CAM_PIN_PWDN    32
 #define CAM_PIN_RESET   -1
 #define CAM_PIN_XCLK    0
@@ -52,5 +55,8 @@ static camera_config_t camera_config = {
         .jpeg_quality = 12, //0-63 lower number means higher quality
         .fb_count = 1 //if more than one, i2s runs in continuous mode. Use only with JPEG
 };
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_CAMERACONFIG_H

@@ -4,6 +4,9 @@
 #include <vector>
 #include "LedMode.h"
 
+namespace LedWall {
+namespace Mode {
+
 class MultiBars: public LedMode
 {
 public:
@@ -73,5 +76,8 @@ protected:
     // timestamp of last frame rendered
     int64_t m_lastFrame = 0;
 };
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_MULTI_BARS_H

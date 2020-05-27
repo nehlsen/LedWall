@@ -2,6 +2,9 @@
 #include <Circle.h>
 #include <cJSON.h>
 
+namespace LedWall {
+namespace Mode {
+
 Breathe::Breathe(LedMatrix &matrix) : LedMode(matrix)
 {
 //    const int x = m_matrix.getWidth() / 2 - 1;
@@ -101,3 +104,6 @@ void Breathe::setCycleTime(uint16_t cycleTime)
 {
     m_cycleTime = cycleTime;
 }
+
+} // namespace Mode
+} // namespace LedWall

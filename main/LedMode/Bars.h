@@ -3,6 +3,9 @@
 
 #include "LedMode.h"
 
+namespace LedWall {
+namespace Mode {
+
 class Bars : public LedMode
 {
 public:
@@ -34,5 +37,8 @@ protected:
     void drawDiagonalBarBl(uint8_t frame);
     void drawDiagonalBarBr(uint8_t frame);
 };
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_BARS_H

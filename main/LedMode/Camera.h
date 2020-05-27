@@ -10,6 +10,9 @@
 #include "esp_camera.h"
 #include <GfxPrimitive.h>
 
+namespace LedWall {
+namespace Mode {
+
 class Camera : public LedMode
 {
 public:
@@ -26,5 +29,8 @@ protected:
     bool cameraInit();
     void setCameraParams();
 };
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_CAMERA_H

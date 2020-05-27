@@ -2,6 +2,9 @@
 #include <esp_camera.h>
 #include "CameraConfig.h"
 
+namespace LedWall {
+namespace Mode {
+
 #define CAM_LOG_TAG "Camera"
 
 Camera::Camera(LedMatrix &matrix) : LedMode(matrix)
@@ -131,3 +134,6 @@ void Camera::setCameraParams()
     int  (*set_raw_gma)         (sensor_t *sensor, int enable);
     int  (*set_lenc)            (sensor_t *sensor, int enable);  */
 }
+
+} // namespace Mode
+} // namespace LedWall

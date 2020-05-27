@@ -1,6 +1,9 @@
 #include "Fire.h"
 #include <cJSON.h>
 
+namespace LedWall {
+namespace Mode {
+
 Fire::Fire(LedMatrix& matrix):
     LedMode(matrix)
 {
@@ -100,3 +103,6 @@ void Fire::updateColumn(uint8_t x)
         m_matrix.pixel(x, y) = ColorFromPalette(m_palette, colorindex);
     }
 }
+
+} // namespace Mode
+} // namespace LedWall

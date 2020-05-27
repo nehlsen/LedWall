@@ -1,6 +1,9 @@
 #include "Network.h"
 #include <sys/socket.h>
 
+namespace LedWall {
+namespace Mode {
+
 #define NET_LOG_TAG "LedMode:Network"
 #define PORT 47011
 
@@ -159,3 +162,6 @@ bool Network::readQueue()
 
     return countNewPixels > 0;
 }
+
+} // namespace Mode
+} // namespace LedWall

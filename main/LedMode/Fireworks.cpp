@@ -3,6 +3,9 @@
 #include <cJSON.h>
 #define MAX_INT_VALUE 65536
 
+namespace LedWall {
+namespace Mode {
+
 void Fireworks::update()
 {
     uint8_t randomHue = random8();
@@ -40,3 +43,6 @@ bool Fireworks::writeOptions(cJSON *root)
 
     return requestedFadeRate || requestedSparkRate;
 }
+
+} // namespace Mode
+} // namespace LedWall

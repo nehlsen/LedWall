@@ -5,6 +5,8 @@
 #include <esp_log.h>
 #include <esp_ota_ops.h>
 
+namespace LedWall {
+
 static const char *UPDATER_LOG_TAG = "OtaUpdater";
 
 #define UPDATER_RUNNING_BIT BIT1
@@ -126,3 +128,5 @@ esp_err_t OtaUpdater::getLastError() const
 {
     return m_updater->lastError;
 }
+
+} // namespace LedWall

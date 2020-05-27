@@ -1,7 +1,6 @@
 #ifndef LEDWALL_BREATHE_H
 #define LEDWALL_BREATHE_H
 
-
 // https://github.com/forkineye/ESPixelStick/blob/master/EffectEngine.cpp
 
   /*
@@ -35,6 +34,9 @@ return _effectDelay / 40; // update every 25ms
 #include "LedMode.h"
 #include <Circle.h>
 #include <Rect.h>
+
+namespace LedWall {
+namespace Mode {
 
 class Breathe : public LedMode
 {
@@ -78,5 +80,8 @@ protected:
     double m_brightnessVariation = 0.106364766; // 0.25/(e-1/e)  -> 25% brightness variation
     uint16_t m_cycleTime = 5000; // 5seconds per breath
 };
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_BREATHE_H

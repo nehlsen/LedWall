@@ -2,6 +2,9 @@
 #include "utilities.h"
 #include <cJSON.h>
 
+namespace LedWall {
+namespace Mode {
+
 // it is not possible to have less than this bars
 #define ABSOLUTE_MIN_BARS 1
 // it is not possible to have more than this bars
@@ -274,3 +277,6 @@ void MultiBars::Bar::draw(uint8_t x, uint8_t y)
         matrix.pixel(x, y) = color;
     }
 }
+
+} // namespace Mode
+} // namespace LedWall

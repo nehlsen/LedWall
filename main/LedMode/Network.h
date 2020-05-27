@@ -4,6 +4,9 @@
 #include "LedMode.h"
 #include <GfxPrimitive.h>
 
+namespace LedWall {
+namespace Mode {
+
 class Network : public LedMode
 {
 public:
@@ -19,5 +22,8 @@ protected:
     bool readQueue();
     GfxPrimitive m_buffer;
 };
+
+} // namespace Mode
+} // namespace LedWall
 
 #endif //LEDWALL_NETWORK_H

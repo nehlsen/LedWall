@@ -8,6 +8,8 @@
 #include "LedMode/LedModes.h"
 #include "WebServer/FileResponseHandler.h"
 
+namespace LedWall {
+
 static const char *WEBSERVER_LOG_TAG = "WebServer";
 
 #define CREATE_FUNCTION_TO_METHOD(fnName, handler) \
@@ -99,7 +101,7 @@ cJSON* WebServer::createLedModeData()
 {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root, "index", m_controller->getModeIndex());
-    cJSON_AddStringToObject(root, "name", LedModes.at(m_controller->getModeIndex()).name);
+    cJSON_AddStringToObject(root, "name", Mode::LedModes.at(m_controller->getModeIndex()).name);
 
     cJSON *options = cJSON_AddObjectToObject(root, "options");
     m_controller->getLedMode()->readOptions(options);
@@ -131,10 +133,10 @@ esp_err_t WebServer::getLedModes(httpd_req_t *req)
 {
     cJSON *root = cJSON_CreateObject();
     cJSON *modeList = cJSON_AddArrayToObject(root, "modes");
-    for (t_LedModes_size idx = 0; idx < LedModes.size(); ++idx) {
+    for (Mode::t_LedModes_size idx = 0; idx < Mode::LedModes.size(); ++idx) {
         cJSON *modeDescription = cJSON_CreateObject();
         cJSON_AddNumberToObject(modeDescription, "index", idx);
-        cJSON_AddStringToObject(modeDescription, "name", LedModes.at(idx).name);
+        cJSON_AddStringToObject(modeDescription, "name", Mode::LedModes.at(idx).name);
         cJSON_AddItemToArray(modeList, modeDescription);
     }
 
@@ -430,3 +432,5 @@ esp_err_t WebServer::handlePost(httpd_req_t *req, const std::function<bool(cJSON
     cJSON_Delete(request);
     return jsonResponse(response, req);
 }
+
+} // namespace LedWall

@@ -4,6 +4,8 @@
 #include <esp_err.h>
 #include <esp_https_ota.h>
 
+namespace LedWall {
+
 class OtaUpdaterPrivate;
 
 class OtaUpdater
@@ -19,5 +21,7 @@ public:
 protected:
     OtaUpdaterPrivate *m_updater;
 };
+
+} // namespace LedWall
 
 #endif //LEDWALL_OTAUPDATER_H

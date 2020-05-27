@@ -5,8 +5,12 @@
 #include <stdint.h>
 
 class CRGB;
-class LedMode;
 class LedMatrix;
+
+namespace LedWall {
+namespace Mode {
+class LedMode;
+} // namespace Mode
 class ConfigManager;
 
 class ModeController
@@ -24,7 +28,7 @@ public:
     bool setModeIndex(int modeIndex);
     int getModeIndex() const;
 
-    LedMode *getLedMode() const;
+    Mode::LedMode *getLedMode() const;
 
 protected:
     CRGB* m_leds;
@@ -34,10 +38,12 @@ protected:
 
     bool m_power = true;
     int m_modeIndex = -1;
-    LedMode *m_ledMode = nullptr;
+    Mode::LedMode *m_ledMode = nullptr;
 
     static void setLedUpdateTaskEnabled(bool enabled);
     static void turnAllLedsOff();
 };
+
+} // namespace LedWall
 
 #endif //LEDWALL_MODECONTROLLER_H
