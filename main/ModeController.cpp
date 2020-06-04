@@ -3,6 +3,7 @@
 #include <freertos/event_groups.h>
 #include <freertos/task.h>
 #include <LedMatrix.h>
+#include <algorithm>
 #include "LedMode/LedModes.h"
 #include "ConfigManager.h"
 #include "events.h"
@@ -62,7 +63,7 @@ ModeController::ModeController(ConfigManager *configManager):
 
     setPower(m_configManager->isPoweredOnBoot());
     setBrightness(m_configManager->getBrightness());
-    setModeIndex(m_configManager->getBootIntoMode());
+    setModeByIndex(m_configManager->getBootIntoMode());
 
     xTaskCreatePinnedToCore(
             &led_update_task,
@@ -115,16 +116,29 @@ uint8_t ModeController::getBrightness() const
     return m_matrix->getBrightness();
 }
 
-bool ModeController::setModeIndex(int modeIndex)
+bool ModeController::setModeByName(const std::string &name)
 {
-    ESP_LOGI(LOG_TAG, "setModeIndex: modeIndex:%d", modeIndex);
+    auto it = std::find_if(Mode::LedModes.begin(), Mode::LedModes.end(), [name](const Mode::LedModeDef_t &modeDef){
+        return modeDef.name == name;
+    });
+
+    if (it != Mode::LedModes.end()) {
+        return setModeByIndex(distance(Mode::LedModes.begin(), it));
+    }
+
+    return false;
+}
+
+bool ModeController::setModeByIndex(int modeIndex)
+{
+    ESP_LOGI(LOG_TAG, "setModeByIndex: modeIndex:%d", modeIndex);
 
     if (modeIndex < 0 || modeIndex >= Mode::LedModes.size()) {
-        ESP_LOGE(LOG_TAG, "setModeIndex: Failed to set Mode: Invalid Index");
+        ESP_LOGE(LOG_TAG, "setModeByIndex: Failed to set Mode: Invalid Index");
         return false;
     }
 
-    ESP_LOGI(LOG_TAG, "setModeIndex: going to create mode:\"%s\"", Mode::LedModes.at(modeIndex).name);
+    ESP_LOGI(LOG_TAG, "setModeByIndex: going to create mode:\"%s\"", Mode::LedModes.at(modeIndex).name);
     Mode::LedMode *newMode = Mode::LedModes.at(modeIndex).factory(*m_matrix);
 
     turnAllLedsOff();

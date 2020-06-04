@@ -15,6 +15,7 @@ typedef struct {
 } LedModeDef_t;
 
 extern std::vector<LedModeDef_t> LedModes;
+typedef std::vector<LedModeDef_t>::iterator t_LedModes_iterator;
 typedef std::vector<LedModeDef_t>::size_type t_LedModes_size;
 
 } // namespace Mode

@@ -117,13 +117,18 @@ esp_err_t WebServer::getLedMode(httpd_req_t *req)
 esp_err_t WebServer::postLedMode(httpd_req_t *req)
 {
     return handlePost(req, [=](cJSON *request, cJSON **response) -> bool {
-        cJSON *const modeObj = cJSON_GetObjectItem(request, "index");
-        if (!modeObj) {
+        bool modeHasBeenSet = false;
+
+        cJSON *const modeByIndex = cJSON_GetObjectItem(request, "index");
+        cJSON *const modeByName = cJSON_GetObjectItem(request, "name");
+        if (modeByIndex && cJSON_IsNumber(modeByIndex)) {
+            modeHasBeenSet = m_controller->setModeByIndex(modeByIndex->valueint);
+        } else if (modeByName && cJSON_IsString(modeByName) && strlen(modeByName->valuestring) <= 16) {
+            modeHasBeenSet = m_controller->setModeByName(modeByName->valuestring);
+        } else {
             return false;
         }
 
-        int mode = modeObj->valueint;
-        bool modeHasBeenSet = m_controller->setModeIndex(mode);
         *response = createLedModeData();
         return modeHasBeenSet;
     });

@@ -3,6 +3,7 @@
 
 #include <list>
 #include <stdint.h>
+#include <string>
 
 class CRGB;
 class LedMatrix;
@@ -25,7 +26,8 @@ public:
     void setBrightness(uint8_t brightness);
     uint8_t getBrightness() const;
 
-    bool setModeIndex(int modeIndex);
+    bool setModeByName(const std::string &name);
+    bool setModeByIndex(int modeIndex);
     int getModeIndex() const;
 
     Mode::LedMode *getLedMode() const;
