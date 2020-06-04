@@ -15,7 +15,7 @@ static const char *WEBSERVER_LOG_TAG = "WebServer";
 #define CREATE_FUNCTION_TO_METHOD(fnName, handler) \
     static esp_err_t fnName(httpd_req_t *req) \
     { \
-        auto *server = (WebServer*)req->user_ctx; \
+        auto *server = static_cast<WebServer*>(req->user_ctx); \
         if (!server) { \
             ESP_LOGE(WEBSERVER_LOG_TAG, "Invalid use of Macro! Missing Server instance!"); \
             return ESP_FAIL; \
