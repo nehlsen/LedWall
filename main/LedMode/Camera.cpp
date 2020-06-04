@@ -13,7 +13,7 @@ Camera::Camera(LedMatrix &matrix) : LedMode(matrix)
     setCameraParams();
 }
 
-void Camera::update()
+bool Camera::update()
 {
     uint8_t currentSeconds = (millis() / 1000) % 60;
 
@@ -21,7 +21,10 @@ void Camera::update()
         m_lastUpdate = currentSeconds;
 
         updateImage();
+        return true;
     }
+
+    return false;
 }
 
 void Camera::updateImage()

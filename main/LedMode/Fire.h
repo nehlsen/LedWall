@@ -17,7 +17,7 @@ public:
     Fire(LedMatrix& matrix);
     ~Fire() override;
 
-    void update() override;
+    bool update() override;
 
     void readOptions(cJSON *root) override;
     bool writeOptions(cJSON *root) override;

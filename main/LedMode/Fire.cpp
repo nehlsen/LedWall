@@ -22,15 +22,17 @@ Fire::~Fire()
     }
 }
 
-void Fire::update()
+bool Fire::update()
 {
     if (!isReady()) {
-        return;
+        return false;
     }
 
     for(uint8_t x = 0; x < m_matrix.getWidth(); ++x) {
         updateColumn(x);
     }
+
+    return true;
 }
 
 void Fire::readOptions(cJSON *root)

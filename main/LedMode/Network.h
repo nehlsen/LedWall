@@ -13,7 +13,7 @@ public:
     explicit Network(LedMatrix& matrix);
     ~Network() override;
 
-    void update() override;
+    bool update() override;
 
 protected:
     QueueHandle_t m_receiveQueue;

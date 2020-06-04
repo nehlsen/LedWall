@@ -10,7 +10,7 @@ long map(long x, long in_min, long in_max, long out_min, long out_max)
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-void LedModeHsiboy::update()
+bool LedModeHsiboy::update()
 {
     //Each animation adjusts the "targetStrip" specified in its parameter.
     //Animations are a function of the current animation frame "frame"
@@ -62,6 +62,7 @@ void LedModeHsiboy::update()
     }
 
     m_frame += m_animateSpeed;
+    return true;
 }
 
 void LedModeHsiboy::readOptions(cJSON *root)

@@ -29,17 +29,19 @@ const TProgmemPalette16 myRedWhiteBluePalette_p =
                 CRGB::Black
         };
 
-void LedModeSample::update()
+bool LedModeSample::update()
 {
     changePalettePeriodically();
 
     static uint8_t startIndex = 0;
     startIndex = startIndex + 1; /* motion speed */
 
-    for( int i = 0; i < FastLED.size(); i++) {
+    for(int i = 0; i < FastLED.size(); i++) {
         FastLED.leds()[i] = ColorFromPalette(m_currentPalette, startIndex, 64, m_currentBlending);
         startIndex += 3;
     }
+
+    return true;
 }
 
 void LedModeSample::changePalettePeriodically()

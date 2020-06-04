@@ -5,7 +5,7 @@
 namespace LedWall {
 namespace Mode {
 
-void Bars::update()
+bool Bars::update()
 {
     m_matrix.fade(m_fadeRate);
 
@@ -16,6 +16,8 @@ void Bars::update()
         advanceDrawMode();
         m_lastBarTime = currentTime;
     }
+
+    return true;
 }
 
 void Bars::readOptions(cJSON *root)

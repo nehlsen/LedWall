@@ -17,7 +17,7 @@ Breathe::Breathe(LedMatrix &matrix) : LedMode(matrix)
     m_shape.setBorderColor(m_color).setFillColor(m_color);
 }
 
-void Breathe::update()
+bool Breathe::update()
 {
     const double reciprocal_of_e = 0.367879441; // 1 / e
 
@@ -29,6 +29,8 @@ void Breathe::update()
 
     m_shape.setBorderColor(color).setFillColor(color);
     m_shape.render(m_matrix);
+
+    return true;
 }
 
 void Breathe::readOptions(cJSON *root)

@@ -6,12 +6,12 @@
 namespace LedWall {
 namespace Mode {
 
-void Fireworks::update()
+bool Fireworks::update()
 {
     m_matrix.fade(m_fadeRate);
 
     if (random8() > m_sparkRate) {
-        return;
+        return true;
     }
 
     uint8_t randomHue = random8();
@@ -19,6 +19,7 @@ void Fireworks::update()
     uint8_t randomY = random8(m_matrix.getHeight());
 
     m_matrix.pixel(randomX, randomY).setHSV(randomHue, 255, 255);
+    return true;
 }
 
 void Fireworks::readOptions(cJSON *root)

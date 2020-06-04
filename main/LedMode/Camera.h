@@ -18,7 +18,7 @@ class Camera : public LedMode
 public:
     explicit Camera(LedMatrix &matrix);
 
-    void update() override;
+    bool update() override;
 
 protected:
     GfxPrimitive m_image;

@@ -5,12 +5,12 @@
 namespace LedWall {
 namespace Mode {
 
-void Text::update()
+bool Text::update()
 {
     uint16_t delay = 1000 / m_scrollSpeed;
     int64_t currentTime = esp_timer_get_time() / 1000;
     if (currentTime - m_lastUpdate < delay && m_lastUpdate > 0) {
-        return;
+        return false;
     }
     m_lastUpdate = currentTime;
 
@@ -36,6 +36,8 @@ void Text::update()
     if (m_currentStep == displayText.getSize().width) {
         m_currentStep = 0;
     }
+
+    return true;
 }
 
 void Text::readOptions(cJSON *root)

@@ -16,7 +16,7 @@ MultiBars::MultiBars(LedMatrix& matrix):
     initBars();
 }
 
-void MultiBars::update()
+bool MultiBars::update()
 {
     m_matrix.fade(m_fadeRate);
 
@@ -34,6 +34,8 @@ void MultiBars::update()
         }
         m_lastFrame = currentTime;
     }
+
+    return true;
 }
 
 void MultiBars::readOptions(cJSON *root)

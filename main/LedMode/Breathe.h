@@ -43,7 +43,7 @@ class Breathe : public LedMode
 public:
     explicit Breathe(LedMatrix &matrix);
 
-    void update() override;
+    bool update() override;
 
     void readOptions(cJSON *root) override;
     bool writeOptions(cJSON *root) override;

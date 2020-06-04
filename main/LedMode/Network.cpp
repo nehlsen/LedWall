@@ -124,7 +124,7 @@ Network::~Network()
     vTaskDelete(m_udpServerTask);
 }
 
-void Network::update()
+bool Network::update()
 {
     UBaseType_t cnt = uxQueueMessagesWaiting(m_receiveQueue);
     if (cnt > 0)
@@ -132,7 +132,10 @@ void Network::update()
 
     if (readQueue()) {
         m_buffer.render(m_matrix);
+        return true;
     }
+
+    return false;
 }
 
 bool Network::readQueue()

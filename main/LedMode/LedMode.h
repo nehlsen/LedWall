@@ -15,7 +15,8 @@ public:
     explicit LedMode(LedMatrix& matrix);
     virtual ~LedMode() = default;
 
-    virtual void update() = 0;
+    // return true if something has changed and needs to be written to physical LEDs, false else
+    virtual bool update() = 0;
     virtual int frameDelay() const;
 
     // read options from mode to JSON object

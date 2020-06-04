@@ -12,7 +12,7 @@ class MultiBars: public LedMode
 public:
     explicit MultiBars(LedMatrix& matrix);
 
-    void update() override;
+    bool update() override;
 
     void readOptions(cJSON *root) override;
     bool writeOptions(cJSON *root) override;

@@ -13,7 +13,7 @@ class LedModeSample: public LedMode
 public:
     using LedMode::LedMode;
 
-    void update() override;
+    bool update() override;
 
 protected:
     void changePalettePeriodically();

@@ -34,7 +34,7 @@ class LedModeHsiboy: public LedMode
 public:
     using LedMode::LedMode;
 
-    void update() override;
+    bool update() override;
 
     void readOptions(cJSON *root) override;
 

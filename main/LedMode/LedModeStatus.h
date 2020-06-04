@@ -13,7 +13,7 @@ class LedModeStatus: public LedMode
 public:
     using LedMode::LedMode;
 
-    void update() override;
+    bool update() override;
 
 protected:
     uint8_t m_lastUpdate = 99;

@@ -26,9 +26,11 @@ void led_update_task(void *pvParameter)
         random16_add_entropy(random());
 
         Mode::LedMode *ledMode = controller->getLedMode();
-        if (ledMode) ledMode->update();
-
-        FastLED.show();
+        if (ledMode) {
+            if (ledMode->update()) {
+                FastLED.show();
+            }
+        }
 
         vTaskDelay(ledMode->frameDelay());
         xEventGroupWaitBits(led_update_task_event_group, LED_WALL_ENABLED_BIT, false, false, portMAX_DELAY);
