@@ -8,17 +8,17 @@ namespace Mode {
 
 void Fireworks::update()
 {
+    m_matrix.fade(m_fadeRate);
+
+    if (random8() > m_sparkRate) {
+        return;
+    }
+
     uint8_t randomHue = random8();
-    uint16_t randomLed = random16(); // not really the LED but a control value to choose a LED
+    uint8_t randomX = random8(m_matrix.getWidth());
+    uint8_t randomY = random8(m_matrix.getHeight());
 
-    for (int i = 0; i < FastLED.size(); i++) {
-        FastLED.leds()[i].nscale8(m_fadeRate);
-    }
-
-    if (randomLed < (MAX_INT_VALUE / (256 - (constrain(m_sparkRate, 1, 256))))) {
-        // FIXME only every other LED works :(
-        FastLED.leds()[randomLed % FastLED.size()].setHSV(randomHue, 255, 255);
-    }
+    m_matrix.pixel(randomX, randomY).setHSV(randomHue, 255, 255);
 }
 
 void Fireworks::readOptions(cJSON *root)
