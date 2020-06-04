@@ -19,6 +19,7 @@ set(COMPONENT_SRCS
         "LedMode/Camera.cpp"
         "LedMode/Network.cpp"
         "LedMode/Breathe.cpp"
+        "LedMode/Text.cpp"
         )
 
 if(CONFIG_ENABLE_REST)
