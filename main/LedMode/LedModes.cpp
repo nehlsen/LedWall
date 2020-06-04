@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "Network.h"
 #include "Breathe.h"
+#include "Text.h"
 
 namespace LedWall {
 namespace Mode {
@@ -24,6 +25,7 @@ LedMode *createModeFire(LedMatrix& matrix) { return new Fire(matrix); }
 LedMode *createModeCamera(LedMatrix& matrix) { return new Camera(matrix); }
 LedMode *createModeNetwork(LedMatrix& matrix) { return new Network(matrix); }
 LedMode *createModeBreathe(LedMatrix& matrix) { return new Breathe(matrix); }
+LedMode *createModeText(LedMatrix& matrix) { return new Text(matrix); }
 
 LedModeDef_t modeStatusDef {"Status", &createModeStatus};
 LedModeDef_t modeBarsDef {"Bars", &createModeBars};
@@ -35,6 +37,7 @@ LedModeDef_t modeFireDef {"Fire", &createModeFire};
 LedModeDef_t modeCameraDef {"Camera", &createModeCamera};
 LedModeDef_t modeNetworkDef {"Network", &createModeNetwork};
 LedModeDef_t modeBreatheDef {"Breathe", &createModeBreathe};
+LedModeDef_t modeTextDef {"Text", &createModeText};
 
 std::vector<LedModeDef_t> LedModes {
         modeStatusDef,
@@ -47,6 +50,7 @@ std::vector<LedModeDef_t> LedModes {
         modeCameraDef,
         modeNetworkDef,
         modeBreatheDef,
+        modeTextDef,
 };
 
 } // namespace Mode
