@@ -102,7 +102,7 @@ void ModeController::triggerSystemReboot()
 void ModeController::setBrightness(uint8_t brightness)
 {
     ESP_LOGI(LOG_TAG, "Set Brightness %.0f%%", (brightness/255.0)*100.0);
-    FastLED.setBrightness(brightness);
+    m_matrix->setBrightness(brightness);
 
     m_configManager->setBrightness(brightness);
     esp_event_post(LEDWALL_EVENTS, LEDWALL_EVENT_BRIGHTNESS_CHANGED, (void*)&brightness, sizeof(brightness), portMAX_DELAY);
@@ -110,7 +110,7 @@ void ModeController::setBrightness(uint8_t brightness)
 
 uint8_t ModeController::getBrightness() const
 {
-    return FastLED.getBrightness();
+    return m_matrix->getBrightness();
 }
 
 bool ModeController::setModeIndex(int modeIndex)
@@ -161,8 +161,7 @@ void ModeController::setLedUpdateTaskEnabled(bool enabled)
 
 void ModeController::turnAllLedsOff()
 {
-    FastLED.clear(true);
-    FastLED.delay(1);
+    m_matrix->clear();
 }
 
 } // namespace LedWall

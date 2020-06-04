@@ -41,7 +41,7 @@ protected:
     Mode::LedMode *m_ledMode = nullptr;
 
     static void setLedUpdateTaskEnabled(bool enabled);
-    static void turnAllLedsOff();
+    void turnAllLedsOff();
 };
 
 } // namespace LedWall
