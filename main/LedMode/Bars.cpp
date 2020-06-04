@@ -7,9 +7,7 @@ namespace Mode {
 
 void Bars::update()
 {
-    for (int i = 0; i < FastLED.size(); i++) {
-        FastLED.leds()[i].nscale8(m_fadeRate);
-    }
+    m_matrix.fade(m_fadeRate);
 
     uint16_t delay = map(m_barsRate, 0, 255, 0, 1000);
     int64_t currentTime = esp_timer_get_time() / 1000;

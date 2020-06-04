@@ -18,9 +18,8 @@ MultiBars::MultiBars(LedMatrix& matrix):
 
 void MultiBars::update()
 {
-    for (int i = 0; i < FastLED.size(); i++) {
-        FastLED.leds()[i].nscale8(m_fadeRate);
-    }
+    m_matrix.fade(m_fadeRate);
+
     uint16_t delay = map(0xff - m_barTravelSpeed, 0, 255, 0, 1000);
     int64_t currentTime = esp_timer_get_time() / 1000;
     if (currentTime - m_lastFrame > delay || currentTime < 1) {
@@ -123,6 +122,7 @@ MultiBars::Bar* MultiBars::createRandomBar()
         auto mode = randomDrawMode();
         auto direction = randomDrawDirection();
 
+        // FIXME this is nonsense
         for (auto &bar : m_bars) {
             if (bar->mode != mode || bar->direction != direction) {
                 return new Bar(m_matrix, mode, direction, m_barKeepsColor, m_blendColor, random8(m_maximumFrameDelay));
