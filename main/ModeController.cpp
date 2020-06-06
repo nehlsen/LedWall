@@ -54,7 +54,8 @@ ModeController::ModeController(ConfigManager *configManager):
     auto &fastLedController = CFastLED::addLeds<WS2812, CONFIG_DATA_PIN, GRB>(m_leds, (matrixWidth*matrixHeight));
 //    fastLedController.setCorrection(TypicalLEDStrip);
 
-    m_matrix = new LedMatrix(fastLedController, matrixWidth, matrixHeight, MatrixInvertHorizontal);
+//    m_matrix = new LedMatrix(fastLedController, matrixWidth, matrixHeight, MatrixInvertHorizontal);
+    m_matrix = new LedMatrix(FastLED, matrixWidth, matrixHeight);
 
     turnAllLedsOff();
 
