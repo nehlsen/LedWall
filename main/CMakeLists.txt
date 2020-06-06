@@ -16,11 +16,21 @@ set(COMPONENT_SRCS
         "LedMode/Bars.cpp"
         "LedMode/MultiBars.cpp"
         "LedMode/Fire.cpp"
-        "LedMode/Camera.cpp"
         "LedMode/Network.cpp"
         "LedMode/Breathe.cpp"
         "LedMode/Text.cpp"
         )
+
+if(CONFIG_ENABLE_CAM)
+    set(COMPONENT_SRCS
+            ${COMPONENT_SRCS}
+            "LedMode/Camera.cpp"
+            )
+    set(EXTRA_COMPONENT_DIRS ../components/esp32-camera)
+    message(STATUS "LedWall: CAM Driver enabled")
+else()
+    message(STATUS "LedWall: CAM Driver disabled")
+endif()
 
 if(CONFIG_ENABLE_REST)
     set(COMPONENT_SRCS

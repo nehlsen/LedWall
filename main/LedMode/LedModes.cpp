@@ -22,7 +22,6 @@ LedMode *createModeFireworks(LedMatrix& matrix) { return new Fireworks(matrix); 
 LedMode *createModeSample(LedMatrix& matrix) { return new LedModeSample(matrix); }
 LedMode *createModeHsiboy(LedMatrix& matrix) { return new LedModeHsiboy(matrix); }
 LedMode *createModeFire(LedMatrix& matrix) { return new Fire(matrix); }
-LedMode *createModeCamera(LedMatrix& matrix) { return new Camera(matrix); }
 LedMode *createModeNetwork(LedMatrix& matrix) { return new Network(matrix); }
 LedMode *createModeBreathe(LedMatrix& matrix) { return new Breathe(matrix); }
 LedMode *createModeText(LedMatrix& matrix) { return new Text(matrix); }
@@ -34,10 +33,14 @@ LedModeDef_t modeFireworksDef {"Fireworks", &createModeFireworks};
 LedModeDef_t modeSampleDef {"Sample", &createModeSample};
 LedModeDef_t modeHsiboyDef {"Hsiboy", &createModeHsiboy};
 LedModeDef_t modeFireDef {"Fire", &createModeFire};
-LedModeDef_t modeCameraDef {"Camera", &createModeCamera};
 LedModeDef_t modeNetworkDef {"Network", &createModeNetwork};
 LedModeDef_t modeBreatheDef {"Breathe", &createModeBreathe};
 LedModeDef_t modeTextDef {"Text", &createModeText};
+
+#ifdef CONFIG_ENABLE_CAM
+LedMode *createModeCamera(LedMatrix& matrix) { return new Camera(matrix); }
+LedModeDef_t modeCameraDef {"Camera", &createModeCamera};
+#endif
 
 std::vector<LedModeDef_t> LedModes {
         modeStatusDef,
@@ -47,10 +50,12 @@ std::vector<LedModeDef_t> LedModes {
         modeSampleDef,
         modeHsiboyDef,
         modeFireDef,
-        modeCameraDef,
         modeNetworkDef,
         modeBreatheDef,
         modeTextDef,
+#ifdef CONFIG_ENABLE_CAM
+        modeCameraDef,
+#endif
 };
 
 } // namespace Mode

@@ -11,6 +11,10 @@ menu "LedWall Configuration"
         help
             Hostname to advertise via mDNS
 
+    config ENABLE_CAM
+        bool "Enable CAM Driver"
+        default false
+
     config ENABLE_MQTT
         bool "Enable MQTT Interface"
         default false
