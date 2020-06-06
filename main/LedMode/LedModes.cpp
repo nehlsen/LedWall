@@ -7,10 +7,13 @@
 #include "LedModeSample.h"
 #include "LedModeHsiboy.h"
 #include "Fire.h"
-#include "Camera.h"
 #include "Network.h"
 #include "Breathe.h"
 #include "Text.h"
+
+#ifdef CONFIG_ENABLE_CAM
+#include "Camera.h"
+#endif
 
 namespace LedWall {
 namespace Mode {
