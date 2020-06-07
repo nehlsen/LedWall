@@ -131,7 +131,7 @@ void app_main()
     auto updater = new LedWall::OtaUpdater;
 
     #ifdef CONFIG_ENABLE_MQTT
-    auto mqtt = new Mqtt(controller, cfg);
+    auto mqtt = new LedWall::Mqtt(controller, cfg);
     mqtt->start();
     #endif
 

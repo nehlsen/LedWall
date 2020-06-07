@@ -4,6 +4,8 @@
 #include <string>
 #include <mqtt_client.h>
 
+namespace LedWall {
+
 class ModeController;
 class ConfigManager;
 
@@ -28,5 +30,7 @@ protected:
     void setupSubscriptions(const std::string &baseTopic);
     void publishState(const std::string &state, const std::string &value);
 };
+
+} // namespace LedWall
 
 #endif //LEDWALL_MQTT_H

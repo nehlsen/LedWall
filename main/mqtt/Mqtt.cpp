@@ -7,6 +7,8 @@
 
 #define LOG_TAG "MQTT"
 
+namespace LedWall {
+
 void mqtt_event_connected(void* event_handler_arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
     Mqtt* mqtt = static_cast<Mqtt*>(event_handler_arg);
@@ -77,7 +79,7 @@ void Mqtt::onMqttData(esp_mqtt_event_handle_t event)
         m_controller->setBrightness(atoi(event->data));
     }
     if (nullptr != strstr(event->topic, "/mode") && event->data_len >= 1) {
-        m_controller->setModeIndex(atoi(event->data));
+        m_controller->setModeByIndex(atoi(event->data));
     }
     if (nullptr != strstr(event->topic, "/reboot")) {
         m_controller->triggerSystemReboot();
@@ -127,3 +129,5 @@ void Mqtt::publishState(const std::string &state, const std::string &value)
 
     esp_mqtt_client_publish(m_client, topic.c_str(), value.c_str(), 0, 0, 0);
 }
+
+} // namespace LedWall
