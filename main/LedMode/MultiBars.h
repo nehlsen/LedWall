@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "LedMode.h"
+#include <Line.h>
 
 namespace LedWall {
 namespace Mode {
@@ -32,6 +33,10 @@ protected:
             DrawHorizontal,
             DrawDiagonalBl, // diagonal bottom left
             DrawDiagonalBr, // diagonal bottom right
+            DrawSectorScanTl, // sector scanner - origin: top left
+            DrawSectorScanTr,
+            DrawSectorScanBl,
+            DrawSectorScanBr,
 
             DrawModeCount
         };
@@ -62,6 +67,11 @@ protected:
         void drawDiagonalBarBl(uint8_t frame);
         void drawDiagonalBarBr(uint8_t frame);
         void draw(uint8_t x, uint8_t y);
+        void drawSectorScanTl(uint8_t frame);
+        void drawSectorScanTr(uint8_t frame);
+        void drawSectorScanBl(uint8_t frame);
+        void drawSectorScanBr(uint8_t frame);
+        void drawLine(Point p0, Point p1);
     };
 
     std::vector<Bar*> m_bars;

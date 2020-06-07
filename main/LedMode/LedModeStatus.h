@@ -2,7 +2,6 @@
 #define LEDWALL_LEDMODESTATUS_H
 
 #include <esp32-hal.h>
-
 #include "LedMode.h"
 
 namespace LedWall {

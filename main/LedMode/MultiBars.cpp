@@ -124,9 +124,8 @@ MultiBars::Bar* MultiBars::createRandomBar()
         auto mode = randomDrawMode();
         auto direction = randomDrawDirection();
 
-        // FIXME this is nonsense
         for (auto &bar : m_bars) {
-            if (bar->mode != mode || bar->direction != direction) {
+            if (bar->mode != mode && bar->direction != direction) {
                 return new Bar(m_matrix, mode, direction, m_barKeepsColor, m_blendColor, random8(m_maximumFrameDelay));
             }
         }
@@ -172,6 +171,12 @@ bool MultiBars::Bar::canDrawFrame() const
         case DrawDiagonalBr:
             return currentFrame < matrix.getWidth() + matrix.getHeight();
 
+        case DrawSectorScanTl:
+        case DrawSectorScanTr:
+        case DrawSectorScanBl:
+        case DrawSectorScanBr:
+            return currentFrame < matrix.getWidth() + matrix.getHeight();
+
         default:
         case DrawModeCount:
             break;
@@ -198,11 +203,25 @@ void MultiBars::Bar::drawFrame()
         case DrawHorizontal:
             drawHorizontalBar(direction == DirectionForward ? currentFrame : matrix.getHeight() - currentFrame - 1);
             break;
+
         case DrawDiagonalBl:
             drawDiagonalBarBl(direction == DirectionForward ? currentFrame : matrix.getWidth() + matrix.getHeight() - currentFrame - 1);
             break;
         case DrawDiagonalBr:
             drawDiagonalBarBr(direction == DirectionForward ? currentFrame : matrix.getWidth() + matrix.getHeight() - currentFrame - 1);
+            break;
+
+        case DrawSectorScanTl:
+            drawSectorScanTl(direction == DirectionForward ? currentFrame : matrix.getWidth() + matrix.getHeight() - currentFrame - 1);
+            break;
+        case DrawSectorScanTr:
+            drawSectorScanTr(direction == DirectionForward ? currentFrame : matrix.getWidth() + matrix.getHeight() - currentFrame - 1);
+            break;
+        case DrawSectorScanBl:
+            drawSectorScanBl(direction == DirectionForward ? currentFrame : matrix.getWidth() + matrix.getHeight() - currentFrame - 1);
+            break;
+        case DrawSectorScanBr:
+            drawSectorScanBr(direction == DirectionForward ? currentFrame : matrix.getWidth() + matrix.getHeight() - currentFrame - 1);
             break;
 
         default:
@@ -278,6 +297,77 @@ void MultiBars::Bar::draw(uint8_t x, uint8_t y)
     } else {
         matrix.pixel(x, y) = color;
     }
+}
+
+void MultiBars::Bar::drawSectorScanTl(uint8_t frame)
+{
+    const int16_t top = matrix.getHeight() - 1;
+    const int16_t right = matrix.getWidth() - 1;
+    const Point origin = {0, top};
+    int16_t target_x = right;
+    int16_t target_y = top - frame;
+    if (target_y < 0) {
+        target_x += target_y;
+        target_x = target_x < 0 ? 0 : target_x;
+        target_y = 0;
+    }
+
+    drawLine(origin, {target_x, target_y});
+}
+
+void MultiBars::Bar::drawSectorScanTr(uint8_t frame)
+{
+    const int16_t top = matrix.getHeight() - 1;
+    const int16_t right = matrix.getWidth() - 1;
+    const Point origin = {right, top};
+    int16_t target_x = 0;
+    int16_t target_y = top - frame;
+    if (target_y < 0) {
+        target_x += -target_y;
+        target_x = target_x >= right ? right : target_x;
+        target_y = 0;
+    }
+
+    drawLine(origin, {target_x, target_y});
+}
+
+void MultiBars::Bar::drawSectorScanBl(uint8_t frame)
+{
+    const int16_t top = matrix.getHeight() - 1;
+    const int16_t right = matrix.getWidth() - 1;
+    const Point origin = {0, 0};
+    int16_t target_x = right;
+    int16_t target_y = frame;
+    if (target_y >= top) {
+        target_x -= target_y-top;
+        target_x = target_x < 0 ? 0 : target_x;
+        target_y = top;
+    }
+
+    drawLine(origin, {target_x, target_y});
+}
+
+void MultiBars::Bar::drawSectorScanBr(uint8_t frame)
+{
+    const int16_t top = matrix.getHeight() - 1;
+    const int16_t right = matrix.getWidth() - 1;
+    const Point origin = {right, 0};
+    int16_t target_x = 0;
+    int16_t target_y = frame;
+    if (target_y >= top) {
+        target_x += target_y-top;
+        target_x = target_x > right ? right : target_x;
+        target_y = top;
+    }
+
+    drawLine(origin, {target_x, target_y});
+}
+
+void MultiBars::Bar::drawLine(Point p0, Point p1)
+{
+    ::Line l(p0, p1);
+    l.setColor(CHSV(constantColor ? hue : random8(), 255, 255));
+    l.render(matrix, blendColor ? GfxPrimitive::RenderModeAdd : GfxPrimitive::RenderModeOverwrite);
 }
 
 } // namespace Mode
