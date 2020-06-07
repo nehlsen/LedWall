@@ -10,6 +10,8 @@
 extern "C" {
 #endif
 
+#define RESET_WIFI_AFTER_ERROR_COUNT 15
+static uint8_t wifi_connect_error_count = 0;
 static const char *PROVISIONING_SERVICE_PREFIX = "PROV_";
 static const char *WIFI_PROVISIONING_LOG_TAG = "WIFI_PROVISIONING";
 
@@ -62,13 +64,38 @@ static void wifi_init_sta()
 
 static void on_got_ip(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
+    wifi_connect_error_count = 0;
+
     ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
     ESP_LOGI(WIFI_PROVISIONING_LOG_TAG, "Got IP: IPv4 address: " IPSTR, IP2STR(&event->ip_info.ip));
 }
 
 static void on_wifi_disconnect(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
-    ESP_LOGI(WIFI_PROVISIONING_LOG_TAG, "Wi-Fi disconnected, trying to reconnect...");
+    wifi_connect_error_count += 1;
+
+    if (wifi_connect_error_count == RESET_WIFI_AFTER_ERROR_COUNT) {
+        ESP_LOGW(WIFI_PROVISIONING_LOG_TAG, "Wi-Fi disconnected - limit reached (%d/%d)", wifi_connect_error_count, RESET_WIFI_AFTER_ERROR_COUNT);
+        ESP_LOGW(WIFI_PROVISIONING_LOG_TAG, "resetting Wi-Fi Config...");
+        wifi_config_t c = {
+            .sta = {
+                .ssid = "",
+                .password = "",
+            }
+        };
+        if (esp_wifi_set_config(ESP_IF_WIFI_STA, &c) != ESP_OK) {
+            ESP_LOGE(WIFI_PROVISIONING_LOG_TAG, "failed to reset Wi-Fi config");
+        } else {
+            ESP_LOGW(WIFI_PROVISIONING_LOG_TAG, "config has been reset, next reboot will start provisioning mode...");
+            for (int down = 5; down > 0; --down) {
+                ESP_LOGW(WIFI_PROVISIONING_LOG_TAG, "reboot in %d...", down);
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+            }
+            esp_restart();
+        }
+    }
+
+    ESP_LOGI(WIFI_PROVISIONING_LOG_TAG, "Wi-Fi disconnected (%d/%d), trying to reconnect...", wifi_connect_error_count, RESET_WIFI_AFTER_ERROR_COUNT);
     ESP_ERROR_CHECK(esp_wifi_connect());
 }
 
