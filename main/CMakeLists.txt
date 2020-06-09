@@ -20,6 +20,7 @@ set(COMPONENT_SRCS
         "LedMode/Breathe.cpp"
         "LedMode/Text.cpp"
         "LedMode/MatesDemo.cpp"
+        "LedMode/Wave.cpp"
         )
 
 if(CONFIG_ENABLE_CAM)

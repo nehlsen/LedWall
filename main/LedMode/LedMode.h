@@ -17,6 +17,7 @@ public:
 
     // return true if something has changed and needs to be written to physical LEDs, false else
     virtual bool update() = 0;
+    virtual int framesPerSecond() const;
     virtual int frameDelay() const;
 
     // read options from mode to JSON object

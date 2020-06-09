@@ -10,6 +10,7 @@
 #include "Breathe.h"
 #include "Text.h"
 #include "MatesDemo.h"
+#include "Wave.h"
 
 #ifdef CONFIG_ENABLE_CAM
 #include "Camera.h"
@@ -29,6 +30,7 @@ LedMode *createModeNetwork(LedMatrix& matrix) { return new Network(matrix); }
 LedMode *createModeBreathe(LedMatrix& matrix) { return new Breathe(matrix); }
 LedMode *createModeText(LedMatrix& matrix) { return new Text(matrix); }
 LedMode *createModeMatesDemo(LedMatrix& matrix) { return new MatesDemo(matrix); }
+LedMode *createModeWave(LedMatrix& matrix) { return new Wave(matrix); }
 
 LedModeDef_t modeStatusDef {"Status", &createModeStatus};
 LedModeDef_t modeBarsDef {"Bars", &createModeBars};
@@ -41,6 +43,7 @@ LedModeDef_t modeNetworkDef {"Network", &createModeNetwork};
 LedModeDef_t modeBreatheDef {"Breathe", &createModeBreathe};
 LedModeDef_t modeTextDef {"Text", &createModeText};
 LedModeDef_t modeMatesDemoDef {"MatesDemo", &createModeMatesDemo};
+LedModeDef_t modeWaveDef {"Wave", &createModeWave};
 
 #ifdef CONFIG_ENABLE_CAM
 LedMode *createModeCamera(LedMatrix& matrix) { return new Camera(matrix); }
@@ -59,6 +62,7 @@ std::vector<LedModeDef_t> LedModes {
         modeBreatheDef,
         modeTextDef,
         modeMatesDemoDef,
+        modeWaveDef,
 #ifdef CONFIG_ENABLE_CAM
         modeCameraDef,
 #endif
