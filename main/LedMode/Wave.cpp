@@ -279,7 +279,8 @@ void Wave::drawWaveVertical(double offset)
 
 void Wave::drawCircles(double offset)
 {
-    for (int n = 0; n < m_circles.size(); ++n) {
+//    for (int n = 0; n < m_circles.size(); ++n) {
+    for (int n = m_circles.size()-1; n >= 0; --n) {
         const double value = sineValue(
                 getWaveDirection() == WaveDirectionForward ? n : m_circles.size()-1-n,
                 offset
@@ -291,7 +292,7 @@ void Wave::drawCircles(double offset)
                 factoredConstrain(m_colorValueLow, m_colorValueHigh, value)
         );
 
-        m_circles[n].setBorderColor(color).render(m_matrix);
+        m_circles[n].setFillColor(color).setBorderColor(color).render(m_matrix);
     }
 }
 
@@ -299,12 +300,11 @@ void Wave::initCircles()
 {
     const int x = m_matrix.getWidth() / 2 + (m_matrix.getWidth()%2 -1);
     const int y = m_matrix.getHeight() / 2 + (m_matrix.getHeight()%2 -1);
-    const int dropRadius = (x > y ? x : y) + 1;
-    const int distance = 1;
+    const int countCircles = (x > y ? x : y) + 3; // plus 3 is to cover the edges. this constant number will probably fail for bigger matrixes
 
-    m_circles.resize(dropRadius/distance);
-    for (int n = 0; n < m_circles.size(); ++n) {
-        m_circles[n].setCenter(x, y).setRadius((n+1)*distance);
+    m_circles.resize(countCircles);
+    for (int n = 0; n < countCircles; ++n) {
+        m_circles[n].setCenter(x, y).setRadius((n+1));
     }
 }
 
