@@ -23,7 +23,7 @@ bool MultiBars::update()
     uint16_t delay = map(0xff - m_barTravelSpeed, 0, 255, 0, 1000);
     int64_t currentTime = esp_timer_get_time() / 1000;
     if (currentTime - m_lastFrame > delay || currentTime < 1) {
-        for (int i = 0; i < m_numberOfBars; ++i) {
+        for (int i = 0; i < getNumberOfBars(); ++i) {
             m_bars[i]->drawFrame();
             
             if (!m_bars[i]->canDrawFrame()) {
@@ -40,80 +40,127 @@ bool MultiBars::update()
 
 void MultiBars::readOptions(cJSON *root)
 {
-    cJSON_AddNumberToObject(root, "fadeRate", m_fadeRate);
-    cJSON_AddNumberToObject(root, "barTravelSpeed", m_barTravelSpeed);
-    cJSON_AddNumberToObject(root, "numberOfBars", m_numberOfBars);
-    cJSON_AddNumberToObject(root, "maximumFrameDelay", m_maximumFrameDelay);
-    cJSON_AddBoolToObject(root, "barKeepsColor", m_barKeepsColor);
-    cJSON_AddBoolToObject(root, "blendColor", m_blendColor);
+    cJSON_AddNumberToObject(root, "fadeRate", getFadeRate());
+    cJSON_AddNumberToObject(root, "barTravelSpeed", getBarTravelSpeed());
+    cJSON_AddNumberToObject(root, "numberOfBars", getNumberOfBars());
+    cJSON_AddNumberToObject(root, "maximumFrameDelay", getMaximumFrameDelay());
+    cJSON_AddBoolToObject(root, "barKeepsColor", isBarKeepsColor());
+    cJSON_AddBoolToObject(root, "blendColor", isBlendColor());
 }
 
 bool MultiBars::writeOptions(cJSON *root)
 {
     cJSON *const requestedFadeRate = cJSON_GetObjectItem(root, "fadeRate");
     if (requestedFadeRate) {
-        int value = requestedFadeRate->valueint;
-        m_fadeRate = constrain(value, 0, 255);
+        setFadeRate(constrain(requestedFadeRate->valueint, 0, 255));
     }
 
     cJSON *const requestedTravelSpeed = cJSON_GetObjectItem(root, "barTravelSpeed");
     if (requestedTravelSpeed) {
-        int value = requestedTravelSpeed->valueint;
-        m_barTravelSpeed = constrain(value, 0, 255);
+        setBarTravelSpeed(constrain(requestedTravelSpeed->valueint, 0, 255));
     }
 
     cJSON *const requestedNumberOfBars = cJSON_GetObjectItem(root, "numberOfBars");
     if (requestedNumberOfBars) {
-        int value = requestedNumberOfBars->valueint;
-        setNumberOfBars(constrain(value, ABSOLUTE_MIN_BARS, ABSOLUTE_MAX_BARS));
+        setNumberOfBars(constrain(requestedNumberOfBars->valueint, ABSOLUTE_MIN_BARS, ABSOLUTE_MAX_BARS));
     }
 
     cJSON *const requestedMaximumFrameDelay = cJSON_GetObjectItem(root, "maximumFrameDelay");
     if (requestedMaximumFrameDelay) {
-        int value = requestedMaximumFrameDelay->valueint;
-        m_maximumFrameDelay = constrain(value, 0, 255);
+        setMaximumFrameDelay(constrain(requestedMaximumFrameDelay->valueint, 0, 255));
     }
 
     cJSON *const requestedKeepColor = cJSON_GetObjectItem(root, "barKeepsColor");
     if (requestedKeepColor) {
-        m_barKeepsColor = cJSON_IsBool(requestedKeepColor) ? cJSON_IsTrue(requestedKeepColor) : true;
+        setBarKeepsColor(cJSON_IsBool(requestedKeepColor) ? cJSON_IsTrue(requestedKeepColor) : true);
     }
 
     cJSON *const requestedBlendColor = cJSON_GetObjectItem(root, "blendColor");
     if (requestedBlendColor) {
-        m_blendColor = cJSON_IsBool(requestedBlendColor) ? cJSON_IsTrue(requestedBlendColor) : true;
+        setBlendColor(cJSON_IsBool(requestedBlendColor) ? cJSON_IsTrue(requestedBlendColor) : true);
     }
 
     return requestedFadeRate || requestedTravelSpeed || requestedNumberOfBars || requestedMaximumFrameDelay || requestedKeepColor || requestedBlendColor;
 }
 
-void MultiBars::initBars()
+const uint8_t &MultiBars::getFadeRate() const
 {
-    m_bars.resize(m_numberOfBars);
-
-    for (int i = 0; i < m_numberOfBars; ++i) {
-        m_bars[i] = new Bar(m_matrix, randomDrawMode(), randomDrawDirection(), m_barKeepsColor, m_blendColor);
-    }
+    return m_fadeRate;
 }
 
-void MultiBars::setNumberOfBars(uint8_t count)
+void MultiBars::setFadeRate(const uint8_t &fadeRate)
 {
-    if (count > m_numberOfBars) {
-        // add (count - m_numberOfBars) bars
-        for (int i = 0; i < count - m_numberOfBars; ++i) {
+    m_fadeRate = fadeRate;
+}
+
+const uint8_t &MultiBars::getBarTravelSpeed() const
+{
+    return m_barTravelSpeed;
+}
+
+void MultiBars::setBarTravelSpeed(const uint8_t &barTravelSpeed)
+{
+    m_barTravelSpeed = barTravelSpeed;
+}
+
+uint8_t MultiBars::getNumberOfBars() const
+{
+    return m_bars.size();
+}
+
+void MultiBars::setNumberOfBars(const uint8_t &numberOfBars)
+{
+    if (numberOfBars > m_bars.size()) {
+        const unsigned int countBarsToAdd = numberOfBars - m_bars.size();
+        for (int i = 0; i < countBarsToAdd; ++i) {
             m_bars.push_back(createRandomBar());
         }
-    }
-
-    if (count < m_numberOfBars) {
-        // delete (m_numberOfBars - count) bars
-        for (int i = 0; i < m_numberOfBars - count; ++i) {
+    } else if (numberOfBars < m_bars.size()) {
+        const unsigned int countBarsToRemove = m_bars.size() - numberOfBars;
+        for (int i = 0; i < countBarsToRemove; ++i) {
             delete m_bars.back();
             m_bars.pop_back();
         }
     }
+}
 
-    m_numberOfBars = count;
+const uint8_t &MultiBars::getMaximumFrameDelay() const
+{
+    return m_maximumFrameDelay;
+}
+
+void MultiBars::setMaximumFrameDelay(const uint8_t &maximumFrameDelay)
+{
+    m_maximumFrameDelay = maximumFrameDelay;
+}
+
+bool MultiBars::isBarKeepsColor() const
+{
+    return m_barKeepsColor;
+}
+
+void MultiBars::setBarKeepsColor(bool barKeepsColor)
+{
+    m_barKeepsColor = barKeepsColor;
+}
+
+bool MultiBars::isBlendColor() const
+{
+    return m_blendColor;
+}
+
+void MultiBars::setBlendColor(bool blendColor)
+{
+    m_blendColor = blendColor;
+}
+
+void MultiBars::initBars(int count)
+{
+    m_bars.resize(count);
+
+    for (int i = 0; i < count; ++i) {
+        m_bars[i] = new Bar(m_matrix, randomDrawMode(), randomDrawDirection(), m_barKeepsColor, m_blendColor);
+    }
 }
 
 MultiBars::Bar* MultiBars::createRandomBar()

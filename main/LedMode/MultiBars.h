@@ -18,10 +18,28 @@ public:
     void readOptions(cJSON *root) override;
     bool writeOptions(cJSON *root) override;
 
+    const uint8_t &getFadeRate() const;
+    void setFadeRate(const uint8_t &fadeRate);
+
+    const uint8_t &getBarTravelSpeed() const;
+    void setBarTravelSpeed(const uint8_t &barTravelSpeed);
+
+    uint8_t getNumberOfBars() const;
+    void setNumberOfBars(const uint8_t &numberOfBars);
+
+    const uint8_t &getMaximumFrameDelay() const;
+    void setMaximumFrameDelay(const uint8_t &maximumFrameDelay);
+
+    bool isBarKeepsColor() const;
+    void setBarKeepsColor(bool barKeepsColor);
+
+    bool isBlendColor() const;
+    void setBlendColor(bool blendColor);
+
 protected:
     uint8_t m_fadeRate = 200; // how fast to fade: 1-fast, 256-slow
     uint8_t m_barTravelSpeed = 245; // how fast bars travel? 1-slow, 255-fast
-    uint8_t m_numberOfBars = 3; // absolute number of parallel bars
+//    uint8_t m_numberOfBars = 3; // absolute number of parallel bars
     uint8_t m_maximumFrameDelay = 7; // maximum frames to delay a new bar? 0-no pause, 5-up to 5 empty frames, ...
     bool m_barKeepsColor = true; // whether bars keep their color while moving or random color each frame
     bool m_blendColor = true; // whether each pixel blends or replaces current color
@@ -75,8 +93,7 @@ protected:
     };
 
     std::vector<Bar*> m_bars;
-    void initBars();
-    void setNumberOfBars(uint8_t count);
+    void initBars(int count = 3);
 
     // semi random - already running config will be prevented
     Bar *createRandomBar();
