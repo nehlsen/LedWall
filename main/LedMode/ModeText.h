@@ -3,6 +3,7 @@
 
 #include "LedMode.h"
 #include <string>
+#include <Text.h>
 
 namespace LedWall {
 namespace Mode {
@@ -38,7 +39,7 @@ public:
     void setScrollMode(ScrollMode mode);
 
 protected:
-    std::string m_text = "<--=";
+    ::Text m_displayText;
     CRGB m_fgColor;
     CRGB m_bgColor;
 
@@ -48,12 +49,10 @@ protected:
     ScrollDirection m_scrollDirection;
     ScrollMode m_scrollMode;
 
-//    Direction m_scrollDirection; // horizontal / vertical
-    // scroll repeat - bounce / flow
-    //  bounce back at edges
-    //  flow continuous
-
     int m_currentStep = 0;
+
+    int scrollInfinite();
+    int scrollBounce();
 };
 
 } // namespace Mode

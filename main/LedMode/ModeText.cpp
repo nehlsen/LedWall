@@ -1,5 +1,4 @@
 #include "ModeText.h"
-#include <Text.h>
 #include <cJSON.h>
 #include "utilities.h"
 #include <QtCore/QDebug>
@@ -9,6 +8,7 @@ namespace Mode {
 
 bool ModeText::update()
 {
+    // FIXME scroll speed seems to be broken
     uint16_t delay = m_scrollSpeed == 0 ? 0 : 1000 / m_scrollSpeed;
     int64_t currentTime = esp_timer_get_time() / 1000;
     if ((m_scrollSpeed == 0 || currentTime - m_lastUpdate < delay) && m_lastUpdate > 0) {
@@ -19,89 +19,37 @@ bool ModeText::update()
 //    m_matrix.fade(140);
     m_matrix.clear();
 
-    ::Text displayText;
-    displayText.setBackgroundColor(CRGB::Black).setColor(CRGB::Green);
-    displayText.setText(m_text);
+    m_displayText.setBackgroundColor(CRGB::Black).setColor(CRGB::Green);
 
-    displayText.setY((m_matrix.getHeight() - displayText.getSize().height) / 2);
-    displayText.setCanvas(
+    m_displayText.setY((m_matrix.getHeight() - m_displayText.getSize().height) / 2);
+    m_displayText.setCanvas(
             0,
             0,
-            max(displayText.getSize().width, m_matrix.getWidth()),
+            max(m_displayText.getSize().width, m_matrix.getWidth()),
             m_matrix.getHeight(),
             GfxPrimitive::CanvasWrapAround
             );
 
-    int xTransform = 0;
-    if (getScrollMode() == ScrollBounce) {
-//        qDebug() << "ScrollBounce";
-        if (displayText.getSize().width < m_matrix.getWidth()) {
-            // text is smaller than matrix and bounces inside
-            qDebug() << "text < matrix, step" << m_currentStep;
+    switch (getScrollMode()) {
+        case ScrollInfinite:
+        default:
+            m_displayText.transform(scrollInfinite(), 0);
+            break;
 
-//            const int16_t freeSpaceWidth = displayText.getCanvas().width - displayText.getSize().width; // has been working
-            const int16_t freeSpaceWidth = m_matrix.getWidth() - displayText.getSize().width; // sounds more reasonable
-            if (m_currentStep == 2*freeSpaceWidth) {
-                m_currentStep = 0;
-            }
-
-            // forward
-            xTransform = m_currentStep;
-
-            // reverse
-            if (m_currentStep >= freeSpaceWidth) {
-                xTransform = freeSpaceWidth - (m_currentStep - freeSpaceWidth);
-            }
-
-            qDebug() << "xTransform" << xTransform;
-
-            m_currentStep++;
-        } else if (displayText.getSize().width > m_matrix.getWidth()) {
-            // text is larger than matrix ...
-            qDebug() << "text > matrix, step" << m_currentStep;
-
-            const int16_t missingSpaceWidth = displayText.getSize().width - m_matrix.getWidth();
-            if (m_currentStep == 2*missingSpaceWidth) {
-                qDebug() << m_currentStep << "==" << 2*missingSpaceWidth << " --- RESET current step to 0";
-                m_currentStep = 0;
-            }
-
-            // forward
-            xTransform = m_currentStep;
-
-            // reverse
-            if (m_currentStep >= missingSpaceWidth) {
-                xTransform = missingSpaceWidth - (m_currentStep - missingSpaceWidth);
-            }
-
-            xTransform *= -1;
-            qDebug() << "xTransform" << xTransform << "(" << missingSpaceWidth << ")";
-
-            m_currentStep++;
-        } else {
-            qDebug() << "text = matrix";
-            // text and matrix are same size. scroll?!
-        }
-//        m_currentStep == displayText.getCanvas().width - m_matrix.getWidth()
-    } else {
-        qDebug() << "ScrollInfinite";
-        xTransform = m_currentStep * (getScrollDirection() == ScrollLeft ? -1 : 1);
-        m_currentStep++;
-        if (m_currentStep >= displayText.getCanvas().width) {
-            m_currentStep = 0;
-        }
+        case ScrollBounce:
+            m_displayText.transform(scrollBounce(), 0);
+            break;
     }
 
-    displayText.transform(xTransform, 0);
-    displayText.render(m_matrix);
+    m_displayText.render(m_matrix);
 
     return true;
 }
 
 void ModeText::readOptions(cJSON *root)
 {
-    cJSON_AddStringToObject(root, "text", m_text.c_str());
-    cJSON_AddNumberToObject(root, "scrollSpeed", m_scrollSpeed);
+    cJSON_AddStringToObject(root, "text", getText().c_str());
+    cJSON_AddNumberToObject(root, "scrollSpeed", getScrollSpeed());
     cJSON_AddNumberToObject(root, "scrollDirection", getScrollDirection());
     cJSON_AddNumberToObject(root, "scrollMode", getScrollMode());
 }
@@ -139,12 +87,12 @@ bool ModeText::writeOptions(cJSON *root)
 
 const std::string &ModeText::getText() const
 {
-    return m_text;
+    return m_displayText.getText();
 }
 
 void ModeText::setText(const std::string &text)
 {
-    m_text = text;
+    m_displayText.setText(text);
 }
 
 uint8_t ModeText::getScrollSpeed() const
@@ -175,6 +123,49 @@ ModeText::ScrollMode ModeText::getScrollMode() const
 void ModeText::setScrollMode(ScrollMode mode)
 {
     m_scrollMode = mode;
+}
+
+int ModeText::scrollInfinite()
+{
+    int xTransform = m_currentStep * (getScrollDirection() == ScrollLeft ? -1 : 1);
+    m_currentStep++;
+    if (m_currentStep >= m_displayText.getCanvas().width) {
+        m_currentStep = 0;
+    }
+
+    return xTransform;
+}
+
+int ModeText::scrollBounce()
+{
+    int xTransform = 0;
+
+    if (m_displayText.getSize().width == m_matrix.getWidth()) {
+        qDebug() << "no bounce!";
+        return xTransform;
+    }
+
+    const bool isOuterBounce = m_displayText.getSize().width > m_matrix.getWidth();
+    const int16_t maxScrollDistance = abs(m_matrix.getWidth() - m_displayText.getSize().width);
+
+    if (m_currentStep == 2*maxScrollDistance) {
+        m_currentStep = 0;
+    }
+
+    if (m_currentStep < maxScrollDistance) {
+        // forward
+        xTransform = m_currentStep;
+    } else {
+        // reverse
+        xTransform = maxScrollDistance - (m_currentStep - maxScrollDistance);
+    }
+
+//    if outer bounce, direction is reversed
+    xTransform *= (isOuterBounce ? -1 : 1);
+
+    m_currentStep++;
+
+    return xTransform;
 }
 
 } // namespace Mode
