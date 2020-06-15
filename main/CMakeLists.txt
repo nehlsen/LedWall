@@ -18,7 +18,7 @@ set(COMPONENT_SRCS
         "LedMode/Fire.cpp"
         "LedMode/Network.cpp"
         "LedMode/Breathe.cpp"
-        "LedMode/Text.cpp"
+        "LedMode/ModeText.cpp"
         "LedMode/MatesDemo.cpp"
         "LedMode/Wave.cpp"
         )

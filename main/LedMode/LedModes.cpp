@@ -8,7 +8,7 @@
 #include "Fire.h"
 #include "Network.h"
 #include "Breathe.h"
-#include "Text.h"
+#include "ModeText.h"
 #include "MatesDemo.h"
 #include "Wave.h"
 
@@ -28,7 +28,7 @@ LedMode *createModeHsiboy(LedMatrix& matrix) { return new LedModeHsiboy(matrix);
 LedMode *createModeFire(LedMatrix& matrix) { return new Fire(matrix); }
 LedMode *createModeNetwork(LedMatrix& matrix) { return new Network(matrix); }
 LedMode *createModeBreathe(LedMatrix& matrix) { return new Breathe(matrix); }
-LedMode *createModeText(LedMatrix& matrix) { return new Text(matrix); }
+LedMode *createModeText(LedMatrix& matrix) { return new ModeText(matrix); }
 LedMode *createModeMatesDemo(LedMatrix& matrix) { return new MatesDemo(matrix); }
 LedMode *createModeWave(LedMatrix& matrix) { return new Wave(matrix); }
 

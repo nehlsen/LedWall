@@ -7,7 +7,7 @@
 namespace LedWall {
 namespace Mode {
 
-class Text : public LedMode
+class ModeText : public LedMode
 {
 public:
     using LedMode::LedMode;
@@ -23,6 +23,20 @@ public:
     uint8_t getScrollSpeed() const;
     void setScrollSpeed(uint8_t scrollSpeed);
 
+    enum ScrollDirection {
+        ScrollLeft,
+        ScrollRight
+    };
+    ScrollDirection getScrollDirection() const;
+    void setScrollDirection(ScrollDirection direction);
+
+    enum ScrollMode {
+        ScrollInfinite,
+        ScrollBounce
+    };
+    ScrollMode getScrollMode() const;
+    void setScrollMode(ScrollMode mode);
+
 protected:
     std::string m_text = "<--=";
     CRGB m_fgColor;
@@ -30,6 +44,9 @@ protected:
 
     uint8_t m_scrollSpeed = 40; // pixels per second
     int64_t m_lastUpdate = 0;
+
+    ScrollDirection m_scrollDirection;
+    ScrollMode m_scrollMode;
 
 //    Direction m_scrollDirection; // horizontal / vertical
     // scroll repeat - bounce / flow
