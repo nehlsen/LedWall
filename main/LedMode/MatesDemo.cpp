@@ -7,6 +7,7 @@ namespace Mode {
 
 bool MatesDemo::update()
 {
+    const int countSamples = 8;
     uint8_t currentSeconds = (millis() / 1000) % 60;
 
     if(m_lastUpdate != currentSeconds) {
