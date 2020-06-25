@@ -13,7 +13,8 @@ bool MatesDemo::update()
         m_lastUpdate = currentSeconds;
 
         m_matrix.clear(true);
-        drawSample(currentSeconds % 6);
+//        drawSample(currentSeconds % countSamples);
+        drawSample(7);
         return true;
     }
 
@@ -54,6 +55,24 @@ void MatesDemo::drawSample(int index)
             break;
         case 5:
             Line(bottomRight, topLeft).setColor(CRGB::Red).render(m_matrix);
+            break;
+
+        case 6:
+            Line(bottomLeft, bottomRight).setGradient(CRGBPalette16(CRGB::Red, CRGB::Green, CRGB::Blue)).render(m_matrix);
+            drawSampleLetter("G");
+            break;
+
+        case 7:
+            ::Text smplLetter("R", CRGB::Red);
+            const int text_x = (m_matrix.getWidth() - smplLetter.getSize().width) / 2;
+            const int text_y = (m_matrix.getHeight() - smplLetter.getSize().height) / 2;
+
+//            smplLetter.setX(text_x);
+//            smplLetter.setY(text_y);
+            smplLetter.setCanvas(text_x, text_y);
+
+//            smplLetter.setRotation(90);
+            smplLetter.render(m_matrix);
             break;
 
 //        case 6:

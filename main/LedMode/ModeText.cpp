@@ -1,6 +1,7 @@
 #include "ModeText.h"
 #include <cJSON.h>
 #include "utilities.h"
+#include <colorutils.h>
 #include <QtCore/QDebug>
 
 namespace LedWall {
@@ -8,7 +9,6 @@ namespace Mode {
 
 bool ModeText::update()
 {
-    // FIXME scroll speed seems to be broken
     uint16_t delay = m_scrollSpeed == 0 ? 0 : 1000 / m_scrollSpeed;
     int64_t currentTime = esp_timer_get_time() / 1000;
     if ((m_scrollSpeed == 0 || currentTime - m_lastUpdate < delay) && m_lastUpdate > 0) {
@@ -19,7 +19,10 @@ bool ModeText::update()
 //    m_matrix.fade(140);
     m_matrix.clear();
 
-    m_displayText.setBackgroundColor(CRGB::Black).setColor(CRGB::Green);
+    m_displayText.setBackgroundColor(CRGB::Black);
+//    m_displayText.setColor(CRGB::Green);
+    m_displayText.setGradient(CRGBPalette16(CRGB::Red, CRGB::Green, CRGB::Blue));
+//    m_displayText.setGradient(CRGBPalette16(CRGB::White, CRGB::Blue, CRGB::White, CRGB::Blue));
 
     m_displayText.setY((m_matrix.getHeight() - m_displayText.getSize().height) / 2);
     m_displayText.setCanvas(
