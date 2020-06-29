@@ -1,21 +1,23 @@
 #include "MatesDemo.h"
 #include <Line.h>
 #include <Text.h>
+#include <GfxCanvas.h>
+#include <Canvas.h>
 
 namespace LedWall {
 namespace Mode {
 
 bool MatesDemo::update()
 {
-    const int countSamples = 8;
+    const int countSamples = 10;
     uint8_t currentSeconds = (millis() / 1000) % 60;
 
     if(m_lastUpdate != currentSeconds) {
         m_lastUpdate = currentSeconds;
 
         m_matrix.clear(true);
-//        drawSample(currentSeconds % countSamples);
-        drawSample(7);
+        drawSample(currentSeconds % countSamples);
+//        drawSample(7);
         return true;
     }
 
@@ -64,16 +66,15 @@ void MatesDemo::drawSample(int index)
             break;
 
         case 7:
-            ::Text smplLetter("R", CRGB::Red);
-            const int text_x = (m_matrix.getWidth() - smplLetter.getSize().width) / 2;
-            const int text_y = (m_matrix.getHeight() - smplLetter.getSize().height) / 2;
+        case 8:
+        case 9:
+            Text smplLetter("R", CRGB::Red);
 
-//            smplLetter.setX(text_x);
-//            smplLetter.setY(text_y);
-            smplLetter.setCanvas(text_x, text_y);
+            Canvas c(smplLetter.pixels());
+            c.setRotation((index-6)*90, c.getCenter())
+             .applyTransformation()
+             .renderCentered(m_matrix);
 
-//            smplLetter.setRotation(90);
-            smplLetter.render(m_matrix);
             break;
 
 //        case 6:
