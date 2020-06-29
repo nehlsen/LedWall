@@ -1,6 +1,139 @@
+#include <Line.h>
+#include <Rect.h>
+#include <Canvas.h>
 #include "FancyDemo.h"
 
-bool LedWall::Mode::FancyDemo::update()
+#include <QtCore/QDebug>
+
+namespace LedWall {
+namespace Mode {
+
+bool FancyDemo::update()
 {
-    return false;
+    m_matrix.clear();
+
+    uint16_t remainingFrames = 0;
+    remainingFrames += part1(m_frame);
+    remainingFrames += part2((int16_t)m_frame - remainingFrames);
+    remainingFrames += part3((int16_t)m_frame - remainingFrames);
+    remainingFrames += part4((int16_t)m_frame - remainingFrames);
+    remainingFrames += part5((int16_t)m_frame - remainingFrames);
+
+    if ((int16_t)m_frame - remainingFrames >= 0) {
+        m_frame = 0;
+    } else {
+        m_frame++;
+    }
+
+    return true;
 }
+
+int16_t FancyDemo::part1(int16_t frame)
+{
+    const uint16_t frameCount = m_matrix.getWidth() / 2 - 1;
+    if (frame < 0 || frame >= frameCount) return frameCount;
+
+    uint8_t x0 = std::round(m_matrix.getWidth() / 2.0 - 1.5);
+    uint8_t x1 = x0 + 2;
+
+    uint8_t y0 = m_matrix.getHeight() / 2;
+    uint8_t y1 = y0 - 1;
+
+    x0 -= frame;
+    x1 += frame;
+
+    // bottom
+    Line(x0, y0, x1, y0, CRGB::White).render(m_matrix);
+    // top
+    Line(x0, y1, x1, y1, CRGB::White).render(m_matrix);
+
+    return frameCount;
+}
+
+int16_t FancyDemo::part2(int16_t frame)
+{
+    const uint16_t frameCount = m_matrix.getHeight() / 2;
+    if (frame < 0 || frame >= frameCount) return frameCount;
+
+    uint8_t x0 = 0;
+    uint8_t x1 = m_matrix.getWidth() - 1;
+
+    uint8_t y0 = m_matrix.getHeight() / 2 - 1;
+    uint8_t y1 = m_matrix.getHeight() / 2;
+
+    y0 -= frame;
+    y1 += frame;
+
+    // bottom
+    Line(x0, y0, x1, y0, CRGB::White).render(m_matrix);
+    // top
+    Line(x0, y1, x1, y1, CRGB::White).render(m_matrix);
+
+    return frameCount;
+}
+
+int16_t FancyDemo::part3(int16_t frame)
+{
+    const uint16_t frameCount = m_matrix.getHeight() / 2;
+    if (frame < 0 || frame >= frameCount) return frameCount;
+
+    uint8_t x = m_matrix.getWidth() / 2 - 1 - frame;
+    uint8_t y = m_matrix.getHeight() / 2 - 1 - frame;
+
+    uint8_t w = 1 + 2*frame;
+    uint8_t h = 1 + 2*frame;
+
+    Rect(x, y, w, h, CRGB::White).render(m_matrix);
+
+    return frameCount;
+}
+
+int16_t FancyDemo::part4(int16_t frame)
+{
+    const uint16_t frameCount = (m_matrix.getHeight() - 10) * (2.0/3.0);
+    if (frame < 0 || frame >= frameCount) return frameCount;
+
+    uint8_t x = (m_matrix.getWidth() - m_matrix.getHeight()) / 2 + 1 + frame;
+    uint8_t y = 1 + frame;
+
+    uint8_t w = m_matrix.getHeight() - 2*frame - 1;
+    uint8_t h = m_matrix.getHeight() - 2*frame - 1;
+
+    Rect(x, y, w, h, CRGB::White).render(m_matrix);
+
+    return frameCount;
+}
+
+int16_t FancyDemo::part5(int16_t frame)
+{
+    // 360 / 8 = 45
+    // 360 / 9 = 40
+    // 360 / 10 = 36
+    // 360 / 12 = 30
+    // 360 / 15 = 24
+
+    const uint8_t degreesPerFrame = 15;
+    const uint16_t frameCount = 360 / degreesPerFrame;
+    if (frame < 0 || frame >= frameCount) return frameCount;
+
+    uint8_t cubeSize = 9;
+
+    uint8_t x = 0;
+    uint8_t y = 0;
+
+    uint8_t w = cubeSize;
+    uint8_t h = cubeSize;
+
+    Canvas c(Rect(x, y, w, h, CRGB::White).pixels());
+    c.setRotation((frame/*+1*/) * degreesPerFrame, c.getCenter())
+     .applyTransformation()
+//     .render(m_matrix)
+     .render(m_matrix, {int16_t((m_matrix.getWidth() - cubeSize) / 2), int16_t((m_matrix.getHeight() - cubeSize) / 2)})
+//     .renderCentered(m_matrix)
+     ;
+
+    return frameCount;
+}
+
+} // namespace Mode
+} // namespace LedWall
