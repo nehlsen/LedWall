@@ -414,7 +414,7 @@ void MultiBars::Bar::drawLine(Point p0, Point p1)
 {
     ::Line l(p0, p1);
     l.setColor(CHSV(constantColor ? hue : random8(), 255, 255));
-    l.render(matrix, blendColor ? GfxPrimitive::RenderModeAdd : GfxPrimitive::RenderModeOverwrite);
+    l.render(matrix, {0, 0}, blendColor ? GfxPrimitive::RenderModeAdd : GfxPrimitive::RenderModeOverwrite);
 }
 
 } // namespace Mode

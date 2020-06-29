@@ -2,7 +2,6 @@
 #include <cJSON.h>
 #include "utilities.h"
 #include <colorutils.h>
-#include <QtCore/QDebug>
 
 namespace LedWall {
 namespace Mode {
@@ -30,7 +29,7 @@ bool ModeText::update()
             0,
             max(m_displayText.getSize().width, m_matrix.getWidth()),
             m_matrix.getHeight(),
-            GfxPrimitive::CanvasWrapAround
+            Text::CanvasWrapAround
             );
 
     switch (getScrollMode()) {
@@ -144,7 +143,6 @@ int ModeText::scrollBounce()
     int xTransform = 0;
 
     if (m_displayText.getSize().width == m_matrix.getWidth()) {
-        qDebug() << "no bounce!";
         return xTransform;
     }
 
