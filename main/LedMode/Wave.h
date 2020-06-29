@@ -37,12 +37,12 @@ public:
     void setWaveDirection(WaveDirection waveDirection);
 
     // peak to peak in pixels
-    int getWaveLength() const; // TODO uint8_t should suffice
-    void setWaveLength(int waveLength);
+    uint8_t getWaveLength() const;
+    void setWaveLength(uint8_t waveLength);
 
     // how many pixels the wave-peak travels per tenth-of-a-second
-    int getSpeed() const; // TODO uint8_t should suffice
-    void setSpeed(int speed);
+    uint8_t getSpeed() const;
+    void setSpeed(uint8_t speed);
 
     std::pair<uint8_t, uint8_t> getModHue() const;
     void setModHue(uint8_t low, uint8_t high);
@@ -56,9 +56,9 @@ public:
 protected:
     WaveMode m_waveMode;
     WaveDirection m_waveDirection;
-    int m_waveLength;
+    uint8_t m_waveLength;
     int m_totalFrames;
-    int m_speed;
+    uint8_t m_speed;
 
     int m_frame = 0;
 

@@ -148,23 +148,23 @@ void Wave::setWaveDirection(Wave::WaveDirection waveDirection)
     m_waveDirection = waveDirection;
 }
 
-int Wave::getWaveLength() const
+uint8_t Wave::getWaveLength() const
 {
     return m_waveLength;
 }
 
-void Wave::setWaveLength(int waveLength)
+void Wave::setWaveLength(uint8_t waveLength)
 {
     m_waveLength = waveLength;
     m_totalFrames = m_waveLength * framesPerSecond();
 }
 
-int Wave::getSpeed() const
+uint8_t Wave::getSpeed() const
 {
     return m_speed;
 }
 
-void Wave::setSpeed(int speed)
+void Wave::setSpeed(uint8_t speed)
 {
     m_speed = speed;
 }
