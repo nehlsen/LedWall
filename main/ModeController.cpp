@@ -41,7 +41,7 @@ void led_update_task(void *pvParameter)
 }
 
 ModeController::ModeController(ConfigManager *configManager):
-    m_configManager(configManager), m_modeOptionsPersister(new ModeOptionsPersister)
+    m_configManager(configManager)
 {
     const int matrixWidth = m_configManager->getMatrixWidth();
     const int matrixHeight = m_configManager->getMatrixHeight();
@@ -145,9 +145,9 @@ bool ModeController::setModeByIndex(int modeIndex)
     Mode::LedMode *newMode = Mode::LedModes.at(modeIndex).factory(*m_matrix);
 
     if (nullptr != m_ledMode) {
-        m_modeOptionsPersister->saveOptions(m_ledMode, Mode::LedModes.at(m_modeIndex).name);
+        ModeOptionsPersister::save(m_ledMode, Mode::LedModes.at(m_modeIndex).name);
     }
-    m_modeOptionsPersister->loadOptions(newMode, Mode::LedModes.at(modeIndex).name);
+    ModeOptionsPersister::load(newMode, Mode::LedModes.at(modeIndex).name);
 
     turnAllLedsOff();
     m_modeIndex = modeIndex;

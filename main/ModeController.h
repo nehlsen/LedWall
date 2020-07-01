@@ -13,7 +13,6 @@ namespace Mode {
 class LedMode;
 } // namespace Mode
 class ConfigManager;
-class ModeOptionsPersister;
 
 class ModeController
 {
@@ -38,7 +37,6 @@ protected:
     LedMatrix* m_matrix;
 
     ConfigManager *m_configManager;
-    ModeOptionsPersister *m_modeOptionsPersister;
 
     bool m_power = true;
     int m_modeIndex = -1;
