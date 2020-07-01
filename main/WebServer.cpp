@@ -31,6 +31,7 @@ CREATE_FUNCTION_TO_METHOD(led_mode_get_handler, getLedMode)
 CREATE_FUNCTION_TO_METHOD(led_mode_post_handler, postLedMode)
 CREATE_FUNCTION_TO_METHOD(led_modes_get_handler, getLedModes)
 CREATE_FUNCTION_TO_METHOD(mode_options_post_handler, postModeOptions)
+CREATE_FUNCTION_TO_METHOD(mode_options_delete_handler, deleteModeOptions)
 CREATE_FUNCTION_TO_METHOD(config_get_handler, getConfig)
 CREATE_FUNCTION_TO_METHOD(config_post_handler, postConfig)
 CREATE_FUNCTION_TO_METHOD(ota_post_handler, postOta)
@@ -157,6 +158,11 @@ esp_err_t WebServer::postModeOptions(httpd_req_t *req)
     });
 }
 
+esp_err_t WebServer::deleteModeOptions(httpd_req_t *req)
+{
+    return ESP_FAIL;
+}
+
 cJSON* WebServer::createConfigData()
 {
     cJSON *root = cJSON_CreateObject();
@@ -268,7 +274,7 @@ void WebServer::startServer()
     }
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.max_uri_handlers = 12;
+    config.max_uri_handlers = 13;
     config.uri_match_fn = httpd_uri_match_wildcard;
 
     ESP_LOGI(WEBSERVER_LOG_TAG, "Starting server on port: '%d'", config.server_port);
@@ -348,6 +354,14 @@ void WebServer::registerUriHandlers()
             .user_ctx = this
     };
     httpd_register_uri_handler(m_hdnlServer, &mode_options_post_uri);
+
+    httpd_uri_t mode_options_delete_uri = {
+            .uri = "/api/v1/mode/options",
+            .method = HTTP_DELETE,
+            .handler = mode_options_delete_handler,
+            .user_ctx = this
+    };
+    httpd_register_uri_handler(m_hdnlServer, &mode_options_delete_uri);
 
     httpd_uri_t config_get_uri = {
             .uri = "/api/v1/config",
