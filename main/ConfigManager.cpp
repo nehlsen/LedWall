@@ -4,7 +4,7 @@
 namespace LedWall {
 
 #define NVS_NAMESPACE "led_wall_config"
-static const char *CONFIG_MANAGER_LOG_TAG = "CONFIG_MANAGER";
+static const char *CONFIG_MANAGER_LOG_TAG = "ConfigManager";
 
 // NOTE keys are limited to 15 characters
 #define MATRIX_WIDTH_KEY        "matrix_width"
@@ -91,7 +91,7 @@ bool ConfigManager::setIntVal(const char *key, int32_t value)
 std::string ConfigManager::getStringVal(const char *key, const std::string &defaultValue) const
 {
     size_t required_size;
-    esp_err_t err = nvs_get_str(m_nvsHandle, key, NULL, &required_size);
+    esp_err_t err = nvs_get_str(m_nvsHandle, key, nullptr, &required_size);
     if (err != ESP_OK) {
         ESP_LOGW(CONFIG_MANAGER_LOG_TAG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key);
         return defaultValue;
@@ -169,7 +169,7 @@ void ConfigManager::setPowerOnResetMode(ConfigManager::AutoPowerOn mode)
     setIntVal(POWER_BOOT_MODE_KEY, mode);
 }
 
-ConfigManager::AutoPowerOn ConfigManager::getPowerOnResetMode()
+ConfigManager::AutoPowerOn ConfigManager::getPowerOnResetMode() const
 {
     return (AutoPowerOn)getIntVal(POWER_BOOT_MODE_KEY, RECOVER_LAST);
 }
@@ -179,7 +179,7 @@ void ConfigManager::setPowerState(bool currentPowerState)
     setIntVal(POWER_LAST_STATE_KEY, currentPowerState);
 }
 
-bool ConfigManager::isPoweredOnBoot()
+bool ConfigManager::isPoweredOnBoot() const
 {
     auto mode = getPowerOnResetMode();
     switch (mode) {

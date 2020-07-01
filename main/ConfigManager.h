@@ -39,9 +39,9 @@ public:
         RECOVER_LAST = 2,
     };
     void setPowerOnResetMode(AutoPowerOn mode); // whether to remember or auto on/off
-    AutoPowerOn getPowerOnResetMode();
+    AutoPowerOn getPowerOnResetMode() const;
     void setPowerState(bool currentPowerState); // remember current power state
-    bool isPoweredOnBoot();
+    bool isPoweredOnBoot() const;
 
 //    void setBootIntoMode(); // set mode to boot into, disables restore
 //    void setAutoRestoreModeEnabled(); // enable auto restore mode
