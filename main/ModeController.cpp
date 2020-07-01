@@ -4,8 +4,10 @@
 #include <freertos/task.h>
 #include <LedMatrix.h>
 #include <algorithm>
+#include <cJSON.h>
 #include "LedMode/LedModes.h"
 #include "ConfigManager.h"
+#include "ModeOptionsPersister.h"
 #include "events.h"
 
 namespace LedWall {
@@ -39,7 +41,7 @@ void led_update_task(void *pvParameter)
 }
 
 ModeController::ModeController(ConfigManager *configManager):
-    m_configManager(configManager)
+    m_configManager(configManager), m_modeOptionsPersister(new ModeOptionsPersister)
 {
     const int matrixWidth = m_configManager->getMatrixWidth();
     const int matrixHeight = m_configManager->getMatrixHeight();
@@ -119,7 +121,7 @@ uint8_t ModeController::getBrightness() const
 
 bool ModeController::setModeByName(const std::string &name)
 {
-    auto it = std::find_if(Mode::LedModes.begin(), Mode::LedModes.end(), [name](const Mode::LedModeDef_t &modeDef){
+    auto it = std::find_if(Mode::LedModes.begin(), Mode::LedModes.end(), [name](const Mode::LedModeDef_t &modeDef) {
         return modeDef.name == name;
     });
 
@@ -141,6 +143,11 @@ bool ModeController::setModeByIndex(int modeIndex)
 
     ESP_LOGI(LOG_TAG, "setModeByIndex: going to create mode:\"%s\"", Mode::LedModes.at(modeIndex).name);
     Mode::LedMode *newMode = Mode::LedModes.at(modeIndex).factory(*m_matrix);
+
+    if (nullptr != m_ledMode) {
+        m_modeOptionsPersister->saveOptions(m_ledMode, Mode::LedModes.at(m_modeIndex).name);
+    }
+    m_modeOptionsPersister->loadOptions(newMode, Mode::LedModes.at(modeIndex).name);
 
     turnAllLedsOff();
     m_modeIndex = modeIndex;

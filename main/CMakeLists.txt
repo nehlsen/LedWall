@@ -2,6 +2,7 @@ set(COMPONENT_SRCS
         "main.cpp"
         "wifi_provisioning.c"
         "ConfigManager.cpp"
+        "ModeOptionsPersister.cpp"
         "OtaUpdater.cpp"
 
         "ModeController.cpp"

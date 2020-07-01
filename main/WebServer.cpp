@@ -386,7 +386,7 @@ esp_err_t WebServer::jsonResponse(cJSON *root, httpd_req_t *req, const char* sta
     httpd_resp_set_status(req, status);
     httpd_resp_set_type(req, "application/json");
 
-    const char *responsePayload = cJSON_Print(root);
+    const char *responsePayload = cJSON_PrintUnformatted(root);
     httpd_resp_sendstr(req, responsePayload);
 
     free((void *)responsePayload);
