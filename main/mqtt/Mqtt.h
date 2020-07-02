@@ -16,14 +16,17 @@ public:
 
     void start();
     void stop();
+    bool isConnected() const;
 
     void onMqttConnected();
+    void onMqttDisconnected();
     void onMqttData(esp_mqtt_event_handle_t event);
     void onLedWallEvent(int32_t event_id, void* event_data);
 
 protected:
     ModeController* m_controller;
     ConfigManager* m_configManager;
+    bool m_isConnected;
 
     esp_mqtt_client_handle_t m_client;
 

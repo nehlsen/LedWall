@@ -18,6 +18,14 @@ void mqtt_event_connected(void* event_handler_arg, esp_event_base_t event_base, 
     mqtt->onMqttConnected();
 }
 
+void mqtt_event_disconnected(void* event_handler_arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
+{
+    Mqtt* mqtt = static_cast<Mqtt*>(event_handler_arg);
+    ESP_ERROR_CHECK(nullptr == mqtt ? ESP_FAIL : ESP_OK);
+
+    mqtt->onMqttDisconnected();
+}
+
 void mqtt_event_data(void* event_handler_arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
     Mqtt* mqtt = static_cast<Mqtt*>(event_handler_arg);
@@ -34,8 +42,10 @@ void led_wall_events(void* event_handler_arg, esp_event_base_t event_base, int32
     mqtt->onLedWallEvent(event_id, event_data);
 }
 
+/* ****************************************************************************************************************** */
+
 Mqtt::Mqtt(ModeController *controller, ConfigManager *configManager):
-    m_controller(controller), m_configManager(configManager)
+    m_controller(controller), m_configManager(configManager), m_isConnected(false)
 {
     const std::string broker = configManager->getMqttBroker();
 
@@ -44,6 +54,7 @@ Mqtt::Mqtt(ModeController *controller, ConfigManager *configManager):
     };
     m_client = esp_mqtt_client_init(&mqtt_cfg);
     esp_mqtt_client_register_event(m_client, MQTT_EVENT_CONNECTED, mqtt_event_connected, this);
+    esp_mqtt_client_register_event(m_client, MQTT_EVENT_DISCONNECTED, mqtt_event_disconnected, this);
     esp_mqtt_client_register_event(m_client, MQTT_EVENT_DATA, mqtt_event_data, this);
 
     esp_event_handler_register(LEDWALL_EVENTS, ESP_EVENT_ANY_ID, led_wall_events, this);
@@ -65,10 +76,26 @@ void Mqtt::stop()
     ESP_LOGI(LOG_TAG, "MQTT Stopped.");
 }
 
+bool Mqtt::isConnected() const
+{
+    return m_isConnected;
+}
+
 void Mqtt::onMqttConnected()
 {
     setupSubscriptions(m_configManager->getMqttDeviceTopic());
     setupSubscriptions(m_configManager->getMqttGroupTopic());
+
+    m_isConnected = true;
+
+    ESP_LOGI(LOG_TAG, "MQTT Connection established...");
+}
+
+void Mqtt::onMqttDisconnected()
+{
+    m_isConnected = false;
+
+    ESP_LOGI(LOG_TAG, "MQTT Connection lost...");
 }
 
 void Mqtt::onMqttData(esp_mqtt_event_handle_t event)
@@ -144,6 +171,10 @@ void Mqtt::setupSubscriptions(const std::string &baseTopic)
 
 void Mqtt::publishState(const std::string &state, const std::string &value)
 {
+    if (!isConnected()) {
+        return;
+    }
+
     std::string topic = "/" + m_configManager->getMqttDeviceTopic() + "/state/" + state;
 
     esp_mqtt_client_publish(m_client, topic.c_str(), value.c_str(), 0, 0, 0);

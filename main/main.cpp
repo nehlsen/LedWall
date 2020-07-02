@@ -105,10 +105,6 @@ esp_err_t init_fs(void)
 
 void app_main()
 {
-    ESP_LOGI(APP_LOG_TAG, "[APP] Startup..");
-    ESP_LOGI(APP_LOG_TAG, "[APP] Free memory: %d bytes", esp_get_free_heap_size());
-    ESP_LOGI(APP_LOG_TAG, "[APP] IDF version: %s", esp_get_idf_version());
-
     esp_log_level_set("*", ESP_LOG_INFO);
     esp_log_level_set("MQTT_CLIENT", ESP_LOG_VERBOSE);
     esp_log_level_set(APP_LOG_TAG, ESP_LOG_VERBOSE);
