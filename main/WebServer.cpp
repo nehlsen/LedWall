@@ -217,18 +217,18 @@ esp_err_t WebServer::postConfig(httpd_req_t *req)
         }
 
         cJSON *const mqttBroker = cJSON_GetObjectItem(request, "MqttBroker");
-        if (mqttBroker && cJSON_IsString(mqttBroker) && strlen(mqttBroker->string) > 0 && strlen(mqttBroker->string) < 64) {
-            m_configManager->setMqttBroker(mqttBroker->string);
+        if (mqttBroker && cJSON_IsString(mqttBroker) && strlen(mqttBroker->valuestring) > 0 && strlen(mqttBroker->valuestring) < 64) {
+            m_configManager->setMqttBroker(mqttBroker->valuestring);
         }
 
         cJSON *const mqttDeviceTopic = cJSON_GetObjectItem(request, "MqttDeviceTopic");
-        if (mqttDeviceTopic && cJSON_IsString(mqttDeviceTopic) && strlen(mqttDeviceTopic->string) > 0 && strlen(mqttDeviceTopic->string) < 64) {
-            m_configManager->setMqttDeviceTopic(mqttDeviceTopic->string);
+        if (mqttDeviceTopic && cJSON_IsString(mqttDeviceTopic) && strlen(mqttDeviceTopic->valuestring) > 0 && strlen(mqttDeviceTopic->valuestring) < 64) {
+            m_configManager->setMqttDeviceTopic(mqttDeviceTopic->valuestring);
         }
 
         cJSON *const mqttGroupTopic = cJSON_GetObjectItem(request, "MqttGroupTopic");
-        if (mqttGroupTopic && cJSON_IsString(mqttGroupTopic) && strlen(mqttGroupTopic->string) > 0 && strlen(mqttGroupTopic->string) < 64) {
-            m_configManager->setMqttGroupTopic(mqttGroupTopic->string);
+        if (mqttGroupTopic && cJSON_IsString(mqttGroupTopic) && strlen(mqttGroupTopic->valuestring) > 0 && strlen(mqttGroupTopic->valuestring) < 64) {
+            m_configManager->setMqttGroupTopic(mqttGroupTopic->valuestring);
         }
 
         *response = createConfigData();
