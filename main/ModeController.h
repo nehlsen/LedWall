@@ -30,6 +30,7 @@ public:
     bool setModeByName(const std::string &name);
     bool setModeByIndex(int modeIndex);
     int getModeIndex() const;
+    std::string getModeName() const;
 
     bool setModeOptions(cJSON *optionsObject);
     void getModeOptions(cJSON *optionsObject);

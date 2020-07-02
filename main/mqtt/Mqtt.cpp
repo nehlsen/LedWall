@@ -5,6 +5,7 @@
 #include "mqtt_client.h"
 #include "esp_log.h"
 #include <cJSON.h>
+#include "../LedMode/LedModes.h"
 
 #define LOG_TAG "MQTT"
 
@@ -109,6 +110,11 @@ void Mqtt::onMqttData(esp_mqtt_event_handle_t event)
     if (nullptr != strstr(event->topic, "/mode/index") && event->data_len >= 1) {
         m_controller->setModeByIndex(atoi(event->data));
     }
+    if (nullptr != strstr(event->topic, "/mode/name") && event->data_len >= 1) {
+        if (strlen(event->data) <= Mode::ValidModeNameLength) {
+            m_controller->setModeByName(event->data);
+        }
+    }
     if (nullptr != strstr(event->topic, "/mode/options") && event->data_len >= 1) {
         cJSON *optionsObject = cJSON_Parse(event->data);
         m_controller->setModeOptions(optionsObject);
@@ -134,24 +140,33 @@ void Mqtt::onLedWallEvent(int32_t event_id, void *event_data)
             break;
         }
 
-        case LEDWALL_EVENT_MODE_CHANGED: {
-            int *modeIndex = static_cast<int *>(event_data);
-            publishState("mode/index", std::to_string(*modeIndex));
+        case LEDWALL_EVENT_MODE_CHANGED:
+            publishMode();
+            publishModeOptions();
             break;
-        }
 
-        case LEDWALL_EVENT_MODE_OPTIONS_CHANGED: {
-            cJSON *optionsObject = cJSON_CreateObject();
-            m_controller->getModeOptions(optionsObject);
-
-            char *jsonBuffer = cJSON_PrintUnformatted(optionsObject);
-            publishState("mode/options", jsonBuffer);
-
-            free(jsonBuffer);
-            cJSON_Delete(optionsObject);
+        case LEDWALL_EVENT_MODE_OPTIONS_CHANGED:
+            publishModeOptions();
             break;
-        }
     }
+}
+
+void Mqtt::publishMode()
+{
+    publishState("mode/index", std::to_string(m_controller->getModeIndex()));
+    publishState("mode/name", m_controller->getModeName());
+}
+
+void Mqtt::publishModeOptions()
+{
+    cJSON *optionsObject = cJSON_CreateObject();
+    m_controller->getModeOptions(optionsObject);
+
+    char *jsonBuffer = cJSON_PrintUnformatted(optionsObject);
+    publishState("mode/options", jsonBuffer);
+
+    free(jsonBuffer);
+    cJSON_Delete(optionsObject);
 }
 
 void Mqtt::setupSubscriptions(const std::string &baseTopic)
@@ -166,6 +181,7 @@ void Mqtt::setupSubscriptions(const std::string &baseTopic)
     subscribeToCommand("reboot");
     subscribeToCommand("brightness");
     subscribeToCommand("mode/index");
+    subscribeToCommand("mode/name");
     subscribeToCommand("mode/options");
 }
 

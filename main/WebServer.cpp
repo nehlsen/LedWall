@@ -124,7 +124,7 @@ esp_err_t WebServer::postLedMode(httpd_req_t *req)
         cJSON *const modeByName = cJSON_GetObjectItem(request, "name");
         if (modeByIndex && cJSON_IsNumber(modeByIndex)) {
             modeHasBeenSet = m_controller->setModeByIndex(modeByIndex->valueint);
-        } else if (modeByName && cJSON_IsString(modeByName) && strlen(modeByName->valuestring) <= 16) {
+        } else if (modeByName && cJSON_IsString(modeByName) && strlen(modeByName->valuestring) <= Mode::ValidModeNameLength) {
             modeHasBeenSet = m_controller->setModeByName(modeByName->valuestring);
         } else {
             return false;

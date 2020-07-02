@@ -7,6 +7,8 @@
 namespace LedWall {
 namespace Mode {
 
+static const uint8_t ValidModeNameLength = 16;
+
 typedef LedMode* (LedModeFactory)(LedMatrix& matrix);
 
 typedef struct {

@@ -30,6 +30,9 @@ protected:
 
     esp_mqtt_client_handle_t m_client;
 
+    void publishMode();
+    void publishModeOptions();
+
     void setupSubscriptions(const std::string &baseTopic);
     void publishState(const std::string &state, const std::string &value);
 };

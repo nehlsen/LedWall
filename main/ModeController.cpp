@@ -170,6 +170,15 @@ int ModeController::getModeIndex() const
     return m_modeIndex;
 }
 
+std::string ModeController::getModeName() const
+{
+    if (getModeIndex() < 0 || getModeIndex() >= Mode::LedModes.size()) {
+        return std::string();
+    }
+
+    return Mode::LedModes.at(getModeIndex()).name;
+}
+
 bool ModeController::setModeOptions(cJSON *optionsObject)
 {
     if (nullptr == getLedMode()) {
