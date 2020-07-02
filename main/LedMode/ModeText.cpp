@@ -27,7 +27,7 @@ bool ModeText::update()
     m_displayText.setCanvas(
             0,
             0,
-            max(m_displayText.getSize().width, m_matrix.getWidth()),
+            std::max(m_displayText.getSize().width, (int16_t)m_matrix.getWidth()),
             m_matrix.getHeight(),
             Text::CanvasWrapAround
             );
