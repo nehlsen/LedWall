@@ -33,9 +33,14 @@ void led_update_task(void *pvParameter)
             if (ledMode->update()) {
                 FastLED.show();
             }
+
+            vTaskDelay(ledMode->frameDelay());
+        } else {
+            // no mode active, throttle update task
+            ESP_LOGW(LOG_TAG, "NO ACTIVE MODE");
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
 
-        vTaskDelay(ledMode->frameDelay());
         xEventGroupWaitBits(led_update_task_event_group, LED_WALL_ENABLED_BIT, false, false, portMAX_DELAY);
     }
 }
