@@ -165,6 +165,36 @@ int ModeController::getModeIndex() const
     return m_modeIndex;
 }
 
+bool ModeController::setModeOptions(cJSON *optionsObject)
+{
+    if (nullptr == getLedMode()) {
+        return false;
+    }
+    if (nullptr == optionsObject) {
+        return false;
+    }
+
+    bool optionsHaveBeenSet = getLedMode()->writeOptions(optionsObject);
+    if (optionsHaveBeenSet) {
+        ModeOptionsPersister::save(m_ledMode, Mode::LedModes.at(m_modeIndex).name);
+        esp_event_post(LEDWALL_EVENTS, LEDWALL_EVENT_MODE_OPTIONS_CHANGED, nullptr, 0, portMAX_DELAY);
+    }
+
+    return optionsHaveBeenSet;
+}
+
+void ModeController::getModeOptions(cJSON *optionsObject)
+{
+    if (nullptr == getLedMode()) {
+        return;
+    }
+    if (nullptr == optionsObject) {
+        return;
+    }
+
+    getLedMode()->readOptions(optionsObject);
+}
+
 Mode::LedMode* ModeController::getLedMode() const
 {
     return m_ledMode;

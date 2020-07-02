@@ -6,9 +6,10 @@
 ESP_EVENT_DECLARE_BASE(LEDWALL_EVENTS);
 
 enum {
-    LEDWALL_EVENT_POWER_CHANGED,      // arg: (bool) isPowered
-    LEDWALL_EVENT_BRIGHTNESS_CHANGED, // arg: (uint8_t) brightness
-    LEDWALL_EVENT_MODE_CHANGED        // arg: (int) modeIndex
+    LEDWALL_EVENT_POWER_CHANGED,        // arg: (bool) isPowered
+    LEDWALL_EVENT_BRIGHTNESS_CHANGED,   // arg: (uint8_t) brightness
+    LEDWALL_EVENT_MODE_CHANGED,         // arg: (int) modeIndex
+    LEDWALL_EVENT_MODE_OPTIONS_CHANGED, // arg: NONE
 };
 
 #endif //LEDWALL_EVENTS_H

@@ -74,38 +74,35 @@ void MatesDemo::drawSample(int index)
         // using canvas to rotate a text 90, 180 and 270 degrees clock-wise
         case 7:
         case 8:
-        case 9:
-        {
+        case 9: {
             Text smplLetter("R", solidColor);
 
             Canvas c(smplLetter.pixels());
             c.setRotation((index-6)*90, c.getCenter())
              .applyTransformation()
              .renderCentered(m_matrix);
-        }
             break;
+        }
 
-        case 10:
-        {
+        case 10: {
             Text smpl("Text");
             smpl
                     .setGradient(gradient, Text::GradientModePerLetter)
                     .setX((m_matrix.getWidth() - smpl.getSize().width) / 2)
                     .setY((m_matrix.getHeight() - smpl.getSize().height) / 2)
                     .render(m_matrix);
-        }
             break;
+        }
 
-        case 11:
-        {
+        case 11: {
             Text smpl("Text");
             smpl
                     .setGradient(gradient, Text::GradientModeOverlay)
                     .setX((m_matrix.getWidth() - smpl.getSize().width) / 2)
                     .setY((m_matrix.getHeight() - smpl.getSize().height) / 2)
                     .render(m_matrix);
-        }
             break;
+        }
 
 //        case 6:
 //            // hexagon optimal angled line

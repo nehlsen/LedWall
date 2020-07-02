@@ -23,6 +23,7 @@ public:
     // read options from mode to JSON object
     virtual void readOptions(cJSON *root);
     // write options from JSON object to mode
+    //   return true if something has changed, false else
     virtual bool writeOptions(cJSON *root);
 
 protected:

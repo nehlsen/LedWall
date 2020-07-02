@@ -4,6 +4,7 @@
 #include "../events.h"
 #include "mqtt_client.h"
 #include "esp_log.h"
+#include <cJSON.h>
 
 #define LOG_TAG "MQTT"
 
@@ -78,8 +79,13 @@ void Mqtt::onMqttData(esp_mqtt_event_handle_t event)
     if (nullptr != strstr(event->topic, "/brightness") && event->data_len >= 1) {
         m_controller->setBrightness(atoi(event->data));
     }
-    if (nullptr != strstr(event->topic, "/mode") && event->data_len >= 1) {
+    if (nullptr != strstr(event->topic, "/mode/index") && event->data_len >= 1) {
         m_controller->setModeByIndex(atoi(event->data));
+    }
+    if (nullptr != strstr(event->topic, "/mode/options") && event->data_len >= 1) {
+        cJSON *optionsObject = cJSON_Parse(event->data);
+        m_controller->setModeOptions(optionsObject);
+        cJSON_Delete(optionsObject);
     }
     if (nullptr != strstr(event->topic, "/reboot")) {
         m_controller->triggerSystemReboot();
@@ -103,7 +109,19 @@ void Mqtt::onLedWallEvent(int32_t event_id, void *event_data)
 
         case LEDWALL_EVENT_MODE_CHANGED: {
             int *modeIndex = static_cast<int *>(event_data);
-            publishState("mode", std::to_string(*modeIndex));
+            publishState("mode/index", std::to_string(*modeIndex));
+            break;
+        }
+
+        case LEDWALL_EVENT_MODE_OPTIONS_CHANGED: {
+            cJSON *optionsObject = cJSON_CreateObject();
+            m_controller->getModeOptions(optionsObject);
+
+            char *jsonBuffer = cJSON_PrintUnformatted(optionsObject);
+            publishState("mode/options", jsonBuffer);
+
+            free(jsonBuffer);
+            cJSON_Delete(optionsObject);
             break;
         }
     }
@@ -120,7 +138,8 @@ void Mqtt::setupSubscriptions(const std::string &baseTopic)
     subscribeToCommand("power");
     subscribeToCommand("reboot");
     subscribeToCommand("brightness");
-    subscribeToCommand("mode");
+    subscribeToCommand("mode/index");
+    subscribeToCommand("mode/options");
 }
 
 void Mqtt::publishState(const std::string &state, const std::string &value)

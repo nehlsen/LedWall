@@ -105,7 +105,7 @@ cJSON* WebServer::createLedModeData()
     cJSON_AddStringToObject(root, "name", Mode::LedModes.at(m_controller->getModeIndex()).name);
 
     cJSON *options = cJSON_AddObjectToObject(root, "options");
-    m_controller->getLedMode()->readOptions(options);
+    m_controller->getModeOptions(options);
 
     return root;
 }
@@ -152,7 +152,7 @@ esp_err_t WebServer::getLedModes(httpd_req_t *req)
 esp_err_t WebServer::postModeOptions(httpd_req_t *req)
 {
     return handlePost(req, [=](cJSON *request, cJSON **response) -> bool {
-        bool optionsHaveBeenSet = m_controller->getLedMode()->writeOptions(request);
+        bool optionsHaveBeenSet = m_controller->setModeOptions(request);
         *response = createLedModeData();
         return optionsHaveBeenSet;
     });

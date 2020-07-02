@@ -7,6 +7,7 @@
 
 class CRGB;
 class LedMatrix;
+class cJSON;
 
 namespace LedWall {
 namespace Mode {
@@ -29,6 +30,9 @@ public:
     bool setModeByName(const std::string &name);
     bool setModeByIndex(int modeIndex);
     int getModeIndex() const;
+
+    bool setModeOptions(cJSON *optionsObject);
+    void getModeOptions(cJSON *optionsObject);
 
     Mode::LedMode *getLedMode() const;
 
