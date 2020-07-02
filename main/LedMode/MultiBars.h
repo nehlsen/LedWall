@@ -30,19 +30,11 @@ public:
     const uint8_t &getMaximumFrameDelay() const;
     void setMaximumFrameDelay(const uint8_t &maximumFrameDelay);
 
-    bool isBarKeepsColor() const;
-    void setBarKeepsColor(bool barKeepsColor);
-
-    bool isBlendColor() const;
-    void setBlendColor(bool blendColor);
-
 protected:
     uint8_t m_fadeRate = 200; // how fast to fade: 1-fast, 256-slow
     uint8_t m_barTravelSpeed = 245; // how fast bars travel? 1-slow, 255-fast
 //    uint8_t m_numberOfBars = 3; // absolute number of parallel bars
     uint8_t m_maximumFrameDelay = 7; // maximum frames to delay a new bar? 0-no pause, 5-up to 5 empty frames, ...
-    bool m_barKeepsColor = true; // whether bars keep their color while moving or random color each frame
-    bool m_blendColor = true; // whether each pixel blends or replaces current color
 
     class Bar {
     public:
@@ -66,13 +58,11 @@ protected:
             DrawDirectionCount
         };
 
-        Bar(LedMatrix& matrix, DrawMode drawMode, DrawDirection drawDirection, bool constantColor, bool blendColor, uint8_t emptyFrames = 0);
+        Bar(LedMatrix& matrix, DrawMode drawMode, DrawDirection drawDirection, uint8_t emptyFrames = 0);
 
         LedMatrix& matrix;
         const DrawMode mode;
         const DrawDirection direction;
-        const bool constantColor;
-        const bool blendColor;
 
         int8_t currentFrame;
         uint8_t hue;

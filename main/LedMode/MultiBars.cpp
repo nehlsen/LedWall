@@ -44,8 +44,6 @@ void MultiBars::readOptions(cJSON *root)
     cJSON_AddNumberToObject(root, "barTravelSpeed", getBarTravelSpeed());
     cJSON_AddNumberToObject(root, "numberOfBars", getNumberOfBars());
     cJSON_AddNumberToObject(root, "maximumFrameDelay", getMaximumFrameDelay());
-    cJSON_AddBoolToObject(root, "barKeepsColor", isBarKeepsColor());
-    cJSON_AddBoolToObject(root, "blendColor", isBlendColor());
 }
 
 bool MultiBars::writeOptions(cJSON *root)
@@ -70,17 +68,7 @@ bool MultiBars::writeOptions(cJSON *root)
         setMaximumFrameDelay(constrain(requestedMaximumFrameDelay->valueint, 0, 255));
     }
 
-    cJSON *const requestedKeepColor = cJSON_GetObjectItem(root, "barKeepsColor");
-    if (requestedKeepColor) {
-        setBarKeepsColor(cJSON_IsBool(requestedKeepColor) ? cJSON_IsTrue(requestedKeepColor) : true);
-    }
-
-    cJSON *const requestedBlendColor = cJSON_GetObjectItem(root, "blendColor");
-    if (requestedBlendColor) {
-        setBlendColor(cJSON_IsBool(requestedBlendColor) ? cJSON_IsTrue(requestedBlendColor) : true);
-    }
-
-    return requestedFadeRate || requestedTravelSpeed || requestedNumberOfBars || requestedMaximumFrameDelay || requestedKeepColor || requestedBlendColor;
+    return requestedFadeRate || requestedTravelSpeed || requestedNumberOfBars || requestedMaximumFrameDelay;
 }
 
 const uint8_t &MultiBars::getFadeRate() const
@@ -134,32 +122,12 @@ void MultiBars::setMaximumFrameDelay(const uint8_t &maximumFrameDelay)
     m_maximumFrameDelay = maximumFrameDelay;
 }
 
-bool MultiBars::isBarKeepsColor() const
-{
-    return m_barKeepsColor;
-}
-
-void MultiBars::setBarKeepsColor(bool barKeepsColor)
-{
-    m_barKeepsColor = barKeepsColor;
-}
-
-bool MultiBars::isBlendColor() const
-{
-    return m_blendColor;
-}
-
-void MultiBars::setBlendColor(bool blendColor)
-{
-    m_blendColor = blendColor;
-}
-
 void MultiBars::initBars(int count)
 {
     m_bars.resize(count);
 
     for (int i = 0; i < count; ++i) {
-        m_bars[i] = new Bar(m_matrix, randomDrawMode(), randomDrawDirection(), m_barKeepsColor, m_blendColor);
+        m_bars[i] = new Bar(m_matrix, randomDrawMode(), randomDrawDirection());
     }
 }
 
@@ -173,12 +141,12 @@ MultiBars::Bar* MultiBars::createRandomBar()
 
         for (auto &bar : m_bars) {
             if (bar->mode != mode && bar->direction != direction) {
-                return new Bar(m_matrix, mode, direction, m_barKeepsColor, m_blendColor, random8(m_maximumFrameDelay));
+                return new Bar(m_matrix, mode, direction, random8(m_maximumFrameDelay));
             }
         }
 
         if (++breakCounter > 15) {
-            return new Bar(m_matrix, Bar::DrawVertical, Bar::DirectionForward, m_barKeepsColor, m_blendColor);
+            return new Bar(m_matrix, Bar::DrawVertical, Bar::DirectionForward);
         }
     }
 }
@@ -195,8 +163,8 @@ MultiBars::Bar::DrawDirection MultiBars::randomDrawDirection() const
 
 /* ******************************  ******************************  ******************************  ****************************** */
 
-MultiBars::Bar::Bar(LedMatrix& pMatrix, MultiBars::Bar::DrawMode drawMode, MultiBars::Bar::DrawDirection drawDirection, bool constColor, bool blend, uint8_t emptyFrames):
-    matrix(pMatrix), mode(drawMode), direction(drawDirection), constantColor(constColor), blendColor(blend),
+MultiBars::Bar::Bar(LedMatrix& pMatrix, MultiBars::Bar::DrawMode drawMode, MultiBars::Bar::DrawDirection drawDirection, uint8_t emptyFrames):
+    matrix(pMatrix), mode(drawMode), direction(drawDirection),
     currentFrame(-1 * emptyFrames), hue(random8())
 {
 //    ESP_LOGI("Bar", "New Bar mode:%d, direction: %d, constColor: %d, blend: %d, emptyFrames: %d", mode, direction, constantColor, blendColor, emptyFrames);
@@ -337,13 +305,7 @@ void MultiBars::Bar::drawDiagonalBarBr(uint8_t frame)
 
 void MultiBars::Bar::draw(uint8_t x, uint8_t y)
 {
-    auto color = CHSV(constantColor ? hue : random8(), 255, 255);
-
-    if (blendColor) {
-        matrix.pixel(x, y) += color;
-    } else {
-        matrix.pixel(x, y) = color;
-    }
+    matrix.pixel(x, y) += CHSV(hue, 255, 255);
 }
 
 void MultiBars::Bar::drawSectorScanTl(uint8_t frame)
@@ -413,8 +375,8 @@ void MultiBars::Bar::drawSectorScanBr(uint8_t frame)
 void MultiBars::Bar::drawLine(Point p0, Point p1)
 {
     ::Line l(p0, p1);
-    l.setColor(CHSV(constantColor ? hue : random8(), 255, 255));
-    l.render(matrix, {0, 0}, blendColor ? GfxPrimitive::RenderModeAdd : GfxPrimitive::RenderModeOverwrite);
+    l.setColor(CHSV(hue, 255, 255));
+    l.render(matrix, {0, 0}, GfxPrimitive::RenderModeAdd);
 }
 
 } // namespace Mode
