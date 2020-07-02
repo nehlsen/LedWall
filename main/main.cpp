@@ -128,7 +128,6 @@ void app_main()
 
     #ifdef CONFIG_ENABLE_MQTT
     auto mqtt = new LedWall::Mqtt(controller, cfg);
-    mqtt->start();
     #endif
 
     #ifdef CONFIG_ENABLE_REST

@@ -11,6 +11,14 @@
 
 namespace LedWall {
 
+static void on_got_ip(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+{
+    Mqtt* mqtt = static_cast<Mqtt*>(event_handler_arg);
+    ESP_ERROR_CHECK(nullptr == mqtt ? ESP_FAIL : ESP_OK);
+
+    mqtt->start();
+}
+
 void mqtt_event_connected(void* event_handler_arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
     Mqtt* mqtt = static_cast<Mqtt*>(event_handler_arg);
@@ -54,6 +62,7 @@ Mqtt::Mqtt(ModeController *controller, ConfigManager *configManager):
             .uri = broker.c_str(),
     };
     m_client = esp_mqtt_client_init(&mqtt_cfg);
+    esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &on_got_ip, this);
     esp_mqtt_client_register_event(m_client, MQTT_EVENT_CONNECTED, mqtt_event_connected, this);
     esp_mqtt_client_register_event(m_client, MQTT_EVENT_DISCONNECTED, mqtt_event_disconnected, this);
     esp_mqtt_client_register_event(m_client, MQTT_EVENT_DATA, mqtt_event_data, this);
