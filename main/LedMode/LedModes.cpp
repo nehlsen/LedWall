@@ -7,7 +7,6 @@
 #include "LedModeHsiboy.h"
 #include "Fire.h"
 #include "Network.h"
-#include "Breathe.h"
 #include "ModeText.h"
 #include "MatesDemo.h"
 #include "Wave.h"
@@ -27,7 +26,6 @@ LedMode *createModeSample(LedMatrix& matrix) { return new LedModeSample(matrix);
 LedMode *createModeHsiboy(LedMatrix& matrix) { return new LedModeHsiboy(matrix); }
 LedMode *createModeFire(LedMatrix& matrix) { return new Fire(matrix); }
 LedMode *createModeNetwork(LedMatrix& matrix) { return new Network(matrix); }
-LedMode *createModeBreathe(LedMatrix& matrix) { return new Breathe(matrix); }
 LedMode *createModeText(LedMatrix& matrix) { return new ModeText(matrix); }
 LedMode *createModeMatesDemo(LedMatrix& matrix) { return new MatesDemo(matrix); }
 LedMode *createModeWave(LedMatrix& matrix) { return new Wave(matrix); }
@@ -40,7 +38,6 @@ LedModeDef_t modeSampleDef {"Sample", &createModeSample};
 LedModeDef_t modeHsiboyDef {"Hsiboy", &createModeHsiboy};
 LedModeDef_t modeFireDef {"Fire", &createModeFire};
 LedModeDef_t modeNetworkDef {"Network", &createModeNetwork};
-LedModeDef_t modeBreatheDef {"Breathe", &createModeBreathe};
 LedModeDef_t modeTextDef {"Text", &createModeText};
 LedModeDef_t modeMatesDemoDef {"MatesDemo", &createModeMatesDemo};
 LedModeDef_t modeWaveDef {"Wave", &createModeWave};
@@ -59,7 +56,6 @@ std::vector<LedModeDef_t> LedModes {
         modeHsiboyDef,
         modeFireDef,
         modeNetworkDef,
-        modeBreatheDef,
         modeTextDef,
         modeMatesDemoDef,
         modeWaveDef,
