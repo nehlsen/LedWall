@@ -9,7 +9,7 @@ namespace Mode {
 
 bool MatesDemo::update()
 {
-    const int countSamples = 10;
+    const int countSamples = 12;
     uint8_t currentSeconds = (millis() / 1000) % 60;
 
     if(m_lastUpdate != currentSeconds) {
@@ -34,56 +34,86 @@ void MatesDemo::drawSample(int index)
     const Point topLeft({0, top});
     const Point topRight({right, top});
 
+    const CRGB solidColor(CRGB::Red);
+    const CRGBPalette16 gradient(CRGB::Red, CRGB::Green, CRGB::Blue);
+
     switch (index) {
+        // straight lines (at bottom, top, left, right), solid color
         case 0:
-            Line(bottomLeft, bottomRight).setColor(CRGB::Red).render(m_matrix);
+            Line(bottomLeft, bottomRight).setColor(solidColor).render(m_matrix);
             drawSampleLetter("B");
             break;
         case 1:
-            Line(topLeft, topRight).setColor(CRGB::Red).render(m_matrix);
+            Line(topLeft, topRight).setColor(solidColor).render(m_matrix);
             drawSampleLetter("T");
             break;
 
         case 2:
-            Line(bottomLeft, topLeft).setColor(CRGB::Red).render(m_matrix);
+            Line(bottomLeft, topLeft).setColor(solidColor).render(m_matrix);
             drawSampleLetter("L");
             break;
         case 3:
-            Line(bottomRight, topRight).setColor(CRGB::Red).render(m_matrix);
+            Line(bottomRight, topRight).setColor(solidColor).render(m_matrix);
             drawSampleLetter("R");
             break;
 
+        // diagonal lines, solid color
         case 4:
-            Line(bottomLeft, topRight).setColor(CRGB::Red).render(m_matrix);
+            Line(bottomLeft, topRight).setColor(solidColor).render(m_matrix);
             break;
         case 5:
-            Line(bottomRight, topLeft).setColor(CRGB::Red).render(m_matrix);
+            Line(bottomRight, topLeft).setColor(solidColor).render(m_matrix);
             break;
 
+        // straight line, gradient
         case 6:
-            Line(bottomLeft, bottomRight).setGradient(CRGBPalette16(CRGB::Red, CRGB::Green, CRGB::Blue)).render(m_matrix);
+            Line(bottomLeft, bottomRight).setGradient(gradient).render(m_matrix);
             drawSampleLetter("G");
             break;
 
+        // using canvas to rotate a text 90, 180 and 270 degrees clock-wise
         case 7:
         case 8:
         case 9:
-            Text smplLetter("R", CRGB::Red);
+        {
+            Text smplLetter("R", solidColor);
 
             Canvas c(smplLetter.pixels());
             c.setRotation((index-6)*90, c.getCenter())
              .applyTransformation()
              .renderCentered(m_matrix);
+        }
+            break;
 
+        case 10:
+        {
+            Text smpl("Text");
+            smpl
+                    .setGradient(gradient, Text::GradientModePerLetter)
+                    .setX((m_matrix.getWidth() - smpl.getSize().width) / 2)
+                    .setY((m_matrix.getHeight() - smpl.getSize().height) / 2)
+                    .render(m_matrix);
+        }
+            break;
+
+        case 11:
+        {
+            Text smpl("Text");
+            smpl
+                    .setGradient(gradient, Text::GradientModeOverlay)
+                    .setX((m_matrix.getWidth() - smpl.getSize().width) / 2)
+                    .setY((m_matrix.getHeight() - smpl.getSize().height) / 2)
+                    .render(m_matrix);
+        }
             break;
 
 //        case 6:
 //            // hexagon optimal angled line
-//            Line({2, top}, {5, 0}).setColor(CRGB::Red).render(m_matrix);
+//            Line({2, top}, {5, 0}).setColor(solidColor).render(m_matrix);
 //            break;
 //        case 7:
 //            // hexagon optimal angled line
-//            Line({2, 0}, {5, top}).setColor(CRGB::Red).render(m_matrix);
+//            Line({2, 0}, {5, top}).setColor(solidColor).render(m_matrix);
 //            break;
     }
 }
