@@ -130,9 +130,7 @@ void app_main()
     #endif
 
     #ifdef CONFIG_ENABLE_REST
-    // TODO the example creates (starts) the server once wifi is ready, stops and restarts on re-connects
     auto *server = new LedWall::WebServer(controller, cfg, updater);
-    server->startServer();
     #endif
 
 //    FIXME factory reset using push button required - could be solved using ESP IDF config

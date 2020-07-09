@@ -2,6 +2,7 @@
 #include <cJSON.h>
 #include <esp_log.h>
 #include <esp_ota_ops.h>
+#include <esp_event.h>
 #include "ModeController.h"
 #include "ConfigManager.h"
 #include "OtaUpdater.h"
@@ -37,9 +38,19 @@ CREATE_FUNCTION_TO_METHOD(config_post_handler, postConfig)
 CREATE_FUNCTION_TO_METHOD(ota_post_handler, postOta)
 CREATE_FUNCTION_TO_METHOD(file_get_handler, getFile)
 
+static void on_got_ip(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+{
+    WebServer* webServer = static_cast<WebServer*>(event_handler_arg);
+    ESP_ERROR_CHECK(nullptr == webServer ? ESP_FAIL : ESP_OK);
+
+    webServer->startServer();
+}
+
 WebServer::WebServer(ModeController *controller, ConfigManager *configManager, OtaUpdater *otaUpdater):
     m_controller(controller), m_configManager(configManager), m_otaUpdater(otaUpdater)
-{}
+{
+    esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &on_got_ip, this);
+}
 
 esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
 {
