@@ -201,7 +201,7 @@ esp_err_t WebServer::postConfig(httpd_req_t *req)
 
         cJSON *const brightness = cJSON_GetObjectItem(request, "Brightness");
         if (brightness) {
-            m_configManager->setBrightness(constrain(brightness->valueint, 0, 255));
+            m_controller->setBrightness(constrain(brightness->valueint, 0, 255));
         }
 
         cJSON *const powerOnResetMode = cJSON_GetObjectItem(request, "PowerOnResetMode");
