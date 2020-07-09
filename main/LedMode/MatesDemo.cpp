@@ -3,13 +3,14 @@
 #include <Text.h>
 #include <GfxCanvas.h>
 #include <Canvas.h>
+#include <Rect.h>
 
 namespace LedWall {
 namespace Mode {
 
 bool MatesDemo::update()
 {
-    const int countSamples = 12;
+    const int countSamples = 13;
     uint8_t currentSeconds = (millis() / 1000) % 60;
 
     if(m_lastUpdate != currentSeconds) {
@@ -103,6 +104,10 @@ void MatesDemo::drawSample(int index)
                     .render(m_matrix);
             break;
         }
+
+        case 12:
+            Rect(0, 0, m_matrix.getWidth(), m_matrix.getHeight(), CRGB::White).setFillColor(CRGB::White).render(m_matrix);
+            break;
 
 //        case 6:
 //            // hexagon optimal angled line
