@@ -53,16 +53,14 @@ ModeController::ModeController(ConfigManager *configManager):
     ESP_LOGI(LOG_TAG, "matrixWidth: %d, matrixHeight: %d, total LEDs: %d", matrixWidth, matrixHeight, (matrixWidth * matrixHeight));
     ESP_LOGD(LOG_TAG, "memory/LED: %d, total memory: %d", (int)sizeof(CRGB), (matrixWidth * matrixHeight) * (int)sizeof(CRGB));
     ESP_LOGD(LOG_TAG, "Free memory (before alloc): %d bytes", esp_get_free_heap_size());
-    m_leds = (CRGB*)malloc((matrixWidth*matrixHeight) * sizeof(CRGB));
+    m_leds = static_cast<CRGB*>(malloc((matrixWidth*matrixHeight) * sizeof(CRGB)));
     ESP_ERROR_CHECK(nullptr == m_leds ? ESP_ERR_NO_MEM : ESP_OK);
     ESP_LOGD(LOG_TAG, "Free memory (after alloc): %d bytes", esp_get_free_heap_size());
 
     ESP_LOGI(LOG_TAG, "Using PIN %d for LEDs", CONFIG_DATA_PIN);
-    auto &fastLedController = CFastLED::addLeds<WS2812, CONFIG_DATA_PIN, GRB>(m_leds, (matrixWidth*matrixHeight));
-//    fastLedController.setCorrection(TypicalLEDStrip);
+    CFastLED::addLeds<WS2812B, CONFIG_DATA_PIN, GRB>(m_leds, (matrixWidth*matrixHeight));
 
-//    m_matrix = new LedMatrix(fastLedController, matrixWidth, matrixHeight, MatrixInvertHorizontal);
-    m_matrix = new LedMatrix(FastLED, matrixWidth, matrixHeight);
+    m_matrix = new LedMatrix(FastLED, matrixWidth, matrixHeight, MatrixInvertHorizontal);
 
     turnAllLedsOff();
 
@@ -76,7 +74,7 @@ ModeController::ModeController(ConfigManager *configManager):
     xTaskCreatePinnedToCore(
             &led_update_task,
             "led_update_task",
-            4000,
+            4 * 1024,
             this,
             5,
             &led_update_task_hdnl,
