@@ -4,3 +4,6 @@
 [submodule "components/Mates-for-LEDs"]
 	path = components/Mates-for-LEDs
 	url = git@github.com:nehlsen/Mates-for-LEDs.git
+[submodule "components/EBLi"]
+	path = components/EBLi
+	url = git@github.com:nehlsen/EBLi.git
