@@ -23,6 +23,7 @@ public:
         WaveModeVertical,
         WaveModeRadialCircle,
         WaveModeRadialRect,
+        WaveModePlane,
     };
 
     WaveMode getWaveMode() const;
@@ -75,6 +76,8 @@ protected:
     void initRects();
     void clearRects();
     std::vector<Rect> m_rects;
+
+    void drawPlane(double offset);
 
     uint8_t m_colorHueLow = 255;
     uint8_t m_colorHueHigh = 255;

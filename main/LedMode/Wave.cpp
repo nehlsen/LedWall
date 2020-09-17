@@ -221,6 +221,10 @@ bool Wave::update()
         case WaveModeRadialRect:
             drawRects(offset);
             break;
+
+        case WaveModePlane:
+            drawPlane(offset);
+            break;
     }
 
     m_frame += (m_waveLength * m_speed)/10;
@@ -353,6 +357,22 @@ void Wave::initRects()
 void Wave::clearRects()
 {
     m_rects.clear();
+}
+
+void Wave::drawPlane(double offset)
+{
+    const double value = sineValue(
+            0,
+            offset
+    );
+
+    const CHSV color(
+            factoredConstrain(m_colorHueLow, m_colorHueHigh, value),
+            factoredConstrain(m_colorSaturationLow, m_colorSaturationHigh, value),
+            factoredConstrain(m_colorValueLow, m_colorValueHigh, value)
+    );
+
+    Rect(0, 0, m_matrix.getWidth(), m_matrix.getHeight(), color).setFillColor(color).render(m_matrix);
 }
 
 uint8_t Wave::factoredConstrain(uint8_t low, uint8_t high, double factor)
