@@ -21,6 +21,9 @@ protected:
     int16_t part3(int16_t frame); // growing cube
     int16_t part4(int16_t frame); // shrinking cube
     int16_t part5(int16_t frame); // rolling cube
+    int16_t part6a(int16_t frame);
+    int16_t part6b(int16_t frame);
+    int16_t part6_abs(int16_t frame, bool forward);
 };
 
 } // namespace Mode
