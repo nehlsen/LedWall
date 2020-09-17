@@ -8,11 +8,26 @@ CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partition_table.csv"
 CONFIG_PARTITION_TABLE_FILENAME="partition_table.csv"
 CONFIG_BT_ENABLED=y
 
-# CONFIG_ENABLE_MQTT is not set
-CONFIG_ENABLE_REST=y
-
 # for development purposes we allow updates over HTTP without certificate checks etc
 CONFIG_OTA_ALLOW_HTTP=y
+
+################################################################################
+# LEDWall Stuff
+
+CONFIG_ENABLE_MQTT=y
+CONFIG_ENABLE_REST=y
+
+################################################################################
+# EBLi Stuff
+
+CONFIG_ENABLE_EBLI_FS=y
+CONFIG_ENABLE_EBLI_WIFI=y
+CONFIG_ENABLE_EBLI_MQTT=y
+CONFIG_EBLI_MQTT_DEFAULT_BROKER="mqtt://iot.eclipse.org"
+CONFIG_EBLI_MQTT_DEFAULT_DEVICE_TOPIC="ledwall"
+CONFIG_EBLI_MQTT_DEFAULT_GROUP_TOPIC="ledwalls"
+CONFIG_ENABLE_EBLI_CONFIG_OTA=y
+# CONFIG_ENABLE_EBLI_CONFIG_MANAGER
 
 ################################################################################
 # CAM Stuff
