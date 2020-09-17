@@ -6,6 +6,7 @@
 #include "../LedMode/LedModes.h"
 #include <Mqtt.h>
 #include <MqttPublisher.h>
+#include <MqttSubscriber.h>
 
 #define LOG_TAG "MQTT"
 
@@ -24,38 +25,8 @@ MqttAdapter::MqttAdapter(ModeController *controller):
 {
     esp_event_handler_register(LEDWALL_EVENTS, ESP_EVENT_ANY_ID, led_wall_events, this);
 
-    auto mqtt = EBLi::Mqtt::instance();
-    m_publisherPower = mqtt->createPublisher("power");
-    m_publisherBrightness = mqtt->createPublisher("brightness");
-    m_publisherModeIndex = mqtt->createPublisher("mode/index");
-    m_publisherModeName = mqtt->createPublisher("mode/name");
-    m_publisherModeOptions = mqtt->createPublisher("mode/options");
-}
-
-void MqttAdapter::onMqttData(esp_mqtt_event_handle_t event)
-{
-    if (nullptr != strstr(event->topic, "/power") && event->data_len >= 1) {
-        m_controller->setPower(event->data[0] == '1');
-    }
-    if (nullptr != strstr(event->topic, "/brightness") && event->data_len >= 1) {
-        m_controller->setBrightness(atoi(event->data));
-    }
-    if (nullptr != strstr(event->topic, "/mode/index") && event->data_len >= 1) {
-        m_controller->setModeByIndex(atoi(event->data));
-    }
-    if (nullptr != strstr(event->topic, "/mode/name") && event->data_len >= 1) {
-        if (strlen(event->data) <= Mode::ValidModeNameLength) {
-            m_controller->setModeByName(event->data);
-        }
-    }
-    if (nullptr != strstr(event->topic, "/mode/options") && event->data_len >= 1) {
-        cJSON *optionsObject = cJSON_Parse(event->data);
-        m_controller->setModeOptions(optionsObject);
-        cJSON_Delete(optionsObject);
-    }
-    if (nullptr != strstr(event->topic, "/reboot")) {
-        m_controller->triggerSystemReboot();
-    }
+    setupPublishers();
+    setupSubscribers();
 }
 
 void MqttAdapter::onLedWallEvent(int32_t event_id, void *event_data)
@@ -98,21 +69,41 @@ void MqttAdapter::publishModeOptions()
     cJSON_Delete(optionsObject);
 }
 
-void MqttAdapter::setupSubscriptions(const std::string &baseTopic)
+void MqttAdapter::setupPublishers()
 {
-    auto subscribeToCommand = [baseTopic, this](const std::string &command) {
-        std::string topic = "/" + baseTopic + "/cmd/" + command;
-        esp_mqtt_client_subscribe(m_client, topic.c_str(), 0);
-        ESP_LOGI(LOG_TAG, "Subscribed to \"%s\"", topic.c_str());
-    };
+    auto mqtt = EBLi::Mqtt::instance();
 
-    subscribeToCommand("power");
-    subscribeToCommand("reboot");
-    subscribeToCommand("brightness");
-    subscribeToCommand("mode/index");
-    subscribeToCommand("mode/name");
-    subscribeToCommand("mode/options");
+    m_publisherPower = mqtt->createPublisher("power");
+    m_publisherBrightness = mqtt->createPublisher("brightness");
+    m_publisherModeIndex = mqtt->createPublisher("mode/index");
+    m_publisherModeName = mqtt->createPublisher("mode/name");
+    m_publisherModeOptions = mqtt->createPublisher("mode/options");
 }
 
+void MqttAdapter::setupSubscribers()
+{
+    auto mqtt = EBLi::Mqtt::instance();
+
+    mqtt->createSubscriber("power", [this](const std::string &value) {
+        m_controller->setPower(value == "1");
+    });
+    mqtt->createSubscriber("brightness", [this](const std::string &value) {
+        m_controller->setBrightness(std::stoi(value));
+    });
+    mqtt->createSubscriber("mode/index", [this](const std::string &value) {
+        m_controller->setModeByIndex(std::stoi(value));
+    });
+    mqtt->createSubscriber("mode/name", [this](const std::string &value) {
+        m_controller->setModeByName(value);
+    });
+    mqtt->createSubscriber("mode/options", [this](const std::string &value) {
+        cJSON *optionsObject = cJSON_Parse(value.c_str());
+        m_controller->setModeOptions(optionsObject);
+        cJSON_Delete(optionsObject);
+    });
+    mqtt->createSubscriber("reboot", [this](const std::string &value) {
+        m_controller->triggerSystemReboot();
+    });
+}
 
 } // namespace LedWall

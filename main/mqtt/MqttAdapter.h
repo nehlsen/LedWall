@@ -16,7 +16,6 @@ class MqttAdapter
 public:
     MqttAdapter(ModeController* controller);
 
-    void onMqttData(esp_mqtt_event_handle_t event);
     void onLedWallEvent(int32_t event_id, void* event_data);
 
 protected:
@@ -28,11 +27,11 @@ protected:
     EBLi::MqttPublisher *m_publisherModeName;
     EBLi::MqttPublisher *m_publisherModeOptions;
 
-
     void publishMode();
     void publishModeOptions();
 
-    void setupSubscriptions(const std::string &baseTopic);
+    void setupPublishers();
+    void setupSubscribers();
 };
 
 }
