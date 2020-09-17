@@ -10,7 +10,7 @@
 #endif
 
 #if defined(CONFIG_ENABLE_MQTT)
-#include "mqtt/Mqtt.h"
+#include "mqtt/MqttAdapter.h"
 #endif
 
 ESP_EVENT_DEFINE_BASE(LEDWALL_EVENTS);
@@ -65,7 +65,7 @@ void app_main()
     auto updater = new EBLi::OtaUpdater;
 
     #ifdef CONFIG_ENABLE_MQTT
-    auto mqtt = new LedWall::Mqtt(controller, cfg);
+    auto mqtt = new LedWall::MqttAdapter(controller);
     #endif
 
     #ifdef CONFIG_ENABLE_REST
