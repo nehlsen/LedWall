@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include <esp_camera.h>
+#include <cJSON.h>
 #include "CameraConfig.h"
 
 namespace LedWall {
@@ -13,25 +14,66 @@ Camera::Camera(LedMatrix &matrix) : LedMode(matrix)
     setCameraParams();
 }
 
-bool Camera::update()
+void Camera::readOptions(cJSON *root)
 {
-    uint8_t currentSeconds = (millis() / 1000) % 60;
+    sensor_t *sensor = esp_camera_sensor_get();
 
-    if(m_lastUpdate != currentSeconds) {
-        m_lastUpdate = currentSeconds;
+    cJSON_AddNumberToObject(root, "brightness", sensor->status.brightness);
+    cJSON_AddNumberToObject(root, "contrast", sensor->status.contrast);
+    cJSON_AddNumberToObject(root, "saturation", sensor->status.saturation);
+}
 
-        updateImage();
-        return true;
+bool Camera::writeOptions(cJSON *root)
+{
+    bool changed = false;
+
+    cJSON *objectItem = cJSON_GetObjectItem(root, "brightness");
+    if (objectItem && cJSON_IsNumber(objectItem)) {
+        int newValue = constrain(objectItem->valueint, -2, 2);
+        sensor_t *sensor = esp_camera_sensor_get();
+        sensor->set_brightness(sensor, newValue);
+        changed = true;
     }
 
-    return false;
+    objectItem = cJSON_GetObjectItem(root, "contrast");
+    if (objectItem && cJSON_IsNumber(objectItem)) {
+        int newValue = constrain(objectItem->valueint, -2, 2);
+        sensor_t *sensor = esp_camera_sensor_get();
+        sensor->set_contrast(sensor, newValue);
+        changed = true;
+    }
+
+    objectItem = cJSON_GetObjectItem(root, "saturation");
+    if (objectItem && cJSON_IsNumber(objectItem)) {
+        int newValue = constrain(objectItem->valueint, -2, 2);
+        sensor_t *sensor = esp_camera_sensor_get();
+        sensor->set_saturation(sensor, newValue);
+        changed = true;
+    }
+
+    return changed;
+}
+
+bool Camera::update()
+{
+//    uint8_t currentSeconds = (millis() / 1000) % 60;
+
+//    if(m_lastUpdate != currentSeconds) {
+//        m_lastUpdate = currentSeconds;
+
+        updateImage();
+//        m_image.render(m_matrix);
+        return true;
+//    }
+
+//    return false;
 }
 
 void Camera::updateImage()
 {
     camera_fb_t *fb = esp_camera_fb_get();
     if (fb) {
-        m_image = downSample(fb);
+        /*m_image = */downSample(fb);
         esp_camera_fb_return(fb);
     }
 }
@@ -40,26 +82,28 @@ GfxPrimitive Camera::downSample(camera_fb_t *fb)
 {
     const size_t vertical_scaling = fb->height / m_matrix.getHeight();
     const size_t horizontal_scaling = fb->width / m_matrix.getWidth();
-    const int scaling = horizontal_scaling < vertical_scaling ? horizontal_scaling : vertical_scaling;
+    const int scaling = std::min(horizontal_scaling, vertical_scaling);
 
     GfxPrimitive buffer;
     if (fb->format == PIXFORMAT_GRAYSCALE) {
         // 1bpp
         for (int x = 0; x < m_matrix.getWidth(); ++x) {
             for (int y = 0; y < m_matrix.getHeight(); ++y) {
-                // each camera frame is 160 in width... i assume
+                // each camera frame is 160 in width...
                 // since my matrix is wider than high... rotate!
                 // take every 7th pixel
                 int fb_x = x * scaling;
                 int fb_y = y * scaling;
                 int fb_index = fb_y * fb->width + fb_x;
 
-                ESP_LOGI("Camera::downSample", "x/y:%d,%d -> fb x/y:%d,%d -> fb-idx:%d/%d", x, y, fb_x, fb_y, fb_index, fb->len);
-//                fb->buf[(y * 160 + x)]
+//                ESP_LOGI("Camera::downSample", "x/y:%d,%d -> fb x/y:%d,%d -> fb-idx:%d/%d", x, y, fb_x, fb_y, fb_index, fb->len);
 
                 if (fb_index < fb->len) {
-                    int value = fb->buf[fb_index];
-                    buffer.merge(Pixel(x, y, CRGB(value, value, value)));
+                    uint8_t value = fb->buf[fb_index];
+//                    buffer.merge(Pixel(x, y, CRGB(value, value, value)));
+//                    m_matrix.pixel(x, y) = CRGB(value, value, value);
+                    const uint8_t msbCutoffMask = 0b00111111;
+                    m_matrix.pixel(x, y).setHSV(0, 0, value&msbCutoffMask);
                 }
             }
         }

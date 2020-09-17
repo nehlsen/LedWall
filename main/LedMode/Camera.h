@@ -18,6 +18,9 @@ class Camera : public LedMode
 public:
     explicit Camera(LedMatrix &matrix);
 
+    void readOptions(cJSON *root) override;
+    bool writeOptions(cJSON *root) override;
+
     bool update() override;
 
 protected:
