@@ -26,7 +26,7 @@ if(CONFIG_ENABLE_CAM)
             ${COMPONENT_SRCS}
             "LedMode/Camera.cpp"
             )
-    set(EXTRA_COMPONENT_DIRS ../components/esp32-camera)
+#    set(EXTRA_COMPONENT_DIRS ../../esp/components/esp32-camera)
     message(STATUS "LedWall: CAM Driver enabled")
 else()
     message(STATUS "LedWall: CAM Driver disabled")

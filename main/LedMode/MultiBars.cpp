@@ -24,6 +24,9 @@ bool MultiBars::update()
     int64_t currentTime = esp_timer_get_time() / 1000;
     if (currentTime - m_lastFrame > delay || currentTime < 1) {
         for (int i = 0; i < getNumberOfBars(); ++i) {
+            // FIXME frame should be drawn in all calls to update
+            //       drawFrame should accept argument: (bool)incrementFrameCount
+            //       delay should control this boolean and not the draw itself
             m_bars[i]->drawFrame();
             
             if (!m_bars[i]->canDrawFrame()) {

@@ -43,7 +43,7 @@ See companion at https://github.com/nehlsen/LedWall-Grafitti and https://github.
 - Animations/Samples/Demos from https://github.com/eshkrab/fastLED-idf
 - Animations/Samples/Demos from https://gist.github.com/hsiboy/f9ef711418b40e259b06
 
-## Usage
+## Build
 ```shell script
 # !!! init ESP32 IDF (source export.sh)
 cd My_Projects_dir
@@ -54,3 +54,8 @@ cd build
 cmake ..
 make flash
 ```
+
+## Usage samples
+
+- Trigger OTA update \
+`curl -X POST <IP-OF-LEDWALL>/ota "https://url.to/update"`
