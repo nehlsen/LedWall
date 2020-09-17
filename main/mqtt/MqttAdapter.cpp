@@ -1,14 +1,13 @@
 #include "MqttAdapter.h"
 #include "../ModeController.h"
 #include "../events.h"
-#include <esp_log.h>
-#include <cJSON.h>
 #include "../LedMode/LedModes.h"
 #include <Mqtt.h>
 #include <MqttPublisher.h>
-#include <MqttSubscriber.h>
+#include <esp_log.h>
+#include <cJSON.h>
 
-#define LOG_TAG "MQTT"
+#define LOG_TAG "MqttAdapter"
 
 namespace LedWall {
 

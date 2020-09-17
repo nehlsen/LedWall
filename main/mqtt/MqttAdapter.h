@@ -14,7 +14,7 @@ class ModeController;
 class MqttAdapter
 {
 public:
-    MqttAdapter(ModeController* controller);
+    explicit MqttAdapter(ModeController* controller);
 
     void onLedWallEvent(int32_t event_id, void* event_data);
 
