@@ -59,3 +59,27 @@ make flash
 
 - Trigger OTA update \
 `curl -X POST <IP-OF-LEDWALL>/ota "https://url.to/update"`
+
+## MQTT
+
+Following Topics are **subscribed** to by the device. All Topics are subscribed to twice, once for the device topic and once for the group topic.
+In case of e.g. `/cmd/power` this results in `mywall/cmd/power` and `all-my-walls/cmd/power` assuming the device topic is `mywall` and the group topic is `all-my-walls`.
+
+| Topic              | Type         | Possible Values        |
+| ------------------ | ------------ | ---------------------- |
+| /cmd/power         | int          | 0: Off, 1: On          |
+| /cmd/brightness    | int          | 0-255, brightness      |
+| /cmd/mode/index    | int          | 0-x, mode index        |
+| /cmd/mode/name     | string       | mode name              |
+| /cmd/mode/options  | string/json  | mode options           |
+| /cmd/reboot        | -none-       | -none-                 |
+
+Following Topics are **published** by the device. Each Topic is published once per device-topic.
+
+| Topic                | Type         | Possible Values        |
+| -------------------- | ------------ | ---------------------- |
+| /state/power         | int          | 0: Off, 1: On          |
+| /state/brightness    | int          | 0-255, brightness      |
+| /state/mode/index    | int          | 0-x, mode index        |
+| /state/mode/name     | string       | mode name              |
+| /state/mode/options  | string/json  | mode options           |
