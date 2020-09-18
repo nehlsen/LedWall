@@ -13,6 +13,10 @@
 #include "mqtt/MqttAdapter.h"
 #endif
 
+#if defined(CONFIG_LEDWALL_SENSORS)
+#include "Sensors/Sensors.h"
+#endif
+
 ESP_EVENT_DEFINE_BASE(LEDWALL_EVENTS);
 
 static const char *APP_LOG_TAG = "LED_WALL";
@@ -64,12 +68,16 @@ void app_main()
 
     auto updater = new EBLi::OtaUpdater;
 
-    #ifdef CONFIG_ENABLE_MQTT
+    #if defined(CONFIG_ENABLE_MQTT)
     auto mqtt = new LedWall::MqttAdapter(controller);
     #endif
 
-    #ifdef CONFIG_ENABLE_REST
+    #if defined(CONFIG_ENABLE_REST)
     auto *server = new LedWall::WebServer(controller, cfg, updater);
+    #endif
+
+    #if defined(CONFIG_LEDWALL_SENSORS)
+    auto *sensors = new LedWall::Sensors::Sensors();
     #endif
 }
 

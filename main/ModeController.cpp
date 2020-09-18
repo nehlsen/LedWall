@@ -18,7 +18,7 @@ static const char *LOG_TAG = "ModeController";
 static TaskHandle_t led_update_task_hdnl;
 static EventGroupHandle_t led_update_task_event_group;
 
-void led_update_task(void *pvParameter)
+[[noreturn]] void led_update_task(void *pvParameter)
 {
     ESP_LOGI(LOG_TAG, "led_update_task...");
 

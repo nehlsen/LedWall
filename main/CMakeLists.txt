@@ -53,6 +53,16 @@ else()
     message(STATUS "LedWall: MQTT Interface disabled")
 endif()
 
+if(CONFIG_LEDWALL_SENSORS)
+    set(COMPONENT_SRCS
+            ${COMPONENT_SRCS}
+            "Sensors/Sensors.cpp"
+            )
+    message(STATUS "LedWall: Sensors enabled")
+else()
+    message(STATUS "LedWall: Sensors disabled")
+endif()
+
 register_component(
         SRCS ${COMPONENT_SRCS}
         INCLUDE_DIRS "."
