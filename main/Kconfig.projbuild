@@ -33,8 +33,7 @@ menu "LedWall Configuration"
 
     config LEDWALL_SENSOR_AHT10
             bool "Enable AHT10 Temperature and Humidity Sensor"
-            depends on LEDWALL_SENSORS
-            depends on CONFIG_ENABLE_EBLI_MQTT
+            depends on LEDWALL_SENSORS && ENABLE_EBLI_MQTT
             default false
 
 endmenu
