@@ -143,6 +143,10 @@ bool ModeController::setModeByIndex(int modeIndex)
         ESP_LOGE(LOG_TAG, "setModeByIndex: Failed to set Mode: Invalid Index");
         return false;
     }
+    if (modeIndex == m_modeIndex) {
+        ESP_LOGE(LOG_TAG, "setModeByIndex: current mode and requested mode are the same, bailing...");
+        return false;
+    }
 
     ESP_LOGI(LOG_TAG, "setModeByIndex: going to create mode:\"%s\"", Mode::LedModes.at(modeIndex).name);
     Mode::LedMode *newMode = Mode::LedModes.at(modeIndex).factory(*m_matrix);
