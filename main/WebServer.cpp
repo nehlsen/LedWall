@@ -8,6 +8,7 @@
 #include <OtaUpdater.h>
 #include "LedMode/LedModes.h"
 #include "WebServer/FileResponseHandler.h"
+#include <ConfigManager.h>
 
 namespace LedWall {
 
@@ -61,7 +62,7 @@ esp_err_t WebServer::getSystemInfo(httpd_req_t *req)
     esp_chip_info(&chip_info);
     cJSON_AddNumberToObject(root, "cores", chip_info.cores);
 
-    cJSON_AddNumberToObject(root, "restarts", m_configManager->getRestartCounter());
+    cJSON_AddNumberToObject(root, "restarts", EBLi::ConfigManager::instance()->getRestartCounter());
 
     const esp_app_desc_t *app_desc = esp_ota_get_app_description();
     cJSON_AddStringToObject(root, "projectName", app_desc->project_name);

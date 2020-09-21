@@ -1,11 +1,9 @@
 #include <esp_log.h>
 #include <Mqtt.h>
+#include <ConfigManager.h>
 #include "ConfigManager.h"
 
 namespace LedWall {
-
-#define NVS_NAMESPACE "led_wall_config"
-static const char *CONFIG_MANAGER_LOG_TAG = "ConfigManager";
 
 // NOTE keys are limited to 15 characters
 #define MATRIX_WIDTH_KEY        "matrix_width"
@@ -17,159 +15,49 @@ static const char *CONFIG_MANAGER_LOG_TAG = "ConfigManager";
 #define LED_MODE_LAST_STATE_KEY "led_mode_state"
 #define LED_MODE_BOOT_MODE_KEY  "led_mode_boot"
 
-bool ConfigManager::open()
-{
-    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &m_nvsHandle);
- 
-    if (err != ESP_OK) {
-        ESP_LOGE(CONFIG_MANAGER_LOG_TAG, "Error (%s) opening NVS handle!\n", esp_err_to_name(err));
-        return false;
-    }
-    
-    updateRestartCounter();
-    return true;
-}
-
-void ConfigManager::close()
-{
-    nvs_close(m_nvsHandle);
-}
-
-void ConfigManager::setAutoCommitEnabled(bool enabled)
-{
-    m_autoCommitEnabled = enabled;
-}
-
-bool ConfigManager::isAutoCommitEnabled() const
-{
-    return m_autoCommitEnabled;
-}
-
-bool ConfigManager::commit()
-{
-    esp_err_t err = nvs_commit(m_nvsHandle);
-    
-    if (err != ESP_OK) {
-        ESP_LOGE(CONFIG_MANAGER_LOG_TAG, "Error (%s) committing NVS Data!", esp_err_to_name(err));
-        return false;
-    }
-
-    return true;
-}
-
-int32_t ConfigManager::getIntVal(const char *key, int32_t defaultValue) const
-{
-    int32_t value = defaultValue;
-    esp_err_t err = nvs_get_i32(m_nvsHandle, key, &value);
-
-    if (err != ESP_OK) {
-        ESP_LOGW(CONFIG_MANAGER_LOG_TAG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key);
-    }
-    
-    return value;
-}
-
-bool ConfigManager::setIntVal(const char *key, int32_t value)
-{
-    esp_err_t err = nvs_set_i32(m_nvsHandle, key, value);
-
-    if (err != ESP_OK) {
-        ESP_LOGE(CONFIG_MANAGER_LOG_TAG, "NVS write Error (%s), key:\"%s\"", esp_err_to_name(err), key);
-        return false;
-    }
-
-    return autoCommit();
-}
-
-std::string ConfigManager::getStringVal(const char *key, const std::string &defaultValue) const
-{
-    size_t required_size;
-    esp_err_t err = nvs_get_str(m_nvsHandle, key, nullptr, &required_size);
-    if (err != ESP_OK) {
-        ESP_LOGW(CONFIG_MANAGER_LOG_TAG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key);
-        return defaultValue;
-    }
-    if (required_size >= 64) {
-        ESP_LOGW(CONFIG_MANAGER_LOG_TAG, "NVS read failed - max size exceeded, key:\"%s\"", key);
-        return defaultValue;
-    }
-
-    char* value = (char*)malloc(required_size);
-    err = nvs_get_str(m_nvsHandle, key, value, &required_size);
-    if (err != ESP_OK) {
-        ESP_LOGW(CONFIG_MANAGER_LOG_TAG, "NVS read Error (%s), key:\"%s\"", esp_err_to_name(err), key);
-        return defaultValue;
-    }
-
-    auto ret = std::string(value);
-    free(value);
-    return ret;
-}
-
-bool ConfigManager::setStringVal(const char *key, const std::string &value)
-{
-    esp_err_t err = nvs_set_str(m_nvsHandle, key, value.c_str());
-
-    if (err != ESP_OK) {
-        ESP_LOGE(CONFIG_MANAGER_LOG_TAG, "NVS write Error (%s), key:\"%s\"", esp_err_to_name(err), key);
-        return false;
-    }
-
-    return autoCommit();
-}
-
-int32_t ConfigManager::getRestartCounter()
-{
-    if (m_restartCounter == 0) {
-        m_restartCounter = getIntVal(RESTART_COUNTER_KEY, 0);
-    }
-    
-    return m_restartCounter;
-}
-
 uint8_t ConfigManager::getMatrixWidth() const
 {
-    return getIntVal(MATRIX_WIDTH_KEY, 4);
+    return EBLi::ConfigManager::instance()->getValue(MATRIX_WIDTH_KEY, 4);
 }
 
 void ConfigManager::setMatrixWidth(uint8_t width)
 {
-    setIntVal(MATRIX_WIDTH_KEY, width);
+    EBLi::ConfigManager::instance()->setValue(MATRIX_WIDTH_KEY, width);
 }
 
 uint8_t ConfigManager::getMatrixHeight() const
 {
-    return getIntVal(MATRIX_HEIGHT_KEY, 4);
+    return EBLi::ConfigManager::instance()->getValue(MATRIX_HEIGHT_KEY, 4);
 }
 
 void ConfigManager::setMatrixHeight(uint8_t height)
 {
-    setIntVal(MATRIX_HEIGHT_KEY, height);
+    EBLi::ConfigManager::instance()->setValue(MATRIX_HEIGHT_KEY, height);
 }
 
 uint8_t ConfigManager::getBrightness() const
 {
-    return getIntVal(MATRIX_BRIGHTNESS_KEY, 255);
+    return EBLi::ConfigManager::instance()->getValue(MATRIX_BRIGHTNESS_KEY, 255);
 }
 
 void ConfigManager::setBrightness(uint8_t brightness)
 {
-    setIntVal(MATRIX_BRIGHTNESS_KEY, brightness);
+    EBLi::ConfigManager::instance()->setValue(MATRIX_BRIGHTNESS_KEY, brightness);
 }
 
 void ConfigManager::setPowerOnResetMode(ConfigManager::AutoPowerOn mode)
 {
-    setIntVal(POWER_BOOT_MODE_KEY, mode);
+    EBLi::ConfigManager::instance()->setValue(POWER_BOOT_MODE_KEY, mode);
 }
 
 ConfigManager::AutoPowerOn ConfigManager::getPowerOnResetMode() const
 {
-    return (AutoPowerOn)getIntVal(POWER_BOOT_MODE_KEY, RECOVER_LAST);
+    return (AutoPowerOn)EBLi::ConfigManager::instance()->getValue(POWER_BOOT_MODE_KEY, RECOVER_LAST);
 }
 
 void ConfigManager::setPowerState(bool currentPowerState)
 {
-    setIntVal(POWER_LAST_STATE_KEY, currentPowerState);
+    EBLi::ConfigManager::instance()->setValue(POWER_LAST_STATE_KEY, currentPowerState);
 }
 
 bool ConfigManager::isPoweredOnBoot() const
@@ -184,23 +72,23 @@ bool ConfigManager::isPoweredOnBoot() const
 
         default:
         case RECOVER_LAST:
-            return getIntVal(POWER_LAST_STATE_KEY, 1); // FIXME move to getter?
+            return EBLi::ConfigManager::instance()->getValue(POWER_LAST_STATE_KEY, 1); // FIXME move to getter?
     }
 }
 
 void ConfigManager::setLedModeAutoRestore(int autoRestoreMode)
 {
-    setIntVal(LED_MODE_BOOT_MODE_KEY, autoRestoreMode);
+    EBLi::ConfigManager::instance()->setValue(LED_MODE_BOOT_MODE_KEY, autoRestoreMode);
 }
 
 int ConfigManager::getLedModeAutoRestore() const
 {
-    return getIntVal(LED_MODE_BOOT_MODE_KEY, -1);
+    return EBLi::ConfigManager::instance()->getValue(LED_MODE_BOOT_MODE_KEY, -1);
 }
 
 void ConfigManager::setLedMode(int currentModeIndex)
 {
-    setIntVal(LED_MODE_LAST_STATE_KEY, currentModeIndex);
+    EBLi::ConfigManager::instance()->setValue(LED_MODE_LAST_STATE_KEY, currentModeIndex);
 }
 
 int ConfigManager::getBootIntoMode() const
@@ -209,7 +97,7 @@ int ConfigManager::getBootIntoMode() const
 
     if (ledModeAutoRestore < 0) {
         // restore last mode, fallback to mode "0"
-        return getIntVal(LED_MODE_LAST_STATE_KEY, 0);
+        return EBLi::ConfigManager::instance()->getValue(LED_MODE_LAST_STATE_KEY, 0);
     }
 
     return ledModeAutoRestore;
@@ -243,29 +131,6 @@ std::string ConfigManager::getMqttGroupTopic() const
 void ConfigManager::setMqttGroupTopic(const std::string& topic)
 {
     EBLi::Mqtt::instance()->setGroupTopic(topic);
-}
-
-bool ConfigManager::autoCommit()
-{
-    if (!isAutoCommitEnabled()) {
-        return true;
-    }
-    
-    return commit();
-}
-
-void ConfigManager::updateRestartCounter()
-{
-    if (m_restartCounter > 0) {
-        // already incremented...
-        return;
-    }
-
-    int32_t newCount = getRestartCounter() + 1;
-    if (setIntVal(RESTART_COUNTER_KEY, newCount)) {
-        ESP_LOGI(CONFIG_MANAGER_LOG_TAG, "Restart counter updated to %d", newCount);
-        m_restartCounter = newCount;
-    }
 }
 
 } // namespace LedWall

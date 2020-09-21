@@ -63,7 +63,6 @@ void app_main()
     initialise_mdns();
 
     auto cfg = new LedWall::ConfigManager;
-    cfg->open();
     auto controller = new LedWall::ModeController(cfg);
 
     auto updater = new EBLi::OtaUpdater;
