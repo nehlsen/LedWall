@@ -1,4 +1,5 @@
 #include <esp_log.h>
+#include <Mqtt.h>
 #include "ConfigManager.h"
 
 namespace LedWall {
@@ -15,14 +16,6 @@ static const char *CONFIG_MANAGER_LOG_TAG = "ConfigManager";
 #define POWER_BOOT_MODE_KEY     "power_boot_into"
 #define LED_MODE_LAST_STATE_KEY "led_mode_state"
 #define LED_MODE_BOOT_MODE_KEY  "led_mode_boot"
-
-#define MQTT_BROKER_KEY         "mqtt_broker"
-#define MQTT_DEVICE_TOPIC_KEY   "mqtt_device_tpc"
-#define MQTT_GROUP_TOPIC_KEY    "mqtt_group_tpc"
-
-#define MQTT_BROKER_DEFAULT "mqtt://iot.eclipse.org"
-#define MQTT_DEVICE_TOPIC_DEFAULT "a-led-wall"
-#define MQTT_GROUP_TOPIC_DEFAULT "ledwalls"
 
 bool ConfigManager::open()
 {
@@ -224,32 +217,32 @@ int ConfigManager::getBootIntoMode() const
 
 std::string ConfigManager::getMqttBroker() const
 {
-    return getStringVal(MQTT_BROKER_KEY, MQTT_BROKER_DEFAULT);
+    return EBLi::Mqtt::instance()->getBroker();
 }
 
 void ConfigManager::setMqttBroker(const std::string& brokerUrl)
 {
-    setStringVal(MQTT_BROKER_KEY, brokerUrl);
+    EBLi::Mqtt::instance()->setBroker(brokerUrl);
 }
 
 std::string ConfigManager::getMqttDeviceTopic() const
 {
-    return getStringVal(MQTT_DEVICE_TOPIC_KEY, MQTT_DEVICE_TOPIC_DEFAULT);
+    return EBLi::Mqtt::instance()->getDeviceTopic();
 }
 
 void ConfigManager::setMqttDeviceTopic(const std::string& topic)
 {
-    setStringVal(MQTT_DEVICE_TOPIC_KEY, topic);
+    EBLi::Mqtt::instance()->setDeviceTopic(topic);
 }
 
 std::string ConfigManager::getMqttGroupTopic() const
 {
-    return getStringVal(MQTT_GROUP_TOPIC_KEY, MQTT_GROUP_TOPIC_DEFAULT);
+    return EBLi::Mqtt::instance()->getGroupTopic();
 }
 
 void ConfigManager::setMqttGroupTopic(const std::string& topic)
 {
-    setStringVal(MQTT_GROUP_TOPIC_KEY, topic);
+    EBLi::Mqtt::instance()->setGroupTopic(topic);
 }
 
 bool ConfigManager::autoCommit()
