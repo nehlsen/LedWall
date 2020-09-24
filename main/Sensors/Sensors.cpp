@@ -7,6 +7,9 @@
 #if defined(CONFIG_LEDWALL_SENSOR_AHT10)
 #include <AHT10.h>
 #endif
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+#include <ConfigManager.h>
+#endif
 
 #define PUBLISH_DELAY 15000
 
@@ -22,7 +25,7 @@ public:
 
 private:
 #if defined(CONFIG_LEDWALL_SENSOR_AHT10)
-    AHT10 m_aht10;
+    AHT10 *m_aht10 = nullptr;
     EBLi::MqttPublisher *m_aht10TemperaturePublisher;
     EBLi::MqttPublisher *m_aht10HumidityPublisher;
 #endif
@@ -40,8 +43,20 @@ private:
 
 SensorsP::SensorsP()
 {
-    auto mqtt = EBLi::Mqtt::instance();
 #if defined(CONFIG_LEDWALL_SENSOR_AHT10)
+#if defined(CONFIG_ENABLE_EBLI_CONFIG_MANAGER)
+    auto configManager = EBLi::ConfigManager::instance();
+    int i2cPinSda = configManager->property("aht10_i2c_sda")
+            ->setDefaultValue(CONFIG_AHT10_PIN_SDA)
+            ->getValue<int>();
+    int i2cPinScl = configManager->property("aht10_i2c_scl")
+            ->setDefaultValue(CONFIG_AHT10_PIN_SCL)
+            ->getValue<int>();
+    m_aht10 = new AHT10(i2cPinSda, i2cPinScl);
+#else
+    m_aht10 = new AHT10;
+#endif
+    auto mqtt = EBLi::Mqtt::instance();
     m_aht10TemperaturePublisher = mqtt->createPublisher("aht10/temperature");
     m_aht10HumidityPublisher = mqtt->createPublisher("aht10/humidity");
 #endif
@@ -59,9 +74,9 @@ SensorsP::SensorsP()
 void SensorsP::publishAll()
 {
 #if defined(CONFIG_LEDWALL_SENSOR_AHT10)
-    m_aht10.readRawData();
-    m_aht10TemperaturePublisher->publishValue(std::to_string(m_aht10.getTemperature()));
-    m_aht10HumidityPublisher->publishValue(std::to_string(m_aht10.getHumidity()));
+    m_aht10->readRawData();
+    m_aht10TemperaturePublisher->publishValue(std::to_string(m_aht10->getTemperature()));
+    m_aht10HumidityPublisher->publishValue(std::to_string(m_aht10->getHumidity()));
 #endif
 }
 
