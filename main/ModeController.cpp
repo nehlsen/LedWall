@@ -6,9 +6,9 @@
 #include <algorithm>
 #include <cJSON.h>
 #include "LedMode/LedModes.h"
-#include "ConfigManager.h"
 #include "ModeOptionsPersister.h"
 #include "events.h"
+#include "Config.h"
 
 namespace LedWall {
 
@@ -45,11 +45,10 @@ static EventGroupHandle_t led_update_task_event_group;
     }
 }
 
-ModeController::ModeController(ConfigManager *configManager):
-    m_configManager(configManager)
+ModeController::ModeController()
 {
-    const int matrixWidth = m_configManager->getMatrixWidth();
-    const int matrixHeight = m_configManager->getMatrixHeight();
+    const int matrixWidth = Config::matrixWidth()->getValue<int>();
+    const int matrixHeight = Config::matrixHeight()->getValue<int>();
     ESP_LOGI(LOG_TAG, "matrixWidth: %d, matrixHeight: %d, total LEDs: %d", matrixWidth, matrixHeight, (matrixWidth * matrixHeight));
     ESP_LOGD(LOG_TAG, "memory/LED: %d, total memory: %d", (int)sizeof(CRGB), (matrixWidth * matrixHeight) * (int)sizeof(CRGB));
     ESP_LOGD(LOG_TAG, "Free memory (before alloc): %d bytes", esp_get_free_heap_size());
@@ -67,9 +66,9 @@ ModeController::ModeController(ConfigManager *configManager):
     led_update_task_event_group = xEventGroupCreate();
     xEventGroupSetBits(led_update_task_event_group, LED_WALL_ENABLED_BIT);
 
-    setPower(m_configManager->isPoweredOnBoot());
-    setBrightness(m_configManager->getBrightness());
-    setModeByIndex(m_configManager->getBootIntoMode());
+    setPower(Config::isPoweredOnBoot());
+    setBrightness(Config::brightness()->getValue<int>());
+    setModeByIndex(Config::bootIntoLedMode());
 
     xTaskCreatePinnedToCore(
             &led_update_task,
@@ -91,8 +90,8 @@ void ModeController::setPower(bool power)
         turnAllLedsOff();
     }
     setLedUpdateTaskEnabled(m_power);
-    
-    m_configManager->setPowerState(m_power);
+
+    Config::powerLastState()->setValue(m_power);
     esp_event_post(LEDWALL_EVENTS, LEDWALL_EVENT_POWER_CHANGED, (void*)&m_power, sizeof(m_power), portMAX_DELAY);
 }
 
@@ -113,7 +112,7 @@ void ModeController::setBrightness(uint8_t brightness)
     ESP_LOGI(LOG_TAG, "Set Brightness %.0f%%", (brightness/255.0)*100.0);
     m_matrix->setBrightness(brightness);
 
-    m_configManager->setBrightness(brightness);
+    Config::brightness()->setValue(brightness);
     esp_event_post(LEDWALL_EVENTS, LEDWALL_EVENT_BRIGHTNESS_CHANGED, (void*)&brightness, sizeof(brightness), portMAX_DELAY);
 }
 
@@ -161,7 +160,7 @@ bool ModeController::setModeByIndex(int modeIndex)
     delete m_ledMode;
     m_ledMode = newMode;
 
-    m_configManager->setLedMode(m_modeIndex);
+    Config::ledModeLast()->setValue(m_modeIndex);
     esp_event_post(LEDWALL_EVENTS, LEDWALL_EVENT_MODE_CHANGED, (void*)&m_modeIndex, sizeof(m_modeIndex), portMAX_DELAY);
 
     return true;

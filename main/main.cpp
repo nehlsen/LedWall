@@ -15,6 +15,8 @@
 
 #if defined(CONFIG_LEDWALL_SENSORS)
 #include "Sensors/Sensors.h"
+#include "Config.h"
+
 #endif
 
 ESP_EVENT_DEFINE_BASE(LEDWALL_EVENTS);
@@ -62,8 +64,9 @@ void app_main()
     EBLi::init_all();
     initialise_mdns();
 
-    auto cfg = new LedWall::ConfigManager;
-    auto controller = new LedWall::ModeController(cfg);
+    LedWall::Config::init();
+
+    auto controller = new LedWall::ModeController;
 
     auto updater = new EBLi::OtaUpdater;
 
@@ -72,7 +75,7 @@ void app_main()
     #endif
 
     #if defined(CONFIG_ENABLE_REST)
-    auto *server = new LedWall::WebServer(controller, cfg, updater);
+    auto *server = new LedWall::WebServer(controller, updater);
     #endif
 
     #if defined(CONFIG_LEDWALL_SENSORS)

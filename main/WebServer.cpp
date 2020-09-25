@@ -4,7 +4,6 @@
 #include <esp_ota_ops.h>
 #include <esp_event.h>
 #include "ModeController.h"
-#include "ConfigManager.h"
 #include <OtaUpdater.h>
 #include "LedMode/LedModes.h"
 #include "WebServer/FileResponseHandler.h"
@@ -47,8 +46,8 @@ static void on_got_ip(void *event_handler_arg, esp_event_base_t event_base, int3
     webServer->startServer();
 }
 
-WebServer::WebServer(ModeController *controller, ConfigManager *configManager, EBLi::OtaUpdater *otaUpdater):
-    m_controller(controller), m_configManager(configManager), m_otaUpdater(otaUpdater)
+WebServer::WebServer(ModeController *controller, EBLi::OtaUpdater *otaUpdater):
+    m_controller(controller), m_otaUpdater(otaUpdater)
 {
     esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &on_got_ip, this);
 }
@@ -177,18 +176,7 @@ esp_err_t WebServer::deleteModeOptions(httpd_req_t *req)
 
 cJSON* WebServer::createConfigData()
 {
-    cJSON *root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "MatrixWidth", m_configManager->getMatrixWidth());
-    cJSON_AddNumberToObject(root, "MatrixHeight", m_configManager->getMatrixHeight());
-    cJSON_AddNumberToObject(root, "Brightness", m_configManager->getBrightness());
-    cJSON_AddNumberToObject(root, "PowerOnResetMode", m_configManager->getPowerOnResetMode());
-    cJSON_AddNumberToObject(root, "LedModeAutoRestore", m_configManager->getLedModeAutoRestore());
-
-    cJSON_AddStringToObject(root, "MqttBroker", m_configManager->getMqttBroker().c_str());
-    cJSON_AddStringToObject(root, "MqttDeviceTopic", m_configManager->getMqttDeviceTopic().c_str());
-    cJSON_AddStringToObject(root, "MqttGroupTopic", m_configManager->getMqttGroupTopic().c_str());
-
-    return root;
+    return EBLi::ConfigManager::instance()->toJson();
 }
 
 esp_err_t WebServer::getConfig(httpd_req_t *req)
@@ -199,52 +187,9 @@ esp_err_t WebServer::getConfig(httpd_req_t *req)
 esp_err_t WebServer::postConfig(httpd_req_t *req)
 {
     return handlePost(req, [=](cJSON *request, cJSON **response) -> bool {
-        cJSON *const matrixWidth = cJSON_GetObjectItem(request, "MatrixWidth");
-        if (matrixWidth) {
-            uint8_t width = matrixWidth->valueint;
-            m_configManager->setMatrixWidth(constrain(width, 1, 100));
-        }
-
-        cJSON *const matrixHeight = cJSON_GetObjectItem(request, "MatrixHeight");
-        if (matrixHeight) {
-            uint8_t height = matrixHeight->valueint;
-            m_configManager->setMatrixHeight(constrain(height, 1, 100));
-        }
-
-        cJSON *const brightness = cJSON_GetObjectItem(request, "Brightness");
-        if (brightness) {
-            m_controller->setBrightness(constrain(brightness->valueint, 0, 255));
-        }
-
-        cJSON *const powerOnResetMode = cJSON_GetObjectItem(request, "PowerOnResetMode");
-        if (powerOnResetMode) {
-            int mode = powerOnResetMode->valueint;
-            m_configManager->setPowerOnResetMode((ConfigManager::AutoPowerOn)mode);
-        }
-
-        cJSON *const ledModeAutoRestore = cJSON_GetObjectItem(request, "LedModeAutoRestore");
-        if (ledModeAutoRestore) {
-            int mode = ledModeAutoRestore->valueint;
-            m_configManager->setLedModeAutoRestore(mode);
-        }
-
-        cJSON *const mqttBroker = cJSON_GetObjectItem(request, "MqttBroker");
-        if (mqttBroker && cJSON_IsString(mqttBroker) && strlen(mqttBroker->valuestring) > 0 && strlen(mqttBroker->valuestring) < 64) {
-            m_configManager->setMqttBroker(mqttBroker->valuestring);
-        }
-
-        cJSON *const mqttDeviceTopic = cJSON_GetObjectItem(request, "MqttDeviceTopic");
-        if (mqttDeviceTopic && cJSON_IsString(mqttDeviceTopic) && strlen(mqttDeviceTopic->valuestring) > 0 && strlen(mqttDeviceTopic->valuestring) < 64) {
-            m_configManager->setMqttDeviceTopic(mqttDeviceTopic->valuestring);
-        }
-
-        cJSON *const mqttGroupTopic = cJSON_GetObjectItem(request, "MqttGroupTopic");
-        if (mqttGroupTopic && cJSON_IsString(mqttGroupTopic) && strlen(mqttGroupTopic->valuestring) > 0 && strlen(mqttGroupTopic->valuestring) < 64) {
-            m_configManager->setMqttGroupTopic(mqttGroupTopic->valuestring);
-        }
-
+        bool hasChanged = EBLi::ConfigManager::instance()->fromJson(request);
         *response = createConfigData();
-        return matrixWidth || matrixHeight || brightness || powerOnResetMode || ledModeAutoRestore || mqttBroker || mqttDeviceTopic || mqttGroupTopic;
+        return hasChanged;
     });
 }
 

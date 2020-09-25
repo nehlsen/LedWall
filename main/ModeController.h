@@ -13,12 +13,11 @@ namespace LedWall {
 namespace Mode {
 class LedMode;
 } // namespace Mode
-class ConfigManager;
 
 class ModeController
 {
 public:
-    explicit ModeController(ConfigManager *configManager);
+    explicit ModeController();
 
     void setPower(bool power);
     bool getPower() const;
@@ -40,8 +39,6 @@ public:
 protected:
     CRGB* m_leds;
     LedMatrix* m_matrix;
-
-    ConfigManager *m_configManager;
 
     bool m_power = true;
     int m_modeIndex = -1;

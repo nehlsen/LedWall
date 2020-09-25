@@ -12,14 +12,13 @@ class OtaUpdater;
 
 namespace LedWall {
 class ModeController;
-class ConfigManager;
 
 #define READ_BUFFER_SIZE 1024 * 5
 
 class WebServer
 {
 public:
-    WebServer(ModeController *controller, ConfigManager *configManager, EBLi::OtaUpdater *otaUpdater);
+    WebServer(ModeController *controller, EBLi::OtaUpdater *otaUpdater);
 
     esp_err_t getSystemInfo(httpd_req_t *req);
 
@@ -47,7 +46,6 @@ public:
 
 protected:
     ModeController *m_controller;
-    ConfigManager *m_configManager;
     EBLi::OtaUpdater *m_otaUpdater;
 
     httpd_handle_t m_hdnlServer = nullptr;
