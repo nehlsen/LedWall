@@ -10,10 +10,26 @@ class ModeController;
 
 struct Config
 {
-    static void init(ModeController *controller);
+    enum PowerOnMode {
+        ALWAYS_OFF = 0,
+        ALWAYS_ON = 1,
+        RECOVER_LAST = 2,
+    };
+    static const int POWER_STATE_FALLBACK;
+    static const int LED_MODE_AUTO_RESTORE_LAST;
+    static const int LED_MODE_FALLBACK;
+
+    static void init();
     static EBLi::ConfigProperty *matrixWidth();
     static EBLi::ConfigProperty *matrixHeight();
     static EBLi::ConfigProperty *brightness();
+    static EBLi::ConfigProperty *powerOnMode();
+    static EBLi::ConfigProperty *powerLastState();
+    static EBLi::ConfigProperty *ledModeAutoRestore();
+    static EBLi::ConfigProperty *ledModeLast();
+
+    static bool isPoweredOnBoot();
+    static int bootIntoLedMode();
 };
 
 }

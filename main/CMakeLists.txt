@@ -1,6 +1,6 @@
 set(COMPONENT_SRCS
         "main.cpp"
-        "ConfigManager.cpp"
+        "Config.cpp"
         "ModeOptionsPersister.cpp"
 
         "ModeController.cpp"
