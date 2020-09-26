@@ -129,10 +129,24 @@ void ModeText::setScrollMode(ScrollMode mode)
 
 int ModeText::scrollInfinite()
 {
-    int xTransform = m_currentStep * (getScrollDirection() == ScrollLeft ? -1 : 1);
+    int xTransform = 0;
+
+    if (getScrollDirection() == ScrollLeft) {
+        xTransform = -1 * m_currentStep;
+    } else {
+        xTransform = m_currentStep;
+    }
+
     m_currentStep++;
-    if (m_currentStep >= m_displayText.getCanvas().width) {
-        m_currentStep = 0;
+
+    if (getScrollDirection() == ScrollLeft) {
+        if (m_currentStep >= m_displayText.getSize().width) {
+            m_currentStep = -1 * m_matrix.getWidth();
+        }
+    } else {
+        if (m_currentStep >= m_matrix.getWidth()) {
+            m_currentStep = -1 * m_displayText.getSize().width;
+        }
     }
 
     return xTransform;
