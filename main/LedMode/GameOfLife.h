@@ -6,6 +6,8 @@
 namespace LedWall {
 namespace Mode {
 
+class World;
+
 class GameOfLife : public LedMode
 {
 public:
@@ -21,14 +23,13 @@ public:
 
 protected:
     uint8_t m_currentWorld = 0;
-    CRGB* m_worlds[2];
+    World* m_worlds[2];
 
     void clearWorld(int which);
     void drawWorld(int which);
 
     uint8_t width() const;
     uint8_t height() const;
-    uint16_t xyToIndex(int8_t x, int8_t y) const;
 
     int64_t m_lastGenerationTime = 0;
     uint32_t m_generation = 0;
@@ -56,14 +57,11 @@ protected:
     CRGB averageNeighbourhoodColor(int8_t x, int8_t y) const;
     uint8_t countLiveNeighbours(int8_t x, int8_t y) const;
 
-//    void setAlive(int8_t x, int8_t y);
     void setAlive(int8_t x, int8_t y, const CRGB &color);
     void setDead(int8_t x, int8_t y);
 
     bool isAlive(int8_t x, int8_t y) const;
     bool isDead(int8_t x, int8_t y) const;
-
-    CRGB getColorDead() const;
 
     void randomSeed(uint8_t count);
 };

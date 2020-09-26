@@ -1,4 +1,5 @@
 #include "GameOfLife.h"
+#include <PixelMap.h>
 
 // TODO make it configurable?
 #define SCALEDOWN_FACTOR 240
@@ -6,31 +7,120 @@
 namespace LedWall {
 namespace Mode {
 
+class World
+{
+public:
+    World(uint8_t width, uint8_t height): m_width(width), m_height(height) {}
+
+    virtual CRGB get(Point p) const = 0;
+    virtual void set(Point p, const CRGB &color) = 0;
+    virtual void clear() = 0;
+    virtual void clear(Point p) = 0;
+    virtual bool isSet(Point p) const = 0;
+
+protected:
+    uint8_t m_width;
+    uint8_t m_height;
+
+    Point fixPoint(Point p) const
+    {
+        int16_t x = p.x;
+        int16_t y = p.y;
+
+        while (x < 0) {
+            x += m_width;
+        }
+        while (x >= m_width) {
+            x -= m_width;
+        }
+
+        while (y < 0) {
+            y += m_height;
+        }
+        while (y >= m_height) {
+            y -= m_height;
+        }
+
+        return {x, y};
+    }
+};
+
+class WorldCrgbArray : public World
+{
+public:
+    WorldCrgbArray(uint8_t width, uint8_t height): World(width, height)
+    {
+        m_world = static_cast<CRGB*>(malloc(m_width * m_height * sizeof(CRGB)));
+    }
+
+    CRGB get(Point p) const override
+    {
+        return m_world[pointToIndex(p)];
+    }
+
+    void set(Point p, const CRGB &color) override
+    {
+        m_world[pointToIndex(p)] = color;
+    }
+
+    void clear() override
+    {
+        for (int n = 0; n < m_width * m_height; ++n) {
+            m_world[n] = {0, 0, 0};
+        }
+    }
+
+    void clear(Point p) override
+    {
+        set(p, {0, 0, 0});
+    }
+
+    bool isSet(Point p) const override
+    {
+        const CRGB &c(get(p));
+        return c.r != 0 || c.g != 0 || c.b != 0;
+    }
+
+protected:
+    CRGB* m_world;
+
+    uint16_t pointToIndex(Point p) const
+    {
+        p = fixPoint(p);
+
+        return p.x + p.y * m_width;
+    }
+};
+
+class WorldPixelMap : public World
+{
+protected:
+    PixelMap m_world;
+};
+
+/**********************************************************************************************************************/
+
 GameOfLife::GameOfLife(LedMatrix &matrix) : LedMode(matrix)
 {
-    m_worlds[0] = static_cast<CRGB*>(malloc(width() * height() * sizeof(CRGB)));
-    clearWorld(0);
-    m_worlds[1] = static_cast<CRGB*>(malloc(width() * height() * sizeof(CRGB)));
-    clearWorld(1);
+    m_worlds[0] = new WorldCrgbArray(width(), height());
+    m_worlds[0]->clear();
+    m_worlds[1] = new WorldCrgbArray(width(), height());
+    m_worlds[1]->clear();
 
     randomSeed(80);
 }
 
 bool GameOfLife::update()
 {
-    int64_t currentTime = esp_timer_get_time() / 1000;
-
+    const int64_t currentTime = esp_timer_get_time() / 1000;
     // draw current generation at 2 fps and advance
-    if (currentTime - m_lastGenerationTime > getGenerationDelay()) {
-//        ESP_LOGI("GameOfLife", "Current Generation: %d", getGeneration());
-        drawWorld(m_currentWorld);
-
+    if (currentTime - m_lastGenerationTime > getGenerationDelay() || currentTime < 1) {
         advanceGeneration();
         m_lastGenerationTime = currentTime;
     }
 
-    // fade whole world at 25 fps
     m_matrix.fade(SCALEDOWN_FACTOR);
+    drawWorld(m_currentWorld);
 
     return true;
 }
@@ -38,26 +128,21 @@ bool GameOfLife::update()
 uint16_t GameOfLife::getGenerationDelay() const
 {
     // TODO make it configurable
-    return 250;
+    return 500;
 }
 
 void GameOfLife::clearWorld(int which)
 {
-    for (int n = 0; n < width() * height(); ++n) {
-        m_worlds[which][n] = getColorDead();
-    }
+    m_worlds[which]->clear();
 }
 
 void GameOfLife::drawWorld(int which)
 {
     for (uint8_t x = 0; x < width(); ++x) {
         for (uint8_t y = 0; y < height(); ++y) {
-            // FIXME do not draw black
-//            if (m_worlds[which][xyToIndex(x,y)] == CRGB(0, 0, 0)) {
-//                continue;
-//            }
-
-            m_matrix.pixel(x, y) = m_worlds[which][xyToIndex(x,y)];
+            if (m_worlds[which]->isSet({x, y})) {
+                m_matrix.pixel(x, y) = m_worlds[which]->get({x, y});
+            }
         }
     }
 }
@@ -72,25 +157,6 @@ uint8_t GameOfLife::height() const
     return m_matrix.getHeight();
 }
 
-uint16_t GameOfLife::xyToIndex(int8_t x, int8_t y) const
-{
-    while (x < 0) {
-        x += width();
-    }
-    while (x >= width()) {
-        x -= width();
-    }
-
-    while (y < 0) {
-        y += height();
-    }
-    while (y >= height()) {
-        y -= height();
-    }
-
-    return x + y * width();
-}
-
 uint32_t GameOfLife::getGeneration() const
 {
     return m_generation;
@@ -102,7 +168,7 @@ uint32_t GameOfLife::advanceGeneration()
     for (uint8_t x = 0; x < width(); ++x) {
         for (uint8_t y = 0; y < height(); ++y) {
             if (isAliveAndShouldSurvive(x, y)) {
-                setAlive(x, y, m_worlds[m_currentWorld][xyToIndex(x, y)]);
+                setAlive(x, y, m_worlds[m_currentWorld]->get({x, y}));
             }
             if (isDeadAndShouldLive(x, y)) {
                 setAlive(x, y, averageNeighbourhoodColor(x, y));
@@ -175,14 +241,20 @@ CRGB GameOfLife::averageNeighbourhoodColor(int8_t x, int8_t y) const
     neighbours.emplace_back(x+1, y+1);
 
     for (auto &neighbour : neighbours) {
-        const CRGB &neigh = m_worlds[m_currentWorld][xyToIndex(neighbour.first, neighbour.second)];
+        if (!m_worlds[m_currentWorld]->isSet({neighbour.first, neighbour.second})) {
+            continue;
+        }
+
+        const CRGB &neigh = m_worlds[m_currentWorld]->get({neighbour.first, neighbour.second});
         sum_r += neigh.r;
         sum_g += neigh.g;
         sum_b += neigh.b;
         
-        if (neigh.r != 0 || neigh.g != 0 || neigh.b != 0) {
-            liveNeighbours += 1;
-        }
+        liveNeighbours += 1;
+    }
+
+    if (liveNeighbours == 0) {
+        return {0, 0, 0};
     }
 
     const uint8_t avg_r = sum_r/liveNeighbours;
@@ -210,35 +282,25 @@ uint8_t GameOfLife::countLiveNeighbours(int8_t x, int8_t y) const
     return alive;
 }
 
-//void GameOfLife::setAlive(int8_t x, int8_t y)
-//{
-//    setAlive(x, y, averageNeighbourhoodColor(x, y));
-//}
-
 void GameOfLife::setAlive(int8_t x, int8_t y, const CRGB &color)
 {
-    m_worlds[m_currentWorld == 0 ? 1 : 0][xyToIndex(x, y)] = color;
+    m_worlds[m_currentWorld == 0 ? 1 : 0]->set({x, y}, color);
 }
 
 void GameOfLife::setDead(int8_t x, int8_t y)
 {
-    m_worlds[m_currentWorld == 0 ? 1 : 0][xyToIndex(x, y)] = getColorDead();
+    m_worlds[m_currentWorld == 0 ? 1 : 0]->clear({x, y});
 }
 
 bool GameOfLife::isAlive(int8_t x, int8_t y) const
 {
-    return !isDead(x, y);
+    return m_worlds[m_currentWorld]->isSet({x, y});
 }
 
 bool GameOfLife::isDead(int8_t x, int8_t y) const
 {
     // FIXME because we use average colors and fading we should define some threshold for being dead... not only BLACK
-    return m_worlds[m_currentWorld][xyToIndex(x, y)] == getColorDead();
-}
-
-CRGB GameOfLife::getColorDead() const
-{
-    return {0, 0, 0};
+    return !isAlive(x, y);
 }
 
 void GameOfLife::randomSeed(uint8_t count)
@@ -257,7 +319,6 @@ void GameOfLife::randomSeed(uint8_t count)
     }
     endIteration();
 }
-
 
 } // namespace Mode
 } // namespace LedWall
