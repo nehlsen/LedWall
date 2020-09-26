@@ -25,14 +25,14 @@ public:
     void setScrollSpeed(uint8_t scrollSpeed);
 
     enum ScrollDirection {
-        ScrollLeft,
+        ScrollLeft = 0,
         ScrollRight
     };
     ScrollDirection getScrollDirection() const;
     void setScrollDirection(ScrollDirection direction);
 
     enum ScrollMode {
-        ScrollInfinite,
+        ScrollInfinite = 0,
         ScrollBounce
     };
     ScrollMode getScrollMode() const;
@@ -46,8 +46,8 @@ protected:
     uint8_t m_scrollSpeed = 40; // pixels per second
     int64_t m_lastUpdate = 0;
 
-    ScrollDirection m_scrollDirection;
-    ScrollMode m_scrollMode;
+    ScrollDirection m_scrollDirection = ScrollLeft;
+    ScrollMode m_scrollMode = ScrollInfinite;
 
     int m_currentStep = 0;
 
