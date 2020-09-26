@@ -10,6 +10,8 @@
 #include "ModeText.h"
 #include "MatesDemo.h"
 #include "Wave.h"
+#include "FancyDemo.h"
+#include "GameOfLife.h"
 
 #ifdef CONFIG_ENABLE_CAM
 #include "Camera.h"
@@ -29,6 +31,8 @@ LedMode *createModeNetwork(LedMatrix& matrix) { return new Network(matrix); }
 LedMode *createModeText(LedMatrix& matrix) { return new ModeText(matrix); }
 LedMode *createModeMatesDemo(LedMatrix& matrix) { return new MatesDemo(matrix); }
 LedMode *createModeWave(LedMatrix& matrix) { return new Wave(matrix); }
+LedMode *createModeFancyDemo(LedMatrix& matrix) { return new FancyDemo(matrix); }
+LedMode *createModeGameOfLife(LedMatrix& matrix) { return new GameOfLife(matrix); }
 
 LedModeDef_t modeStatusDef {"Status", &createModeStatus};
 LedModeDef_t modeBarsDef {"Bars", &createModeBars};
@@ -41,6 +45,8 @@ LedModeDef_t modeNetworkDef {"Network", &createModeNetwork};
 LedModeDef_t modeTextDef {"Text", &createModeText};
 LedModeDef_t modeMatesDemoDef {"MatesDemo", &createModeMatesDemo};
 LedModeDef_t modeWaveDef {"Wave", &createModeWave};
+LedModeDef_t modeFancyDemoDef {"FancyDemo", &createModeFancyDemo};
+LedModeDef_t modeGameOfLifeDef {"GameOfLife", &createModeGameOfLife};
 
 #ifdef CONFIG_ENABLE_CAM
 LedMode *createModeCamera(LedMatrix& matrix) { return new Camera(matrix); }
@@ -59,6 +65,8 @@ std::vector<LedModeDef_t> LedModes {
         modeTextDef,
         modeMatesDemoDef,
         modeWaveDef,
+        modeFancyDemoDef,
+        modeGameOfLifeDef,
 #ifdef CONFIG_ENABLE_CAM
         modeCameraDef,
 #endif

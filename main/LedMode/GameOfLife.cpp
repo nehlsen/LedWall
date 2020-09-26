@@ -66,7 +66,7 @@ public:
     void clear() override
     {
         for (int n = 0; n < m_width * m_height; ++n) {
-            m_world[n] = {0, 0, 0};
+            m_world[n].setRGB(0, 0, 0);
         }
     }
 
