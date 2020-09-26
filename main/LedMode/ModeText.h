@@ -32,7 +32,8 @@ public:
     void setScrollDirection(ScrollDirection direction);
 
     enum ScrollMode {
-        ScrollInfinite = 0,
+        ScrollNone = 0,
+        ScrollInfinite,
         ScrollBounce
     };
     ScrollMode getScrollMode() const;

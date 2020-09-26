@@ -33,6 +33,9 @@ bool ModeText::update()
             );
 
     switch (getScrollMode()) {
+        case ScrollNone:
+            break;
+
         case ScrollInfinite:
         default:
             m_displayText.transform(scrollInfinite(), 0);
