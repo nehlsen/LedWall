@@ -16,6 +16,8 @@
 
 #if defined(CONFIG_LEDWALL_SENSORS)
 #include "Sensors/Sensors.h"
+#include "Config.h"
+
 #endif
 
 ESP_EVENT_DEFINE_BASE(LEDWALL_EVENTS);
