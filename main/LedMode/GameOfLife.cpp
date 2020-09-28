@@ -1,5 +1,6 @@
 #include "GameOfLife.h"
 #include <PixelMap.h>
+#include <cJSON.h>
 
 // TODO make it configurable?
 #define SCALEDOWN_FACTOR 240
@@ -113,8 +114,7 @@ GameOfLife::GameOfLife(LedMatrix &matrix) : LedMode(matrix)
 bool GameOfLife::update()
 {
     const int64_t currentTime = esp_timer_get_time() / 1000;
-    // draw current generation at 2 fps and advance
-    if (currentTime - m_lastGenerationTime > getGenerationDelay() || currentTime < 1) {
+    if (currentTime - m_lastGenerationTime > getGenerationDelay() || m_lastGenerationTime < 1) {
         advanceGeneration();
         m_lastGenerationTime = currentTime;
     }
@@ -125,10 +125,31 @@ bool GameOfLife::update()
     return true;
 }
 
+void GameOfLife::readOptions(cJSON *root)
+{
+    cJSON_AddNumberToObject(root, "generationDelay", getGenerationDelay());
+}
+
+bool GameOfLife::writeOptions(cJSON *root)
+{
+    bool changed = false;
+    cJSON *objectItem = cJSON_GetObjectItem(root, "generationDelay");
+    if (objectItem && cJSON_IsNumber(objectItem)) {
+        setGenerationDelay(constrain(objectItem->valueint, 25, 5000));
+        changed = true;
+    }
+
+    return changed;
+}
+
 uint16_t GameOfLife::getGenerationDelay() const
 {
-    // TODO make it configurable
-    return 500;
+    return m_generationDelay;
+}
+
+void GameOfLife::setGenerationDelay(uint16_t delayMs)
+{
+    m_generationDelay = delayMs;
 }
 
 void GameOfLife::clearWorld(int which)

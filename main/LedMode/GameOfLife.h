@@ -16,10 +16,11 @@ public:
 
     bool update() override;
 
-//    void readOptions(cJSON *root) override;
-//    bool writeOptions(cJSON *root) override;
+    void readOptions(cJSON *root) override;
+    bool writeOptions(cJSON *root) override;
 
     uint16_t getGenerationDelay() const;
+    void setGenerationDelay(uint16_t delayMs);
 
 protected:
     uint8_t m_currentWorld = 0;
@@ -32,6 +33,7 @@ protected:
     uint8_t height() const;
 
     int64_t m_lastGenerationTime = 0;
+    uint16_t m_generationDelay = 500;
     uint32_t m_generation = 0;
 
     // number of current generation
