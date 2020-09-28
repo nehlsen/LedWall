@@ -99,6 +99,7 @@ bool ModeText::writeOptions(cJSON *root)
 
     objectItem = cJSON_GetObjectItem(root, "color");
     if (objectItem && cJSON_IsString(objectItem) && strlen(objectItem->valuestring) == 7 && objectItem->valuestring[0] == '#') {
+        // FIXME try/catch
         int colorCode = std::stoi(std::string(objectItem->valuestring).substr(1, 6), nullptr, 16);
         setColor(CRGB(colorCode));
         changed = true;
@@ -106,6 +107,7 @@ bool ModeText::writeOptions(cJSON *root)
 
     objectItem = cJSON_GetObjectItem(root, "backgroundColor");
     if (objectItem && cJSON_IsString(objectItem) && strlen(objectItem->valuestring) == 7 && objectItem->valuestring[0] == '#') {
+        // FIXME try/catch
         int colorCode = std::stoi(std::string(objectItem->valuestring).substr(1, 6), nullptr, 16);
         setBackgroundColor(CRGB(colorCode));
         changed = true;

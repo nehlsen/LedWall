@@ -12,6 +12,7 @@
 #include "Wave.h"
 #include "FancyDemo.h"
 #include "GameOfLife.h"
+#include "ModeTime.h"
 
 #ifdef CONFIG_ENABLE_CAM
 #include "Camera.h"
@@ -33,6 +34,7 @@ LedMode *createModeMatesDemo(LedMatrix& matrix) { return new MatesDemo(matrix); 
 LedMode *createModeWave(LedMatrix& matrix) { return new Wave(matrix); }
 LedMode *createModeFancyDemo(LedMatrix& matrix) { return new FancyDemo(matrix); }
 LedMode *createModeGameOfLife(LedMatrix& matrix) { return new GameOfLife(matrix); }
+LedMode *createModeTime(LedMatrix& matrix) { return new ModeTime(matrix); }
 
 LedModeDef_t modeStatusDef {"Status", &createModeStatus};
 LedModeDef_t modeBarsDef {"Bars", &createModeBars};
@@ -47,6 +49,7 @@ LedModeDef_t modeMatesDemoDef {"MatesDemo", &createModeMatesDemo};
 LedModeDef_t modeWaveDef {"Wave", &createModeWave};
 LedModeDef_t modeFancyDemoDef {"FancyDemo", &createModeFancyDemo};
 LedModeDef_t modeGameOfLifeDef {"GameOfLife", &createModeGameOfLife};
+LedModeDef_t modeTimeDef {"Time", &createModeTime};
 
 #ifdef CONFIG_ENABLE_CAM
 LedMode *createModeCamera(LedMatrix& matrix) { return new Camera(matrix); }
@@ -67,6 +70,7 @@ std::vector<LedModeDef_t> LedModes {
         modeWaveDef,
         modeFancyDemoDef,
         modeGameOfLifeDef,
+        modeTimeDef,
 #ifdef CONFIG_ENABLE_CAM
         modeCameraDef,
 #endif
