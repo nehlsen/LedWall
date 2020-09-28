@@ -8,7 +8,7 @@ namespace Mode {
 
 bool FancyDemo::update()
 {
-    m_matrix.clear();
+    m_matrix.clear(false);
 //    m_matrix.fade(192);
 
     uint16_t remainingFrames = 0;

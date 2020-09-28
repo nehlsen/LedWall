@@ -16,7 +16,7 @@ bool MatesDemo::update()
     if(m_lastUpdate != currentSeconds) {
         m_lastUpdate = currentSeconds;
 
-        m_matrix.clear(true);
+        m_matrix.clear(false);
         drawSample(currentSeconds % countSamples);
 //        drawSample(7);
         return true;
