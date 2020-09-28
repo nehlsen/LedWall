@@ -39,10 +39,14 @@ public:
     ScrollMode getScrollMode() const;
     void setScrollMode(ScrollMode mode);
 
-protected:
+    inline const CRGB &getBackgroundColor() const;
+    inline void setBackgroundColor(const CRGB &color);
+
+    inline const CRGB &getColor() const;
+    inline void setColor(const CRGB &color);
+
+private:
     ::Text m_displayText;
-    CRGB m_fgColor;
-    CRGB m_bgColor;
 
     uint8_t m_scrollSpeed = 40; // pixels per second
     int64_t m_lastUpdate = 0;

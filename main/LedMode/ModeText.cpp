@@ -16,11 +16,11 @@ bool ModeText::update()
     m_lastUpdate = currentTime;
 
 //    m_matrix.fade(140);
-    m_matrix.clear();
+    m_matrix.clear(false);
 
-    m_displayText.setBackgroundColor(CRGB::Black);
+//    m_displayText.setBackgroundColor(CRGB::Black);
 //    m_displayText.setColor(CRGB::Green);
-    m_displayText.setGradient(CRGBPalette16(CRGB::Red, CRGB::Green, CRGB::Blue));
+//    m_displayText.setGradient(CRGBPalette16(CRGB::Red, CRGB::Green, CRGB::Blue));
 //    m_displayText.setGradient(CRGBPalette16(CRGB::White, CRGB::Blue, CRGB::White, CRGB::Blue));
 
     m_displayText.setY((m_matrix.getHeight() - m_displayText.getSize().height) / 2);
@@ -53,10 +53,20 @@ bool ModeText::update()
 
 void ModeText::readOptions(cJSON *root)
 {
+    auto jsonAddColorCode = [root](char *key, const CRGB &color) {
+        int colorCode = (color.r << 16) + (color.g << 8) + (color.b);
+        char *buf = (char*)malloc(8);
+        sprintf(buf, "#%06x", colorCode);
+        cJSON_AddStringToObject(root, key, buf);
+        free(buf);
+    };
+
     cJSON_AddStringToObject(root, "text", getText().c_str());
     cJSON_AddNumberToObject(root, "scrollSpeed", getScrollSpeed());
     cJSON_AddNumberToObject(root, "scrollDirection", getScrollDirection());
     cJSON_AddNumberToObject(root, "scrollMode", getScrollMode());
+    jsonAddColorCode("color", getColor());
+    jsonAddColorCode("backgroundColor", getBackgroundColor());
 }
 
 bool ModeText::writeOptions(cJSON *root)
@@ -84,6 +94,20 @@ bool ModeText::writeOptions(cJSON *root)
     objectItem = cJSON_GetObjectItem(root, "scrollMode");
     if (objectItem && cJSON_IsNumber(objectItem)) {
         setScrollMode(static_cast<ScrollMode>(objectItem->valueint));
+        changed = true;
+    }
+
+    objectItem = cJSON_GetObjectItem(root, "color");
+    if (objectItem && cJSON_IsString(objectItem) && strlen(objectItem->valuestring) == 7 && objectItem->valuestring[0] == '#') {
+        int colorCode = std::stoi(std::string(objectItem->valuestring).substr(1, 6), nullptr, 16);
+        setColor(CRGB(colorCode));
+        changed = true;
+    }
+
+    objectItem = cJSON_GetObjectItem(root, "backgroundColor");
+    if (objectItem && cJSON_IsString(objectItem) && strlen(objectItem->valuestring) == 7 && objectItem->valuestring[0] == '#') {
+        int colorCode = std::stoi(std::string(objectItem->valuestring).substr(1, 6), nullptr, 16);
+        setBackgroundColor(CRGB(colorCode));
         changed = true;
     }
 
@@ -184,6 +208,26 @@ int ModeText::scrollBounce()
     m_currentStep++;
 
     return xTransform;
+}
+
+const CRGB &ModeText::getBackgroundColor() const
+{
+    return m_displayText.getBackgroundColor();
+}
+
+void ModeText::setBackgroundColor(const CRGB &color)
+{
+    m_displayText.setBackgroundColor(color);
+}
+
+const CRGB &ModeText::getColor() const
+{
+    return m_displayText.getColor();
+}
+
+void ModeText::setColor(const CRGB &color)
+{
+    m_displayText.setColor(color);
 }
 
 } // namespace Mode
