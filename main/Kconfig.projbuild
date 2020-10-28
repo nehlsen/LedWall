@@ -27,13 +27,4 @@ menu "LedWall Configuration"
         int "Data PIN the LEDs are attached to"
         default 26
 
-    config LEDWALL_SENSORS
-        bool "Enable Sensors"
-        default false
-
-    config LEDWALL_SENSOR_AHT10
-            bool "Enable AHT10 Temperature and Humidity Sensor"
-            depends on LEDWALL_SENSORS && ENABLE_EBLI_MQTT
-            default false
-
 endmenu

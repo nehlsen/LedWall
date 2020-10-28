@@ -14,12 +14,6 @@
 #include "mqtt/MqttAdapter.h"
 #endif
 
-#if defined(CONFIG_LEDWALL_SENSORS)
-#include "Sensors/Sensors.h"
-#include "Config.h"
-
-#endif
-
 ESP_EVENT_DEFINE_BASE(LEDWALL_EVENTS);
 
 static const char *APP_LOG_TAG = "LED_WALL";
@@ -77,10 +71,6 @@ void app_main()
 
     #if defined(CONFIG_ENABLE_REST)
     auto *server = new LedWall::WebServer(controller, updater);
-    #endif
-
-    #if defined(CONFIG_LEDWALL_SENSORS)
-    auto *sensors = new LedWall::Sensors::Sensors();
     #endif
 }
 
