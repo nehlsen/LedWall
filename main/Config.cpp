@@ -12,10 +12,12 @@ const int Config::LED_MODE_FALLBACK = 0;
 void Config::init()
 {
     matrixWidth()
+        ->setVisibility(EBLi::ConfigProperty::Device)
         ->setDefaultValue(4)
         ->setConstraint(EBLi::ConfigPropertyConstraint::Number(1, 100));
 
     matrixHeight()
+        ->setVisibility(EBLi::ConfigProperty::Device)
         ->setDefaultValue(4)
         ->setConstraint(EBLi::ConfigPropertyConstraint::Number(1, 100));
 
@@ -28,23 +30,25 @@ void Config::init()
         ;
 
     powerOnMode()
+        ->setVisibility(EBLi::ConfigProperty::Device)
         ->setDefaultValue(PowerOnMode::RECOVER_LAST)
         ->setConstraint(EBLi::ConfigPropertyConstraint::Number(PowerOnMode::ALWAYS_OFF, PowerOnMode::RECOVER_LAST));
 
     powerLastState()
+        ->setVisibility(EBLi::ConfigProperty::Hidden)
         ->setDefaultValue(POWER_STATE_FALLBACK)
         ->setConstraint(EBLi::ConfigPropertyConstraint::Number(0, 1))
-//        ->setPublish(false)
         ;
 
     ledModeAutoRestore()
+        ->setVisibility(EBLi::ConfigProperty::Device)
         // min:-1, max:ledModeCount-1
         ->setDefaultValue(LED_MODE_AUTO_RESTORE_LAST);
 
     ledModeLast()
+        ->setVisibility(EBLi::ConfigProperty::Hidden)
         // min:0, max:ledModeCount-1
         ->setDefaultValue(LED_MODE_FALLBACK)
-//        ->setPublish(false)
         ;
 }
 
