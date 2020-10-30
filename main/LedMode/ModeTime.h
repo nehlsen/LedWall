@@ -2,6 +2,7 @@
 #define LEDWALL_MODETIME_H
 
 #include "ModeText.h"
+#include <ctime>
 
 namespace LedWall::Mode {
 
@@ -44,6 +45,15 @@ private:
     void showCountUp(bool isOddSecond);
 
     static std::string formatSeconds(int seconds, bool includeSplittingDots);
+
+    void setCountDownToParameter(const char *dateTimeString);
+    void setCountSinceParameter(const char *dateTimeString);
+
+    static std::time_t parseDateTimeParameter(const char *dateTimeString);
+    // expect "%Y-%m-%d %H:%M:%S"
+    static std::time_t parseDateTime(const char *dateTimeString);
+    // expect "%Y-%m-%d" and use 00:00:00 as time (first second of target day)
+    static std::time_t parseDate(const char *dateTimeString);
 };
 
 }

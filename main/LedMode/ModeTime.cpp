@@ -1,6 +1,7 @@
-#include <cJSON.h>
-//#include <Delayer.h>
 #include "ModeTime.h"
+//#include <Delayer.h>
+#include <esp_log.h>
+#include <cJSON.h>
 
 namespace LedWall::Mode {
 
@@ -29,10 +30,12 @@ bool ModeTime::update()
             break;
 
         case VariantCountDown:
+        case VariantCountDownTo:
             showCountDown(isOdd);
             break;
 
         case VariantCountUp:
+        case VariantCountSince:
             showCountUp(isOdd);
             break;
 
@@ -59,7 +62,25 @@ bool ModeTime::writeOptions(cJSON *root)
 
     cJSON *const requestedVariantParameter = cJSON_GetObjectItem(root, "parameter");
     if (requestedVariantParameter) {
-        setVariantParameter(requestedVariantParameter->valueint);
+        switch (getVariant()) {
+            case VariantCountDown:
+            case VariantCountUp:
+                setVariantParameter(requestedVariantParameter->valueint);
+                break;
+
+            case VariantCountDownTo:
+                setCountDownToParameter(requestedVariantParameter->valuestring);
+                break;
+
+            case VariantCountSince:
+                setCountSinceParameter(requestedVariantParameter->valuestring);
+                break;
+
+            default:
+                // ignore parameter, variant does not accept parameters
+                setVariantParameter(0);
+                break;
+        }
     }
 
     return requestedVariant || requestedVariantParameter;
@@ -104,12 +125,12 @@ void ModeTime::setVariantCountUp()
 
 void ModeTime::showTime(bool isOddSecond)
 {
-    time_t now;
-    char strftime_buf[64];
-    struct tm timeinfo;
+    std::time_t now = std::time(nullptr);
 
-    time(&now);
+    std::tm timeinfo{};
     localtime_r(&now, &timeinfo);
+
+    char strftime_buf[64];
     strftime(strftime_buf, sizeof(strftime_buf), (isOddSecond ? "%H %M" : "%H:%M"), &timeinfo);
 
     setText(strftime_buf);
@@ -117,6 +138,15 @@ void ModeTime::showTime(bool isOddSecond)
 
 void ModeTime::showCountDown(bool isOddSecond)
 {
+    /**
+     * TODO
+     * less than 60 seconds? show only seconds, centered
+     * more than 60/99 minutes? show HH:MM
+     * more than 24h? show "~2 d", "~99 d"
+     * more than 99d? "8" rotated by 90 degrees, infinity! :)
+     */
+
+
     std::string remainingTime = formatSeconds(m_variantParameter, isOddSecond);
 
     if (m_variantParameter > 0) {
@@ -152,6 +182,90 @@ std::string ModeTime::formatSeconds(int secondsToFormat, bool includeSplittingDo
     formattedSeconds += std::to_string(seconds);
 
     return formattedSeconds;
+}
+
+void ModeTime::setCountDownToParameter(const char *dateTimeString)
+{
+    std::time_t targetTime = parseDateTimeParameter(dateTimeString);
+    if (targetTime == -1) {
+        ESP_LOGW("ModeTime", "Failed to parse date time parameter");
+        return;
+    }
+
+    std::time_t now = std::time(nullptr);
+    int timeDiff = std::ceil(std::difftime(targetTime, now));
+
+    ESP_LOGI("ModeTime", "setCountDownToParameter(%s), remaining: %ds", dateTimeString, timeDiff);
+    setVariantParameter(timeDiff < 0 ? 0 : timeDiff);
+}
+
+void ModeTime::setCountSinceParameter(const char *dateTimeString)
+{
+    std::time_t targetTime = parseDateTimeParameter(dateTimeString);
+    if (targetTime == -1) {
+        ESP_LOGW("ModeTime", "Failed to parse date time parameter");
+        return;
+    }
+
+    std::time_t now = std::time(nullptr);
+    int timeDiff = std::ceil(std::difftime(now, targetTime));
+
+    setVariantParameter(timeDiff < 0 ? 0 : timeDiff);
+}
+
+std::time_t ModeTime::parseDateTimeParameter(const char *dateTimeString)
+{
+    // (1) accepted date format: "yyyy-mm-dd HH:mm:ss"
+    // (2) accepted date format: "yyyy-mm-dd" -> time: 00:00:00
+
+    // FIXME possible issue: if target time is once-second-ago, parser will return -1 -> same as error value :(
+
+    std::time_t targetTime = parseDateTime(dateTimeString);
+    if (targetTime != -1) {
+        return targetTime;
+    }
+
+    targetTime = parseDate(dateTimeString);
+    if (targetTime != -1) {
+        return targetTime;
+    }
+
+    return -1;
+}
+
+std::time_t ModeTime::parseDateTime(const char *dateTimeString)
+{
+    std::tm dateTime{};
+    if (strptime(dateTimeString, "%Y-%m-%d %H:%M:%S", &dateTime) != nullptr) {
+        dateTime.tm_isdst = -1; // detect/guess whether we need daylight saving
+        std::time_t unixTime = std::mktime(&dateTime);
+        if (unixTime != -1) {
+            // we have time!
+        }
+
+        return unixTime;
+    }
+
+    return -1;
+}
+
+std::time_t ModeTime::parseDate(const char *dateTimeString)
+{
+    std::tm dateTime{};
+    if (strptime(dateTimeString, "%Y-%m-%d", &dateTime) != nullptr) {
+        dateTime.tm_hour = 0;
+        dateTime.tm_min = 0;
+        dateTime.tm_sec = 0;
+        dateTime.tm_isdst = -1; // detect/guess whether we need daylight saving
+        std::time_t unixTime = std::mktime(&dateTime);
+        if (unixTime != -1) {
+            // we have time!
+        }
+
+        return unixTime;
+    }
+
+    return -1;
 }
 
 }
