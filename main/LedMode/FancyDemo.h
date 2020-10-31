@@ -3,30 +3,29 @@
 
 #include "LedMode.h"
 
-namespace LedWall {
-namespace Mode {
+namespace LedWall::Mode {
 
+class FancyDemoPart;
 class FancyDemo : public LedMode
 {
 public:
-    using LedMode::LedMode;
+    explicit FancyDemo(LedMatrix& matrix);
 
     bool update() override;
 
 protected:
     uint16_t m_frame = 0;
 
-    int16_t part1(int16_t frame); // bars grow horizontally
-    int16_t part2(int16_t frame); // bars open to top/bottom
-    int16_t part3(int16_t frame); // growing cube
-    int16_t part4(int16_t frame); // shrinking cube
-    int16_t part5(int16_t frame); // rolling cube
     int16_t part6a(int16_t frame);
     int16_t part6b(int16_t frame);
     int16_t part6_abs(int16_t frame, bool forward);
+
+    std::vector<FancyDemoPart*> m_parts;
+    void initParts();
+
+    FancyDemoPart* getCurrentPart();
 };
 
-} // namespace Mode
-} // namespace LedWall
+}
 
 #endif //LEDWALL_FANCYDEMO_H
