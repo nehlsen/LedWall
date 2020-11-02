@@ -14,6 +14,7 @@ void FdExplodingLetters::renderImpl(uint16_t relativeFrame)
 {
     Canvas c(m_letters.pixels());
     c
+        .setSubPixelTransformationFactor(2)
         .setZoom(map(relativeFrame, 0, getFrameCount(), 100, targetZoom))
         .applyTransformation()
         .renderCentered(m_matrix)

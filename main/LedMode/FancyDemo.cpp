@@ -11,6 +11,7 @@
 #include "FancyDemo/FdSprinkle.h"
 #include "FancyDemo/FdExplodingLetters.h"
 #include "FancyDemo/FdCircleGrow.h"
+#include "FancyDemo/FdNHeartC.h"
 
 namespace LedWall::Mode {
 
@@ -71,6 +72,7 @@ void FancyDemo::initParts()
     m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2021", REVERSE));
     m_parts.push_back(new FdBarsOpen(m_parts.back(), PartOptions(VERTICAL | REVERSE)));
     m_parts.push_back(new FdBarsGrow(m_parts.back(), PartOptions(VERTICAL | REVERSE)));
+    m_parts.push_back(new FdNHeartC(m_parts.back()));
 }
 
 FancyDemoPart *FancyDemo::getCurrentPart()
