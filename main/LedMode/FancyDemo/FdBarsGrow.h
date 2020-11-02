@@ -9,15 +9,15 @@ namespace LedWall::Mode {
 class FdBarsGrow : public FancyDemoPart
 {
 public:
-    explicit FdBarsGrow(uint16_t firstFrame, LedMatrix &matrix, bool growHorizontal);
-    explicit FdBarsGrow(FancyDemoPart *previousPart, bool growHorizontal);
-
-    void render(uint16_t relativeFrame) override;
+    using FancyDemoPart::FancyDemoPart;
+//    explicit FdBarsGrow(uint16_t firstFrame, LedMatrix &matrix, bool growHorizontal);
+//    explicit FdBarsGrow(FancyDemoPart *previousPart, bool growHorizontal);
 
 protected:
+    void renderImpl(uint16_t relativeFrame) override;
     uint16_t getFrameCount() const override;
 
-    const bool m_growHorizontal;
+//    const bool m_growHorizontal;
 };
 
 }

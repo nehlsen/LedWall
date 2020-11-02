@@ -12,9 +12,8 @@ public:
     explicit FdExplodingLetters(uint16_t firstFrame, LedMatrix &matrix, const std::string &letters);
     explicit FdExplodingLetters(FancyDemoPart *previousPart, const std::string &letters);
 
-    void render(uint16_t relativeFrame) override;
-
 protected:
+    void renderImpl(uint16_t relativeFrame) override;
     uint16_t getFrameCount() const override;
 
     const Text m_letters;

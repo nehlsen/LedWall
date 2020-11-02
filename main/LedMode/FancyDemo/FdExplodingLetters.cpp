@@ -14,7 +14,7 @@ FdExplodingLetters::FdExplodingLetters(FancyDemoPart *previousPart, const std::s
     FancyDemoPart(previousPart), m_letters(letters, CRGB::White)
 {}
 
-void FdExplodingLetters::render(uint16_t relativeFrame)
+void FdExplodingLetters::renderImpl(uint16_t relativeFrame)
 {
     Canvas c(m_letters.pixels());
     c

@@ -17,7 +17,7 @@ FdRollingCube::FdRollingCube(FancyDemoPart *previousPart, bool directionForward)
 {
 }
 
-void FdRollingCube::render(uint16_t relativeFrame)
+void FdRollingCube::renderImpl(uint16_t relativeFrame)
 {
 //    if (frame < 0 || frame >= frameCount) return frameCount;
 

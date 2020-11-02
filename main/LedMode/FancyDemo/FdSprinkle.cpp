@@ -4,7 +4,7 @@
 
 namespace LedWall::Mode {
 
-void FdSprinkle::render(uint16_t relativeFrame)
+void FdSprinkle::renderImpl(uint16_t relativeFrame)
 {
     GfxPrimitive prim;
 

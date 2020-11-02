@@ -4,13 +4,13 @@
 
 namespace LedWall::Mode {
 
-FdBarsOpen::FdBarsOpen(FancyDemoPart *previousPart, bool growHorizontal):
-    FancyDemoPart(previousPart), m_growHorizontal(growHorizontal)
-{}
+//FdBarsOpen::FdBarsOpen(FancyDemoPart *previousPart, bool growHorizontal):
+//    FancyDemoPart(previousPart), m_growHorizontal(growHorizontal)
+//{}
 
-void FdBarsOpen::render(uint16_t relativeFrame)
+void FdBarsOpen::renderImpl(uint16_t relativeFrame)
 {
-    if (m_growHorizontal) {
+    if (isHorizontal()) {
         uint8_t x0 = 0;
         uint8_t x1 = m_matrix.getWidth() - 1;
 
@@ -39,7 +39,7 @@ void FdBarsOpen::render(uint16_t relativeFrame)
 
 uint16_t FdBarsOpen::getFrameCount() const
 {
-    if (m_growHorizontal) {
+    if (isHorizontal()) {
         return m_matrix.getHeight() / 2;
     } else {
         return m_matrix.getWidth() / 2;

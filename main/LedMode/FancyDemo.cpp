@@ -34,7 +34,7 @@ bool FancyDemo::update()
 
 void FancyDemo::initParts()
 {
-    m_parts.push_back(new FdExplodingLetters(0, m_matrix, "10"));
+//    m_parts.push_back(new FdExplodingLetters(0, m_matrix, "10"));
 //    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "9"));
 //    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "8"));
 //    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "7"));
@@ -44,10 +44,10 @@ void FancyDemo::initParts()
 //    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "3"));
 //    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2"));
 //    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "1"));
-    m_parts.push_back(new FdBarsGrow(m_parts.back(), true));
-    m_parts.push_back(new FdBarsOpen(m_parts.back(), true));
-    m_parts.push_back(new FdBarsGrow(m_parts.back(), false));
-    m_parts.push_back(new FdBarsOpen(m_parts.back(), false));
+//    m_parts.push_back(new FdBarsGrow(m_parts.back()));
+//    m_parts.push_back(new FdBarsOpen(m_parts.back()));
+//    m_parts.push_back(new FdBarsGrow(m_parts.back(), VERTICAL));
+//    m_parts.push_back(new FdBarsOpen(m_parts.back(), VERTICAL));
 //    m_parts.push_back(new FancyDemoPart3(m_parts.back()));
 //    m_parts.push_back(new FancyDemoPart4(m_parts.back()));
 //    m_parts.push_back(new FdRollingCube(m_parts.back(), true));
@@ -55,6 +55,16 @@ void FancyDemo::initParts()
 //    m_parts.push_back(new FdColorRays(m_parts.back(), false));
 //    m_parts.push_back(new FdRollingCube(m_parts.back(), false));
 //    m_parts.push_back(new FdSprinkle(m_parts.back()));
+
+
+    m_parts.push_back(new FdBarsGrow(0, m_matrix));
+    m_parts.push_back(new FdBarsOpen(m_parts.back()));
+    m_parts.push_back(new FdBarsOpen(m_parts.back(), REVERSE));
+    m_parts.push_back(new FdBarsGrow(m_parts.back(), REVERSE));
+    m_parts.push_back(new FdBarsGrow(m_parts.back(), VERTICAL));
+    m_parts.push_back(new FdBarsOpen(m_parts.back(), VERTICAL));
+    m_parts.push_back(new FdBarsOpen(m_parts.back(), PartOptions(VERTICAL | REVERSE)));
+    m_parts.push_back(new FdBarsGrow(m_parts.back(), PartOptions(VERTICAL | REVERSE)));
 }
 
 FancyDemoPart *FancyDemo::getCurrentPart()

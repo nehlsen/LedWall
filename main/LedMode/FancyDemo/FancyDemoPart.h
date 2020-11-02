@@ -19,23 +19,24 @@ enum PartOptions {
 class FancyDemoPart
 {
 public:
-    explicit FancyDemoPart(uint16_t firstFrame, LedMatrix &matrix);
-    explicit FancyDemoPart(FancyDemoPart *previousPart);
+    explicit FancyDemoPart(uint16_t firstFrame, LedMatrix &matrix, PartOptions options = NO_OPS);
+    explicit FancyDemoPart(FancyDemoPart *previousPart, PartOptions options = NO_OPS);
 
-    uint16_t getFirstFrame() const; // absolut frame index
-    uint16_t getLastFrame() const; // absolut frame index
+    uint16_t getFirstFrame() const;
+    uint16_t getLastFrame() const;
 
-//    uint16_t getFrameCount() const;
-//    uint16_t getRemainingFrames() const;
-
-    virtual void render(uint16_t relativeFrame) = 0;
+    virtual void render(uint16_t relativeFrame);
 
 protected:
+    virtual void renderImpl(uint16_t relativeFrame) = 0;
+
     LedMatrix &m_matrix;
-
-//    void setFrameCount(uint16_t frameCount);
-
     virtual uint16_t getFrameCount() const = 0;
+
+    PartOptions m_options;
+    bool hasOption(PartOptions option) const;
+    bool isForward() const;
+    bool isHorizontal() const;
 
 private:
     const uint16_t m_firstFrame;

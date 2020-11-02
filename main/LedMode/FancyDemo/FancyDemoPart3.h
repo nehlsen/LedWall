@@ -11,9 +11,8 @@ class FancyDemoPart3 : public FancyDemoPart
 public:
     using FancyDemoPart::FancyDemoPart;
 
-    void render(uint16_t relativeFrame) override;
-
 protected:
+    void renderImpl(uint16_t relativeFrame) override;
     uint16_t getFrameCount() const override;
 };
 

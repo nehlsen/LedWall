@@ -4,7 +4,7 @@
 
 namespace LedWall::Mode {
 
-void FancyDemoPart4::render(uint16_t relativeFrame)
+void FancyDemoPart4::renderImpl(uint16_t relativeFrame)
 {
 //    if (frame < 0 || frame >= frameCount) return frameCount;
 

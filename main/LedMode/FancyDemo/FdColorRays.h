@@ -13,9 +13,8 @@ class FdColorRays : public FancyDemoPart
 public:
     explicit FdColorRays(FancyDemoPart *previousPart, bool directionForward);
 
-    void render(uint16_t relativeFrame) override;
-
 protected:
+    void renderImpl(uint16_t relativeFrame) override;
     uint16_t getFrameCount() const override;
 
     GfxPrimitive m_lines;

@@ -9,14 +9,14 @@ namespace LedWall::Mode {
 class FdBarsOpen : public FancyDemoPart
 {
 public:
-    explicit FdBarsOpen(FancyDemoPart *previousPart, bool growHorizontal);
-
-    void render(uint16_t relativeFrame) override;
+    using FancyDemoPart::FancyDemoPart;
+//    explicit FdBarsOpen(FancyDemoPart *previousPart, bool growHorizontal);
 
 protected:
+    void renderImpl(uint16_t relativeFrame) override;
     uint16_t getFrameCount() const override;
 
-    const bool m_growHorizontal;
+//    const bool m_growHorizontal;
 };
 
 }

@@ -10,7 +10,7 @@ FdColorRays::FdColorRays(FancyDemoPart *previousPart, bool directionForward):
     initLines();
 }
 
-void FdColorRays::render(uint16_t relativeFrame)
+void FdColorRays::renderImpl(uint16_t relativeFrame)
 {
 //    if (frame < 0 || frame >= frameCount) return frameCount;
 

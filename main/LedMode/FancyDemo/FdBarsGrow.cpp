@@ -4,17 +4,17 @@
 
 namespace LedWall::Mode {
 
-FdBarsGrow::FdBarsGrow(uint16_t firstFrame, LedMatrix &matrix, bool growHorizontal):
-    FancyDemoPart(firstFrame, matrix), m_growHorizontal(growHorizontal)
-{}
+//FdBarsGrow::FdBarsGrow(uint16_t firstFrame, LedMatrix &matrix, bool growHorizontal):
+//    FancyDemoPart(firstFrame, matrix), m_growHorizontal(growHorizontal)
+//{}
+//
+//FdBarsGrow::FdBarsGrow(FancyDemoPart *previousPart, bool growHorizontal):
+//    FancyDemoPart(previousPart), m_growHorizontal(growHorizontal)
+//{}
 
-FdBarsGrow::FdBarsGrow(FancyDemoPart *previousPart, bool growHorizontal):
-    FancyDemoPart(previousPart), m_growHorizontal(growHorizontal)
-{}
-
-void FdBarsGrow::render(uint16_t relativeFrame)
+void FdBarsGrow::renderImpl(uint16_t relativeFrame)
 {
-    if (m_growHorizontal) {
+    if (isHorizontal()) {
         uint8_t x0 = std::round(m_matrix.getWidth() / 2.0 - 1.5);
         uint8_t x1 = x0 + 2;
 
@@ -43,7 +43,7 @@ void FdBarsGrow::render(uint16_t relativeFrame)
 
 uint16_t FdBarsGrow::getFrameCount() const
 {
-    if (m_growHorizontal) {
+    if (isHorizontal()) {
         return m_matrix.getWidth() / 2 - 1;
     } else {
         return m_matrix.getHeight() / 2 - 1;
