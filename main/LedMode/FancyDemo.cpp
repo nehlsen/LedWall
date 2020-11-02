@@ -46,14 +46,17 @@ void FancyDemo::initParts()
     m_parts.push_back(new FdExplodingLetters(m_parts.back(), "1"));
     m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2021"));
     m_parts.push_back(new FdSprinkle(m_parts.back()));
+    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2021", REVERSE));
     m_parts.push_back(new FdColorRays(m_parts.back(), REVERSE));
     m_parts.push_back(new FdColorRays(m_parts.back()));
     m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2021"));
     m_parts.push_back(new FdBarsGrow(m_parts.back()));
     m_parts.push_back(new FdBarsOpen(m_parts.back()));
+    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2021", REVERSE));
     m_parts.push_back(new FdBarsOpen(m_parts.back(), REVERSE));
     m_parts.push_back(new FdBarsGrow(m_parts.back(), REVERSE));
     m_parts.push_back(new FdCubeGrow(m_parts.back()));
+    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2021"));
     m_parts.push_back(new FdCubeGrow(m_parts.back(), REVERSE));
     m_parts.push_back(new FdCubeRoll(m_parts.back()));
     m_parts.push_back(new FdColorRays(m_parts.back()));
@@ -65,6 +68,7 @@ void FancyDemo::initParts()
     m_parts.push_back(new FdBarsOpen(m_parts.back(), VERTICAL));
     m_parts.push_back(new FdCircleGrow(m_parts.back(), REVERSE));
     m_parts.push_back(new FdCircleGrow(m_parts.back(), REVERSE));
+    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2021", REVERSE));
     m_parts.push_back(new FdBarsOpen(m_parts.back(), PartOptions(VERTICAL | REVERSE)));
     m_parts.push_back(new FdBarsGrow(m_parts.back(), PartOptions(VERTICAL | REVERSE)));
 }

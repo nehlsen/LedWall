@@ -9,8 +9,7 @@ namespace LedWall::Mode {
 class FdExplodingLetters : public FancyDemoPart
 {
 public:
-    explicit FdExplodingLetters(uint16_t firstFrame, LedMatrix &matrix, const std::string &letters);
-    explicit FdExplodingLetters(FancyDemoPart *previousPart, const std::string &letters);
+    explicit FdExplodingLetters(FancyDemoPart *previousPart, const std::string &letters, PartOptions options = NO_OPS);
 
 protected:
     void renderImpl(uint16_t relativeFrame) override;

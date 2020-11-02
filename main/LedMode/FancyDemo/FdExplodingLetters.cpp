@@ -6,19 +6,15 @@ namespace LedWall::Mode {
 
 const uint16_t targetZoom = 750;
 
-FdExplodingLetters::FdExplodingLetters(uint16_t firstFrame, LedMatrix &matrix, const std::string &letters):
-    FancyDemoPart(firstFrame, matrix), m_letters(letters, CRGB::White)
-{}
-
-FdExplodingLetters::FdExplodingLetters(FancyDemoPart *previousPart, const std::string &letters):
-    FancyDemoPart(previousPart), m_letters(letters, CRGB::White)
+FdExplodingLetters::FdExplodingLetters(FancyDemoPart *previousPart, const std::string &letters, PartOptions options):
+    FancyDemoPart(previousPart, options), m_letters(letters, CRGB::White)
 {}
 
 void FdExplodingLetters::renderImpl(uint16_t relativeFrame)
 {
     Canvas c(m_letters.pixels());
     c
-        .setZoom(map(relativeFrame, 0, 25, 100, targetZoom))
+        .setZoom(map(relativeFrame, 0, getFrameCount(), 100, targetZoom))
         .applyTransformation()
         .renderCentered(m_matrix)
     ;
@@ -26,7 +22,7 @@ void FdExplodingLetters::renderImpl(uint16_t relativeFrame)
 
 uint16_t FdExplodingLetters::getFrameCount() const
 {
-    return 25; // one second
+    return 25; // 25 frames = one second
 }
 
 }
