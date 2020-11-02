@@ -7,11 +7,10 @@
 
 namespace LedWall::Mode {
 
-// start with ?, ?
 class FdColorRays : public FancyDemoPart
 {
 public:
-    explicit FdColorRays(FancyDemoPart *previousPart, bool directionForward);
+    using FancyDemoPart::FancyDemoPart;
 
 protected:
     void renderImpl(uint16_t relativeFrame) override;
@@ -19,8 +18,6 @@ protected:
 
     GfxPrimitive m_lines;
     void initLines();
-
-    const bool m_directionForward = true;
 };
 
 }

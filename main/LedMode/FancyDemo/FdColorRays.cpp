@@ -4,20 +4,16 @@ namespace LedWall::Mode {
 
 static const uint8_t degreesPerFrame = 10;
 
-FdColorRays::FdColorRays(FancyDemoPart *previousPart, bool directionForward):
-    FancyDemoPart(previousPart), m_directionForward(directionForward)
-{
-    initLines();
-}
-
 void FdColorRays::renderImpl(uint16_t relativeFrame)
 {
-//    if (frame < 0 || frame >= frameCount) return frameCount;
+    if (m_lines.pixels().empty()) {
+        initLines();
+    }
 
     Canvas c(m_lines.pixels());
 
     c
-        .setRotation((relativeFrame) * degreesPerFrame * (m_directionForward ? 1 : -1), c.getCenter())
+        .setRotation((relativeFrame) * degreesPerFrame, c.getCenter())
         .applyTransformation()
         .render(m_matrix, {int16_t(m_matrix.getWidth() / 2), int16_t(m_matrix.getHeight() / 2)})
     ;

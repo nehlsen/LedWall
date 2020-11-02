@@ -26,7 +26,7 @@ set(COMPONENT_SRCS
         "LedMode/FancyDemo/FdBarsOpen.cpp"
         "LedMode/FancyDemo/FancyDemoPart3.cpp"
         "LedMode/FancyDemo/FancyDemoPart4.cpp"
-        "LedMode/FancyDemo/FdRollingCube.cpp"
+        "LedMode/FancyDemo/FdCubeRoll.cpp"
         "LedMode/FancyDemo/FdColorRays.cpp"
         "LedMode/GameOfLife.cpp"
         )
