@@ -1,16 +1,16 @@
-#include "FancyDemoPart6.h"
+#include "FdColorRays.h"
 
 namespace LedWall::Mode {
 
 static const uint8_t degreesPerFrame = 10;
 
-FancyDemoPart6::FancyDemoPart6(FancyDemoPart *previousPart, bool directionForward):
+FdColorRays::FdColorRays(FancyDemoPart *previousPart, bool directionForward):
     FancyDemoPart(previousPart), m_directionForward(directionForward)
 {
     initLines();
 }
 
-void FancyDemoPart6::render(uint16_t relativeFrame)
+void FdColorRays::render(uint16_t relativeFrame)
 {
 //    if (frame < 0 || frame >= frameCount) return frameCount;
 
@@ -23,12 +23,12 @@ void FancyDemoPart6::render(uint16_t relativeFrame)
     ;
 }
 
-uint16_t FancyDemoPart6::getFrameCount() const
+uint16_t FdColorRays::getFrameCount() const
 {
     return 180 / degreesPerFrame + 1;
 }
 
-void FancyDemoPart6::initLines()
+void FdColorRays::initLines()
 {
     const int offset = 2;
     const int length = std::max(m_matrix.getHeight(), m_matrix.getWidth());

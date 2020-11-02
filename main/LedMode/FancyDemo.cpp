@@ -1,11 +1,13 @@
 #include <algorithm>
 #include "FancyDemo.h"
-#include "FancyDemo/FancyDemoPart1.h"
-#include "FancyDemo/FancyDemoPart2.h"
+#include "FancyDemo/FdBarsGrow.h"
+#include "FancyDemo/FdBarsOpen.h"
 #include "FancyDemo/FancyDemoPart3.h"
 #include "FancyDemo/FancyDemoPart4.h"
-#include "FancyDemo/FancyDemoPart5.h"
-#include "FancyDemo/FancyDemoPart6.h"
+#include "FancyDemo/FdRollingCube.h"
+#include "FancyDemo/FdColorRays.h"
+#include "FancyDemo/FdSprinkle.h"
+#include "FancyDemo/FdExplodingLetters.h"
 
 namespace LedWall::Mode {
 
@@ -32,13 +34,27 @@ bool FancyDemo::update()
 
 void FancyDemo::initParts()
 {
-    m_parts.push_back(new FancyDemoPart1(0, m_matrix));
-    m_parts.push_back(new FancyDemoPart2(m_parts.back()));
-    m_parts.push_back(new FancyDemoPart3(m_parts.back()));
-    m_parts.push_back(new FancyDemoPart4(m_parts.back()));
-    m_parts.push_back(new FancyDemoPart5(m_parts.back()));
-    m_parts.push_back(new FancyDemoPart6(m_parts.back(), true));
-    m_parts.push_back(new FancyDemoPart6(m_parts.back(), false));
+    m_parts.push_back(new FdExplodingLetters(0, m_matrix, "10"));
+//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "9"));
+//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "8"));
+//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "7"));
+//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "6"));
+//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "5"));
+//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "4"));
+//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "3"));
+//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2"));
+//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "1"));
+    m_parts.push_back(new FdBarsGrow(m_parts.back(), true));
+    m_parts.push_back(new FdBarsOpen(m_parts.back(), true));
+    m_parts.push_back(new FdBarsGrow(m_parts.back(), false));
+    m_parts.push_back(new FdBarsOpen(m_parts.back(), false));
+//    m_parts.push_back(new FancyDemoPart3(m_parts.back()));
+//    m_parts.push_back(new FancyDemoPart4(m_parts.back()));
+//    m_parts.push_back(new FdRollingCube(m_parts.back(), true));
+//    m_parts.push_back(new FdColorRays(m_parts.back(), true));
+//    m_parts.push_back(new FdColorRays(m_parts.back(), false));
+//    m_parts.push_back(new FdRollingCube(m_parts.back(), false));
+//    m_parts.push_back(new FdSprinkle(m_parts.back()));
 }
 
 FancyDemoPart *FancyDemo::getCurrentPart()

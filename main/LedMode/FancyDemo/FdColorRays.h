@@ -8,10 +8,10 @@
 namespace LedWall::Mode {
 
 // start with ?, ?
-class FancyDemoPart6 : public FancyDemoPart
+class FdColorRays : public FancyDemoPart
 {
 public:
-    explicit FancyDemoPart6(FancyDemoPart *previousPart, bool directionForward);
+    explicit FdColorRays(FancyDemoPart *previousPart, bool directionForward);
 
     void render(uint16_t relativeFrame) override;
 

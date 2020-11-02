@@ -22,12 +22,12 @@ set(COMPONENT_SRCS
         "LedMode/Wave.cpp"
         "LedMode/FancyDemo.cpp"
         "LedMode/FancyDemo/FancyDemoPart.cpp"
-        "LedMode/FancyDemo/FancyDemoPart1.cpp"
-        "LedMode/FancyDemo/FancyDemoPart2.cpp"
+        "LedMode/FancyDemo/FdBarsGrow.cpp"
+        "LedMode/FancyDemo/FdBarsOpen.cpp"
         "LedMode/FancyDemo/FancyDemoPart3.cpp"
         "LedMode/FancyDemo/FancyDemoPart4.cpp"
-        "LedMode/FancyDemo/FancyDemoPart5.cpp"
-        "LedMode/FancyDemo/FancyDemoPart6.cpp"
+        "LedMode/FancyDemo/FdRollingCube.cpp"
+        "LedMode/FancyDemo/FdColorRays.cpp"
         "LedMode/GameOfLife.cpp"
         )
 

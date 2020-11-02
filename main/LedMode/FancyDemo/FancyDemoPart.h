@@ -7,6 +7,15 @@ class LedMatrix;
 
 namespace LedWall::Mode {
 
+enum PartOptions {
+    FORWARD    = 0b0000,
+    REVERSE    = 0b0001,
+    HORIZONTAL = 0b0000,
+    VERTICAL   = 0b0010,
+
+    NO_OPS     = 0b0000,
+};
+
 class FancyDemoPart
 {
 public:

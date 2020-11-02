@@ -1,4 +1,4 @@
-#include "FancyDemoPart5.h"
+#include "FdRollingCube.h"
 #include <LedMatrix.h>
 #include <Canvas.h>
 #include <Rect.h>
@@ -12,7 +12,12 @@ namespace LedWall::Mode {
 // 360 / 15 = 24
 static const uint8_t degreesPerFrame = 15;
 
-void FancyDemoPart5::render(uint16_t relativeFrame)
+FdRollingCube::FdRollingCube(FancyDemoPart *previousPart, bool directionForward):
+    FancyDemoPart(previousPart), m_directionForward(directionForward)
+{
+}
+
+void FdRollingCube::render(uint16_t relativeFrame)
 {
 //    if (frame < 0 || frame >= frameCount) return frameCount;
 
@@ -25,7 +30,7 @@ void FancyDemoPart5::render(uint16_t relativeFrame)
     uint8_t h = cubeSize;
 
     Canvas c(Rect(x, y, w, h, CRGB::White).pixels());
-    c.setRotation((relativeFrame+1) * degreesPerFrame, c.getCenter())
+    c.setRotation((relativeFrame+1) * degreesPerFrame * (m_directionForward ? 1 : -1), c.getCenter())
             .applyTransformation()
 //     .render(m_matrix)
             .render(m_matrix, {int16_t((m_matrix.getWidth() - cubeSize) / 2), int16_t((m_matrix.getHeight() - cubeSize) / 2)})
@@ -33,7 +38,7 @@ void FancyDemoPart5::render(uint16_t relativeFrame)
             ;
 }
 
-uint16_t FancyDemoPart5::getFrameCount() const
+uint16_t FdRollingCube::getFrameCount() const
 {
     return 360 / degreesPerFrame;
 }

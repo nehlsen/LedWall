@@ -1,12 +1,12 @@
-#ifndef LEDWALL_FANCYDEMOPART2_H
-#define LEDWALL_FANCYDEMOPART2_H
+#ifndef LEDWALL_FANCYDEMOPART7_H
+#define LEDWALL_FANCYDEMOPART7_H
 
 #include "FancyDemoPart.h"
 
 namespace LedWall::Mode {
 
-// start with horizontal bars, open to the top and bottom
-class FancyDemoPart2 : public FancyDemoPart
+// sprinkle
+class FdSprinkle : public FancyDemoPart
 {
 public:
     using FancyDemoPart::FancyDemoPart;
@@ -19,4 +19,4 @@ protected:
 
 }
 
-#endif //LEDWALL_FANCYDEMOPART2_H
+#endif //LEDWALL_FANCYDEMOPART7_H

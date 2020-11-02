@@ -6,15 +6,17 @@
 namespace LedWall::Mode {
 
 // start with ?, rolling cube
-class FancyDemoPart5 : public FancyDemoPart
+class FdRollingCube : public FancyDemoPart
 {
 public:
-    using FancyDemoPart::FancyDemoPart;
+    explicit FdRollingCube(FancyDemoPart *previousPart, bool directionForward);
 
     void render(uint16_t relativeFrame) override;
 
 protected:
     uint16_t getFrameCount() const override;
+
+    const bool m_directionForward = true;
 };
 
 }

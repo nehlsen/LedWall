@@ -6,16 +6,18 @@
 namespace LedWall::Mode {
 
 // start with centered box, grow bars horizontally
-class FancyDemoPart1 : public FancyDemoPart
+class FdBarsGrow : public FancyDemoPart
 {
 public:
-    using FancyDemoPart::FancyDemoPart;
-//    explicit FancyDemoPart1(uint16_t firstFrame, LedMatrix &matrix);
+    explicit FdBarsGrow(uint16_t firstFrame, LedMatrix &matrix, bool growHorizontal);
+    explicit FdBarsGrow(FancyDemoPart *previousPart, bool growHorizontal);
 
     void render(uint16_t relativeFrame) override;
 
 protected:
     uint16_t getFrameCount() const override;
+
+    const bool m_growHorizontal;
 };
 
 }
