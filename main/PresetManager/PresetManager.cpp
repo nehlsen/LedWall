@@ -42,7 +42,7 @@ PresetList PresetManager::getPresets()
     ESP_LOGD(LOG_TAG, "getPresets");
 
     if (readPresetsFromFile()) {
-        ESP_LOGI(LOG_TAG, "getPresets, readPresets succeed: %d presets available", m_presetList.size());
+        ESP_LOGD(LOG_TAG, "getPresets, readPresets succeed: %d presets available", m_presetList.size());
     }
 
     return m_presetList;
@@ -174,7 +174,7 @@ bool PresetManager::readPresetsFromFile()
         ESP_LOGW(LOG_TAG, "readPresetsFromFile, first child of 'presets' is not an object, failed to load presets");
     }
 
-    ESP_LOGI(LOG_TAG, "readPresetsFromFile, read %d presets from disc", m_presetList.size());
+    ESP_LOGD(LOG_TAG, "readPresetsFromFile, read %d presets from disc", m_presetList.size());
 
     cJSON_free(allPresets);
     return true;
@@ -211,7 +211,7 @@ bool PresetManager::writePresetsToFile()
         return false;
     }
 
-    ESP_LOGI(LOG_TAG, "writePresetsToFile, written %d presets to disc", m_presetList.size());
+    ESP_LOGD(LOG_TAG, "writePresetsToFile, written %d presets to disc", m_presetList.size());
 
     free(writeBuffer);
     closePresetsFile();
