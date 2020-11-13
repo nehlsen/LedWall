@@ -9,6 +9,7 @@
 #include "ModeOptionsPersister.h"
 #include "events.h"
 #include "Config.h"
+#include "PresetManager/PresetManager.h"
 
 namespace LedWall {
 
@@ -123,15 +124,12 @@ uint8_t ModeController::getBrightness() const
 
 bool ModeController::setModeByName(const std::string &name)
 {
-    auto it = std::find_if(Mode::LedModes.begin(), Mode::LedModes.end(), [name](const Mode::LedModeDef_t &modeDef) {
-        return modeDef.name == name;
-    });
-
-    if (it != Mode::LedModes.end()) {
-        return setModeByIndex(distance(Mode::LedModes.begin(), it));
+    const int modeIndex = getModeIndex(name);
+    if (modeIndex < 0) {
+        return false;
     }
 
-    return false;
+    return setModeByIndex(modeIndex);
 }
 
 bool ModeController::setModeByIndex(int modeIndex)
@@ -155,13 +153,7 @@ bool ModeController::setModeByIndex(int modeIndex)
     }
     ModeOptionsPersister::load(newMode, Mode::LedModes.at(modeIndex).name);
 
-    turnAllLedsOff();
-    m_modeIndex = modeIndex;
-    delete m_ledMode;
-    m_ledMode = newMode;
-
-    Config::ledModeLast()->setValue(m_modeIndex);
-    esp_event_post(LEDWALL_EVENTS, LEDWALL_EVENT_MODE_CHANGED, (void*)&m_modeIndex, sizeof(m_modeIndex), portMAX_DELAY);
+    updateMode(modeIndex, newMode);
 
     return true;
 }
@@ -178,6 +170,51 @@ std::string ModeController::getModeName() const
     }
 
     return Mode::LedModes.at(getModeIndex()).name;
+}
+
+void ModeController::savePreset(const std::string &presetName)
+{
+    PresetManager pm;
+    pm.savePreset(presetName, Mode::LedModes.at(m_modeIndex).name, m_ledMode);
+}
+
+bool ModeController::loadPreset(const std::string &presetName)
+{
+    PresetManager pm;
+
+    if (!pm.hasPreset(presetName)) {
+        ESP_LOGE(LOG_TAG, "loadPreset(\"%s\"): FAILED, no such preset", presetName.c_str());
+        return false;
+    }
+    const auto preset = pm.getPreset(presetName);
+
+    const int modeIndex = getModeIndex(preset.getModeName());
+    if (modeIndex < 0) {
+        ESP_LOGE(LOG_TAG, "loadPreset(\"%s\"): FAILED, no such mode: \"%s\"", presetName.c_str(), preset.getModeName().c_str());
+        return false;
+    }
+
+    if (modeIndex == m_modeIndex) {
+        ESP_LOGW(LOG_TAG, "loadPreset(\"%s\"): current mode and requested mode are the same, just load options", presetName.c_str());
+    } else {
+        updateMode(modeIndex, Mode::LedModes.at(modeIndex).factory(*m_matrix));
+    }
+
+    m_ledMode->writeOptions(preset.getModeOptions());
+
+    return true;
+}
+
+void ModeController::deletePreset(const std::string &presetName)
+{
+    PresetManager pm;
+    pm.deletePreset(presetName);
+}
+
+void ModeController::deleteAllPresets()
+{
+    PresetManager pm;
+    pm.deleteAllPresets();
 }
 
 bool ModeController::setModeOptions(cJSON *optionsObject)
@@ -198,7 +235,7 @@ bool ModeController::setModeOptions(cJSON *optionsObject)
     return optionsHaveBeenSet;
 }
 
-void ModeController::getModeOptions(cJSON *optionsObject)
+void ModeController::getModeOptions(cJSON *optionsObject) const
 {
     if (nullptr == getLedMode()) {
         return;
@@ -213,6 +250,31 @@ void ModeController::getModeOptions(cJSON *optionsObject)
 Mode::LedMode* ModeController::getLedMode() const
 {
     return m_ledMode;
+}
+
+void ModeController::updateMode(int newModeIndex, Mode::LedMode *newMode)
+{
+    turnAllLedsOff();
+
+    m_modeIndex = newModeIndex;
+    delete m_ledMode;
+    m_ledMode = newMode;
+
+    Config::ledModeLast()->setValue(m_modeIndex);
+    esp_event_post(LEDWALL_EVENTS, LEDWALL_EVENT_MODE_CHANGED, (void*)&m_modeIndex, sizeof(m_modeIndex), portMAX_DELAY);
+}
+
+int ModeController::getModeIndex(const std::string &name)
+{
+    auto it = std::find_if(Mode::LedModes.begin(), Mode::LedModes.end(), [name](const Mode::LedModeDef_t &modeDef) {
+        return modeDef.name == name;
+    });
+
+    if (it == Mode::LedModes.end()) {
+        return -1;
+    }
+
+    return distance(Mode::LedModes.begin(), it);
 }
 
 void ModeController::setLedUpdateTaskEnabled(bool enabled)

@@ -8,7 +8,7 @@
 namespace LedWall {
 
 static const char *LOG_TAG = "ModeOptionsPersister";
-static const int READ_BUFFER_SIZE = 2 * 1024;
+static const int READ_BUFFER_SIZE = 2 * 1024; // FIXME is used for write too
 static const int MAX_FILE_NAME_LENGTH = 10;
 
 bool ModeOptionsPersister::save(Mode::LedMode *ledMode, const char *modeName)
@@ -28,8 +28,8 @@ bool ModeOptionsPersister::reset(Mode::LedMode *ledMode, const char *modeName)
 
 ModeOptionsPersister::ModeOptionsPersister()
 {
-    m_cfgFileName = (char*)calloc(MAX_FILE_NAME_LENGTH, sizeof(char));
-    m_readBuffer = (char*)calloc(READ_BUFFER_SIZE, sizeof(char));
+    m_cfgFileName = (char*)calloc(MAX_FILE_NAME_LENGTH, sizeof(char)); // FIXME do we really need an alloc?!
+    m_readBuffer = (char*)calloc(READ_BUFFER_SIZE, sizeof(char)); // FIXME only allocate on actual read
 }
 
 ModeOptionsPersister::~ModeOptionsPersister()
@@ -92,7 +92,6 @@ bool ModeOptionsPersister::loadOptions(Mode::LedMode *ledMode, const char *modeN
         return false;
     }
 
-//    fread(readBuffer, READ_BUFFER_SIZE, 1, cfgFile);
     fread(m_readBuffer, sizeof(char), READ_BUFFER_SIZE, m_cfgFile);
     if (ferror(m_cfgFile)) {
         ESP_LOGE(LOG_TAG, "loadOptions, Failed to read file : %s", m_cfgFileName);

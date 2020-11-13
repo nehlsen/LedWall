@@ -100,6 +100,18 @@ void MqttAdapter::setupSubscribers()
         m_controller->setModeOptions(optionsObject);
         cJSON_Delete(optionsObject);
     });
+    mqtt->createSubscriber("preset/save", [this](const std::string &value) {
+        m_controller->savePreset(value);
+    });
+    mqtt->createSubscriber("preset/load", [this](const std::string &value) {
+        m_controller->loadPreset(value);
+    });
+    mqtt->createSubscriber("preset/delete", [this](const std::string &value) {
+        m_controller->deletePreset(value);
+    });
+    mqtt->createSubscriber("preset/clear", [this](const std::string &value) {
+        m_controller->deleteAllPresets();
+    });
     mqtt->createSubscriber("reboot", [this](const std::string &value) {
         m_controller->triggerSystemReboot();
     });

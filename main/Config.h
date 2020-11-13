@@ -26,6 +26,7 @@ struct Config
     static EBLi::ConfigProperty *powerOnMode();
     static EBLi::ConfigProperty *powerLastState();
     static EBLi::ConfigProperty *ledModeAutoRestore();
+    //! last used led-mode (will be restored on power up)
     static EBLi::ConfigProperty *ledModeLast();
 
     static bool isPoweredOnBoot();

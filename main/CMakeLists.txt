@@ -3,6 +3,9 @@ set(COMPONENT_SRCS
         "Config.cpp"
         "ModeOptionsPersister.cpp"
 
+        "PresetManager/PresetManager.cpp"
+        "PresetManager/Preset.cpp"
+
         "ModeController.cpp"
         "LedMode/LedMode.cpp"
         "LedMode/LedModes.cpp"

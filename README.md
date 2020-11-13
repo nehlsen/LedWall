@@ -72,6 +72,10 @@ In case of e.g. `/cmd/power` this results in `mywall/cmd/power` and `all-my-wall
 | /cmd/mode/index    | int          | 0-x, mode index        |
 | /cmd/mode/name     | string       | mode name              |
 | /cmd/mode/options  | string/json  | mode options           |
+| /cmd/preset/save   | string       | preset name            |
+| /cmd/preset/load   | string       | preset name            |
+| /cmd/preset/delete | string       | preset name            |
+| /cmd/preset/clear  | -none-       | -none-                 |
 | /cmd/reboot        | -none-       | -none-                 |
 
 Following Topics are **published** by the device. Each Topic is published once per device-topic.
