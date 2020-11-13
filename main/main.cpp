@@ -71,6 +71,8 @@ void app_main()
 
     #if defined(CONFIG_ENABLE_REST)
     auto *server = new LedWall::WebServer(controller, updater);
+    // server auto-starts once the IP is ready - this should already be the case. start manually...
+    server->startServer();
     #endif
 }
 

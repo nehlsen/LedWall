@@ -49,6 +49,8 @@ static void on_got_ip(void *event_handler_arg, esp_event_base_t event_base, int3
 WebServer::WebServer(ModeController *controller, EBLi::OtaUpdater *otaUpdater):
     m_controller(controller), m_otaUpdater(otaUpdater)
 {
+    ESP_LOGI(WEBSERVER_LOG_TAG, "Creating server, waiting for IP to start...");
+
     esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &on_got_ip, this);
 }
 
