@@ -69,6 +69,8 @@ void FileResponseHandler::setMimeType()
         type = "image/x-icon";
     } else if (isFileExtension(".svg")) {
         type = "text/xml";
+    } else if (isFileExtension(".json")) {
+        type = "application/json";
     }
     httpd_resp_set_type(m_request, type);
 
