@@ -3,11 +3,11 @@
 namespace LedWall::Mode {
 
 FancyDemoPart::FancyDemoPart(uint16_t firstFrame, LedMatrix &matrix, PartOptions options):
-    m_matrix(matrix), m_firstFrame(firstFrame), m_options(options)
+    m_matrix(matrix), m_options(options), m_firstFrame(firstFrame)
 {}
 
 FancyDemoPart::FancyDemoPart(FancyDemoPart *previousPart, PartOptions options):
-    m_matrix(previousPart->m_matrix), m_firstFrame(previousPart->getLastFrame() + 1), m_options(options)
+    m_matrix(previousPart->m_matrix), m_options(options), m_firstFrame(previousPart->getLastFrame() + 1)
 {}
 
 uint16_t FancyDemoPart::getFirstFrame() const

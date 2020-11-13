@@ -1,5 +1,5 @@
-#ifndef LEDWALLSTUDIO_FDNHEARTC_H
-#define LEDWALLSTUDIO_FDNHEARTC_H
+#ifndef LEDWALL_FDNHEARTC_H
+#define LEDWALL_FDNHEARTC_H
 
 #include "FancyDemoPart.h"
 
@@ -17,4 +17,4 @@ protected:
 
 }
 
-#endif //LEDWALLSTUDIO_FDNHEARTC_H
+#endif //LEDWALL_FDNHEARTC_H

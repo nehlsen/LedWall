@@ -1,5 +1,5 @@
-#ifndef LEDWALLSTUDIO_FDCUBEGROW_H
-#define LEDWALLSTUDIO_FDCUBEGROW_H
+#ifndef LEDWALL_FDCUBEGROW_H
+#define LEDWALL_FDCUBEGROW_H
 
 #include "FancyDemoPart.h"
 
@@ -17,4 +17,4 @@ protected:
 
 }
 
-#endif //LEDWALLSTUDIO_FDCUBEGROW_H
+#endif //LEDWALL_FDCUBEGROW_H

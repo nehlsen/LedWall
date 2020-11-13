@@ -1,5 +1,5 @@
-#ifndef LEDWALLSTUDIO_NOTHING_H
-#define LEDWALLSTUDIO_NOTHING_H
+#ifndef LEDWALL_NOTHING_H
+#define LEDWALL_NOTHING_H
 
 #include "FancyDemoPart.h"
 
@@ -18,4 +18,4 @@ protected:
 }
 
 
-#endif //LEDWALLSTUDIO_NOTHING_H
+#endif //LEDWALL_NOTHING_H

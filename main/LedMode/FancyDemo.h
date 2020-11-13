@@ -2,6 +2,7 @@
 #define LEDWALL_FANCYDEMO_H
 
 #include "LedMode.h"
+#include <vector>
 
 namespace LedWall::Mode {
 
@@ -15,10 +16,6 @@ public:
 
 protected:
     uint16_t m_frame = 0;
-
-    int16_t part6a(int16_t frame);
-    int16_t part6b(int16_t frame);
-    int16_t part6_abs(int16_t frame, bool forward);
 
     std::vector<FancyDemoPart*> m_parts;
     void initParts();
