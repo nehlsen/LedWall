@@ -3,7 +3,6 @@
 #include "../events.h"
 #include "../LedMode/LedModes.h"
 #include <Mqtt.h>
-#include <MqttPublisher.h>
 #include <esp_log.h>
 #include <cJSON.h>
 
@@ -72,7 +71,7 @@ void MqttAdapter::setupPublishers()
 {
     auto mqtt = EBLi::Mqtt::instance();
 
-    m_publisherPower = mqtt->createPublisher("power");
+    m_publisherPower = mqtt->createPublisher("power", EBLi::MqttPublisher::RetainValue);
     m_publisherBrightness = mqtt->createPublisher("brightness");
     m_publisherModeIndex = mqtt->createPublisher("mode/index");
     m_publisherModeName = mqtt->createPublisher("mode/name");
