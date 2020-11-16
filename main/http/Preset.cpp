@@ -83,6 +83,7 @@ std::vector<EBLi::http::module::HttpModule::HttpEndpoint> Preset::getHttpEndpoin
 
     auto deleteAllPresets = [=](httpd_req_t *request) {
         LedWall::ModeController::deleteAllPresets();
+        httpd_resp_send(request, "", 0);
         return ESP_OK;
     };
 
