@@ -7,7 +7,12 @@
 #include "Config.h"
 
 #if defined(CONFIG_ENABLE_REST)
-#include "WebServer.h"
+#include <WebServer.h>
+#include "http/Power.h"
+#include "http/Mode.h"
+#include "http/ModeOptions.h"
+#include "http/ModeList.h"
+#include "http/Preset.h"
 #endif
 
 #if defined(CONFIG_ENABLE_MQTT)
@@ -63,16 +68,19 @@ void app_main()
 
     auto controller = new LedWall::ModeController;
 
-    auto updater = new EBLi::OtaUpdater;
+    auto updater = new EBLi::OtaUpdater; // FIXME shouldn't this be in ebli:init_all ?!
 
     #if defined(CONFIG_ENABLE_MQTT)
     auto mqtt = new LedWall::MqttAdapter(controller);
     #endif
 
     #if defined(CONFIG_ENABLE_REST)
-    auto *server = new LedWall::WebServer(controller, updater);
-    // server auto-starts once the IP is ready - this should already be the case. start manually...
-    server->startServer();
+    auto server = EBLi::http::WebServer::instance();
+    server->addModule(new LedWall::http::Power(controller));
+    server->addModule(new LedWall::http::Mode(controller));
+    server->addModule(new LedWall::http::ModeOptions(controller));
+    server->addModule(new LedWall::http::ModeList());
+    server->addModule(new LedWall::http::Preset(controller));
     #endif
 }
 

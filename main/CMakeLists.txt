@@ -41,10 +41,7 @@ set(COMPONENT_SRCS
         )
 
 if(CONFIG_ENABLE_CAM)
-    set(COMPONENT_SRCS
-            ${COMPONENT_SRCS}
-            "LedMode/Camera.cpp"
-            )
+    list(APPEND COMPONENT_SRCS LedMode/Camera.cpp)
 #    set(EXTRA_COMPONENT_DIRS ../../esp/components/esp32-camera)
     message(STATUS "LedWall: CAM Driver enabled")
 else()
@@ -52,21 +49,14 @@ else()
 endif()
 
 if(CONFIG_ENABLE_REST)
-    set(COMPONENT_SRCS
-            ${COMPONENT_SRCS}
-            "WebServer.cpp"
-            "WebServer/FileResponseHandler.cpp"
-            )
+    list(APPEND COMPONENT_SRCS http/Power.cpp http/Mode.cpp http/ModeOptions.cpp http/ModeList.cpp http/Preset.cpp)
     message(STATUS "LedWall: REST Interface enabled")
 else()
     message(STATUS "LedWall: REST Interface disabled")
 endif()
 
 if(CONFIG_ENABLE_MQTT)
-    set(COMPONENT_SRCS
-            ${COMPONENT_SRCS}
-            "mqtt/MqttAdapter.cpp"
-            )
+    list(APPEND COMPONENT_SRCS mqtt/MqttAdapter.cpp)
     message(STATUS "LedWall: MQTT Interface enabled")
 else()
     message(STATUS "LedWall: MQTT Interface disabled")
