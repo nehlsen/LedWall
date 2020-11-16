@@ -52,6 +52,10 @@ bool PresetManager::hasPreset(const std::string &presetName)
 {
     ESP_LOGD(LOG_TAG, "hasPreset(%s)", presetName.c_str());
 
+    if (!Preset::isValidName(presetName)) {
+        return false;
+    }
+
     getPresets(); // FIXME [load] make sure load-from-file is triggered
 
     return findPresetByName(presetName) != m_presetList.end();
@@ -69,9 +73,13 @@ Preset PresetManager::getPreset(const std::string &presetName)
     return *findPresetByName(presetName);
 }
 
-void PresetManager::savePreset(const std::string &presetName, const char *modeName, Mode::LedMode *ledMode)
+bool PresetManager::savePreset(const std::string &presetName, const char *modeName, Mode::LedMode *ledMode)
 {
     ESP_LOGD(LOG_TAG, "savePreset(%s)", presetName.c_str());
+
+    if (!Preset::isValidName(presetName)) {
+        return false;
+    }
 
     // FIXME [load] relies on hasPreset to load-from-file
     if (hasPreset(presetName)) {
@@ -79,28 +87,28 @@ void PresetManager::savePreset(const std::string &presetName, const char *modeNa
     }
 
     createPreset(presetName, modeName, ledMode);
-    writePresetsToFile();
+    return writePresetsToFile();
 }
 
-void PresetManager::deletePreset(const std::string &presetName)
+bool PresetManager::deletePreset(const std::string &presetName)
 {
     ESP_LOGD(LOG_TAG, "deletePreset(%s)", presetName.c_str());
 
     // FIXME [load] relies on hasPreset to load-from-file
     if (!hasPreset(presetName)) {
-        return;
+        return false;
     }
 
     m_presetList.erase(findPresetByName(presetName));
-    writePresetsToFile();
+    return writePresetsToFile();
 }
 
-void PresetManager::deleteAllPresets()
+bool PresetManager::deleteAllPresets()
 {
     ESP_LOGD(LOG_TAG, "deleteAllPresets");
 
     m_presetList.clear();
-    writePresetsToFile();
+    return writePresetsToFile();
 }
 
 bool PresetManager::openPresetsFile(bool openForWriting)

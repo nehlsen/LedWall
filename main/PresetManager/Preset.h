@@ -20,8 +20,11 @@ public:
     void setModeName(const std::string &modeName);
 
     bool hasModeOptions() const;
-    cJSON *getModeOptions() const;
+    [[nodiscard]] cJSON *getModeOptions() const;
     void setModeOptions(cJSON *modeOptions);
+
+    static const uint8_t ValidNameLength = 16;
+    static bool isValidName(const std::string &presetName);
 
 private:
     std::string m_presetName;

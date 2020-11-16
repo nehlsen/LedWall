@@ -48,4 +48,16 @@ void Preset::setModeOptions(cJSON *modeOptions)
     m_modeOptions = modeOptions;
 }
 
+bool Preset::isValidName(const std::string &presetName)
+{
+    if (presetName.length() < 1) {
+        return false;
+    }
+    if (presetName.length() > ValidNameLength) {
+        return false;
+    }
+
+    return true;
+}
+
 }

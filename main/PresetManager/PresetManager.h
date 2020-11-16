@@ -20,9 +20,9 @@ public:
 
     bool hasPreset(const std::string &presetName);
     Preset getPreset(const std::string &presetName);
-    void savePreset(const std::string &presetName, const char *modeName, Mode::LedMode *ledMode);
-    void deletePreset(const std::string &presetName);
-    void deleteAllPresets();
+    bool savePreset(const std::string &presetName, const char *modeName, Mode::LedMode *ledMode);
+    bool deletePreset(const std::string &presetName);
+    bool deleteAllPresets();
 
 private:
     FILE *m_presetsFile = nullptr;
