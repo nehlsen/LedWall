@@ -68,7 +68,7 @@ void app_main()
 
     auto controller = new LedWall::ModeController;
 
-    auto updater = new EBLi::OtaUpdater; // FIXME shouldn't this be in ebli:init_all ?!
+    auto updater = new EBLi::ota::OtaUpdater; // FIXME shouldn't this be in ebli:init_all ?!
 
     #if defined(CONFIG_ENABLE_MQTT)
     auto mqtt = new LedWall::MqttAdapter(controller);
