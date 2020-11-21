@@ -53,7 +53,7 @@ bool ModeText::update()
 
 void ModeText::readOptions(cJSON *root)
 {
-    auto jsonAddColorCode = [root](char *key, const CRGB &color) {
+    auto jsonAddColorCode = [root](const char *key, const CRGB &color) {
         int colorCode = (color.r << 16) + (color.g << 8) + (color.b);
         char *buf = (char*)malloc(8);
         sprintf(buf, "#%06x", colorCode);

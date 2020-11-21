@@ -1,25 +1,19 @@
 #include "ModeTime.h"
-//#include <Delayer.h>
 #include <esp_log.h>
 #include <cJSON.h>
 
 namespace LedWall::Mode {
 
-ModeTime::ModeTime(LedMatrix &matrix): ModeText(matrix)
+ModeTime::ModeTime(LedMatrix &matrix): ModeText(matrix), m_updateDelay(1000)
 {
     setScrollMode(ScrollNone);
 }
 
 bool ModeTime::update()
 {
-//    EBLi::Delayer delayer;
-
-    const uint16_t delay = 1000;
-    int64_t currentTime = esp_timer_get_time() / 1000;
-    if ((currentTime - m_lastTimeUpdate < delay) && m_lastTimeUpdate > 0) {
+    if (!m_updateDelay.isTimedOut()) {
         return false;
     }
-    m_lastTimeUpdate = currentTime;
 
     static bool isOdd = false;
     isOdd = !isOdd;
@@ -123,7 +117,7 @@ void ModeTime::setVariantCountUp()
     setVariantParameter(0);
 }
 
-void ModeTime::showTime(bool isOddSecond)
+void ModeTime::showTime(bool includeColon)
 {
     std::time_t now = std::time(nullptr);
 
@@ -131,12 +125,12 @@ void ModeTime::showTime(bool isOddSecond)
     localtime_r(&now, &timeinfo);
 
     char strftime_buf[64];
-    strftime(strftime_buf, sizeof(strftime_buf), (isOddSecond ? "%H %M" : "%H:%M"), &timeinfo);
+    strftime(strftime_buf, sizeof(strftime_buf), (includeColon ? "%H:%M" : "%H %M"), &timeinfo);
 
     setText(strftime_buf);
 }
 
-void ModeTime::showCountDown(bool isOddSecond)
+void ModeTime::showCountDown(bool includeColon)
 {
     /**
      * TODO
@@ -146,8 +140,7 @@ void ModeTime::showCountDown(bool isOddSecond)
      * more than 99d? "8" rotated by 90 degrees, infinity! :)
      */
 
-
-    std::string remainingTime = formatSeconds(m_variantParameter, isOddSecond);
+    std::string remainingTime = formatSeconds(m_variantParameter, includeColon);
 
     if (m_variantParameter > 0) {
         --m_variantParameter;
@@ -156,16 +149,16 @@ void ModeTime::showCountDown(bool isOddSecond)
     setText(remainingTime);
 }
 
-void ModeTime::showCountUp(bool isOddSecond)
+void ModeTime::showCountUp(bool includeColon)
 {
-    std::string timeSoFar = formatSeconds(m_variantParameter, isOddSecond);
+    std::string timeSoFar = formatSeconds(m_variantParameter, includeColon);
 
     ++m_variantParameter;
 
     setText(timeSoFar);
 }
 
-std::string ModeTime::formatSeconds(int secondsToFormat, bool includeSplittingDots)
+std::string ModeTime::formatSeconds(int secondsToFormat, bool includeColon)
 {
     std::string formattedSeconds;
 
@@ -176,7 +169,7 @@ std::string ModeTime::formatSeconds(int secondsToFormat, bool includeSplittingDo
     formattedSeconds += (minutes < 10 ? "0" : "");
     formattedSeconds += std::to_string(minutes);
 
-    formattedSeconds += (includeSplittingDots ? " " : ":");
+    formattedSeconds += (includeColon ? ":" : " ");
 
     formattedSeconds += (seconds < 10 ? "0" : "");
     formattedSeconds += std::to_string(seconds);
@@ -218,7 +211,7 @@ std::time_t ModeTime::parseDateTimeParameter(const char *dateTimeString)
     // (1) accepted date format: "yyyy-mm-dd HH:mm:ss"
     // (2) accepted date format: "yyyy-mm-dd" -> time: 00:00:00
 
-    // FIXME possible issue: if target time is once-second-ago, parser will return -1 -> same as error value :(
+    // FIXME possible issue: if target time is one-second-ago, parser will return -1 -> same as error value :(
 
     std::time_t targetTime = parseDateTime(dateTimeString);
     if (targetTime != -1) {

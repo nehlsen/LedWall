@@ -2,6 +2,7 @@
 #define LEDWALL_MODETIME_H
 
 #include "ModeText.h"
+#include <Delayer.h>
 #include <ctime>
 
 namespace LedWall::Mode {
@@ -36,15 +37,15 @@ public:
 //    void setVariantCountSince();
 
 private:
-    int64_t m_lastTimeUpdate = 0;
+    EBLi::Utility::Delayer m_updateDelay;
     Variant m_variant = Variant::VariantTime;
     int m_variantParameter = 0;
 
-    void showTime(bool isOddSecond);
-    void showCountDown(bool isOddSecond);
-    void showCountUp(bool isOddSecond);
+    void showTime(bool includeColon);
+    void showCountDown(bool includeColon);
+    void showCountUp(bool includeColon);
 
-    static std::string formatSeconds(int seconds, bool includeSplittingDots);
+    static std::string formatSeconds(int seconds, bool includeColon);
 
     void setCountDownToParameter(const char *dateTimeString);
     void setCountSinceParameter(const char *dateTimeString);
