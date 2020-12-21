@@ -9,6 +9,9 @@ class TimeFormatter
 {
 public:
     static std::string formatSeconds(int secondsToFormat, bool includeColon);
+
+private:
+    static std::string formatTwoTimeParts(int partOne, int partTwo, bool includeColon);
 };
 
 }
