@@ -14,9 +14,11 @@
 #include "FancyDemo/FdCircleGrow.h"
 #include "FancyDemo/FdNHeartC.h"
 
-#include <iostream>
+//#include <iostream>
 
 namespace LedWall::Mode {
+
+static const uint8_t curtainTime = 9;
 
 NewYearsEve::NewYearsEve(LedMatrix &matrix):
     ModeText(matrix)
@@ -28,17 +30,16 @@ NewYearsEve::NewYearsEve(LedMatrix &matrix):
 bool NewYearsEve::update()
 {
     int remainingSeconds = secondsUntilNewYears();
-    if (remainingSeconds > 5) {
+    if (remainingSeconds > curtainTime) {
         return renderCountdown(remainingSeconds);
-    } else if (remainingSeconds >= 1 && m_parts.size() < 5) {
+    } else if (remainingSeconds >= 1 && m_parts.size() < 5) { // 5 ?! assume 5 or less parts are the curtain and not the final animation
         m_parts.push_back(new Nothing(0, m_matrix));
 
-        m_parts.push_back(new FdExplodingLetters(m_parts.back(), "5"));
-        m_parts.push_back(new FdExplodingLetters(m_parts.back(), "4"));
-        m_parts.push_back(new FdExplodingLetters(m_parts.back(), "3"));
-        m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2"));
-        m_parts.push_back(new FdExplodingLetters(m_parts.back(), "1"));
-    } else if (remainingSeconds < 1 && m_parts.size() < 10) {
+        for (int i = curtainTime; i > 0; --i) {
+            m_parts.push_back(new FdExplodingLetters(m_parts.back(), std::to_string(i)));
+        }
+
+    } else if (remainingSeconds < 1 && m_parts.size() < 15) { // 15 ?! assume final animation has at least 15 parts
         initParts();
     }
 
@@ -78,13 +79,9 @@ FancyDemoPart * NewYearsEve::getCurrentPart()
 
 void NewYearsEve::initParts()
 {
+    m_parts.clear();
     m_parts.push_back(new Nothing(0, m_matrix));
 
-//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "5"));
-//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "4"));
-//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "3"));
-//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2"));
-//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "1"));
     m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2021"));
     m_parts.push_back(new FdSprinkle(m_parts.back()));
     m_parts.push_back(new FdExplodingLetters(m_parts.back(), "2021", REVERSE));
@@ -115,18 +112,9 @@ void NewYearsEve::initParts()
     m_parts.push_back(new FdNHeartC(m_parts.back()));
 }
 
-//bool NewYearsEve::renderCurtain(int remainingSeconds)
-//{
-//    m_parts.clear();
-//    m_parts.push_back(new Nothing(0, m_matrix));
-//    m_parts.push_back(new FdExplodingLetters(m_parts.back(), "5"));
-//
-//    std::to_string(remainingSeconds)
-//}
-
 bool NewYearsEve::renderCountdown(int remainingSeconds)
 {
-    setText(TimeFormatter::formatSeconds(remainingSeconds, true));
+    setText(TimeFormatter::formatSeconds(remainingSeconds, remainingSeconds%2));
     return ModeText::update();
 }
 
@@ -137,7 +125,10 @@ void NewYearsEve::initTargetTime()
     memcpy(&m_targetTime, tmnow, sizeof(std::tm));
 
     if (true) {
-        m_targetTime.tm_min += 5;
+//        m_targetTime.tm_mday += 1;
+//        m_targetTime.tm_hour += 1;
+//        m_targetTime.tm_min += 1;
+        m_targetTime.tm_sec += 18;
     } else {
         m_targetTime.tm_year += 1;
         m_targetTime.tm_mon = 0;
@@ -149,42 +140,13 @@ void NewYearsEve::initTargetTime()
 
     char s_targetTime[100];
     strftime(s_targetTime, sizeof s_targetTime, "%c\n", &m_targetTime);
-    ESP_LOGI("NewYearsEve", "initTargetTime: %s", s_targetTime);
-    std::cout << s_targetTime << std::endl;
+//    ESP_LOGI("NewYearsEve", "initTargetTime: %s", s_targetTime);
+//    std::cout << "initTargetTime: " << s_targetTime << std::endl;
 }
 
 int NewYearsEve::secondsUntilNewYears()
 {
-//    std::tm tm_targetTime{};
-//    if (true) {
-//        std::time_t tnow = std::time(nullptr);
-//        std::tm *tmnow = std::localtime(&tnow);
-//        memcpy(&tm_targetTime, tmnow, sizeof(std::tm));
-//        tm_targetTime.tm_min += 5;
-//
-////        tm_targetTime.tm_year = 2020 - 1900;
-////        tm_targetTime.tm_mon = 11;
-////        tm_targetTime.tm_mday = 21;
-////        tm_targetTime.tm_hour = 9;
-////        tm_targetTime.tm_min = 10;
-////        tm_targetTime.tm_sec = 0;
-////        tm_targetTime.tm_isdst = -1; // detect/guess whether we need daylight saving
-//
-//        char s_targetTime[100];
-//        strftime(s_targetTime, sizeof s_targetTime, "%c\n", &tm_targetTime);
-//        ESP_LOGI("NewYearsEve", "test target time %s", s_targetTime);
-//    } else {
-//        tm_targetTime.tm_year = 2021;
-//        tm_targetTime.tm_mon = 0;
-//        tm_targetTime.tm_mday = 1;
-//        tm_targetTime.tm_hour = 0;
-//        tm_targetTime.tm_min = 0;
-//        tm_targetTime.tm_sec = 0;
-//    }
-
-//    std::time_t targetTime = std::mktime(&tm_targetTime);
     std::time_t targetTime = std::mktime(&m_targetTime);
-
     std::time_t now = std::time(nullptr);
     return std::ceil(std::difftime(targetTime, now));
 }

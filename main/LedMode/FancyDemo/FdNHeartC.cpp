@@ -30,7 +30,7 @@ void FdNHeartC::renderImpl(uint16_t relativeFrame)
 
 uint16_t FdNHeartC::getFrameCount() const
 {
-    return 37;
+    return 28;
 }
 
 }
