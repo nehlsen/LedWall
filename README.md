@@ -87,3 +87,25 @@ Following Topics are **published** by the device. Each Topic is published once p
 | /state/mode/index    | int          | 0-x, mode index        |
 | /state/mode/name     | string       | mode name              |
 | /state/mode/options  | string/json  | mode options           |
+
+## HTTP API / RESTful API
+
+| HTTP | Path `/api/v2/...` | Description |
+| ---- | ------------------ |------------ |
+| GET  | /led/mode          | Get current Mode and Options |
+| POST | /led/mode          | Set current Mode (either by name or index) |
+| GET  | /led/modes         | Get a list of available modes |
+| POST | /led/mode/options  | Set options of currently running mode |
+| GET  | /led/power         | Get current power state |
+| POST | /led/power         | power on/off |
+| GET  | /led/presets       | get a list of available presets |
+| POST | /led/preset/save   | save preset |
+| POST | /led/preset/load   | load preset |
+| POST | /led/preset/delete | delete preset |
+| POST | /led/preset/clear  | delete all stored Presets |
+| EBLi |||
+| POST | /system/reboot | ... |
+| GET  | /system/info | ... |
+| GET  | /fs/* | ... |
+| GET  | /config | ... |
+| POST | /config | ... |
