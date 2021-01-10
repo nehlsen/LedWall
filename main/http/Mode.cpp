@@ -8,8 +8,12 @@ Mode::Mode(ModeController *controller) : m_controller(controller)
 
 std::vector<EBLi::http::module::HttpModule::HttpEndpoint> Mode::getHttpEndpoints() const
 {
-    auto createLedModeData = [=]() {
+    auto createLedModeData = [=]() -> cJSON* {
         cJSON *root = cJSON_CreateObject();
+        if (nullptr == root) {
+            return nullptr;
+        }
+
         cJSON_AddNumberToObject(root, "index", m_controller->getModeIndex());
         cJSON_AddStringToObject(root, "name", ::LedWall::Mode::LedModes.at(m_controller->getModeIndex()).name);
 
