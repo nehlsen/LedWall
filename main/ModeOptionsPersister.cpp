@@ -45,7 +45,7 @@ bool ModeOptionsPersister::saveOptions(Mode::LedMode *ledMode, const char *modeN
     ESP_LOGD(LOG_TAG, "saveOptions %s", modeName);
 
     if (strlen(modeName) > MAX_FILE_NAME_LENGTH) {
-        ESP_LOGE(LOG_TAG, "saveOptions, mode name is too long, options can not be saved");
+        ESP_LOGE(LOG_TAG, "saveOptions, mode name \"%s\" is too long, options can not be saved", modeName);
         return false;
     }
 
@@ -80,7 +80,7 @@ bool ModeOptionsPersister::loadOptions(Mode::LedMode *ledMode, const char *modeN
     ESP_LOGD(LOG_TAG, "loadOptions %s", modeName);
 
     if (strlen(modeName) > MAX_FILE_NAME_LENGTH) {
-        ESP_LOGE(LOG_TAG, "loadOptions, mode name is too long, options can not be saved");
+        ESP_LOGE(LOG_TAG, "loadOptions, mode name \"%s\" is too long, options can not be restored", modeName);
         return false;
     }
 
