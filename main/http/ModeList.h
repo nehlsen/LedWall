@@ -8,7 +8,13 @@ namespace LedWall::http {
 class ModeList: public EBLi::http::module::HttpModule
 {
 public:
-    [[nodiscard]] std::vector<HttpEndpoint> getHttpEndpoints() const override;
+    ModeList();
+
+    [[nodiscard]] std::vector<httpd_uri_t *> getHandlers() override;
+
+private:
+    httpd_uri_t m_get_mode_list_uri;
+    static esp_err_t getModeListHttpHandler(httpd_req_t *request);
 };
 
 }

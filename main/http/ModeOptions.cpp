@@ -3,51 +3,78 @@
 
 namespace LedWall::http {
 
-ModeOptions::ModeOptions(ModeController *controller) : m_controller(controller)
+ModeOptions::ModeOptions(ModeController *controller):
+    m_controller(controller),
+    m_get_mode_options_uri {
+        .uri = BASE_URI "/led/mode/options",
+        .method = http_method::HTTP_GET,
+        .handler = ModeOptions::getModeOptionsHttpHandler,
+        .user_ctx = m_controller
+    },
+    m_post_mode_options_uri {
+        .uri = BASE_URI "/led/mode/options",
+        .method = http_method::HTTP_POST,
+        .handler = ModeOptions::postModeOptionsHttpHandler,
+        .user_ctx = m_controller
+    },
+    m_delete_mode_options_uri {
+        .uri = BASE_URI "/led/mode/options",
+        .method = http_method::HTTP_DELETE,
+        .handler = ModeOptions::deleteModeOptionsHttpHandler,
+        .user_ctx = m_controller
+    }
 {}
 
-std::vector<EBLi::http::module::HttpModule::HttpEndpoint> ModeOptions::getHttpEndpoints() const
+std::vector<httpd_uri_t *> ModeOptions::getHandlers()
 {
-    auto createLedModeData = [=]() {
+    return {&m_get_mode_options_uri, &m_post_mode_options_uri, &m_delete_mode_options_uri};
+}
+
+esp_err_t ModeOptions::getModeOptionsHttpHandler(httpd_req_t *request)
+{
+    auto controller = static_cast<ModeController*>(request->user_ctx);
+    if (nullptr == controller) {
+        return ESP_FAIL;
+    }
+
+    cJSON *options = cJSON_CreateObject();
+    controller->getModeOptions(options);
+
+    return sendJsonResponse(options, request);
+}
+
+esp_err_t ModeOptions::postModeOptionsHttpHandler(httpd_req_t *request)
+{
+    auto controller = static_cast<ModeController*>(request->user_ctx);
+    if (nullptr == controller) {
+        return ESP_FAIL;
+    }
+
+    return jsonRequestHelper(request, [controller](cJSON *jsonRequestData, cJSON **jsonResponseData) -> bool {
+        bool optionsHaveBeenSet = controller->setModeOptions(jsonRequestData);
+
         cJSON *root = cJSON_CreateObject();
-        cJSON_AddNumberToObject(root, "index", m_controller->getModeIndex());
-        cJSON_AddStringToObject(root, "name", Mode::LedModes.at(m_controller->getModeIndex()).name);
+        cJSON_AddNumberToObject(root, "index", controller->getModeIndex());
+        cJSON_AddStringToObject(root, "name", Mode::LedModes.at(controller->getModeIndex()).name);
 
         cJSON *options = cJSON_AddObjectToObject(root, "options");
-        m_controller->getModeOptions(options);
+        controller->getModeOptions(options);
 
-        return root;
-    };
+        *jsonResponseData = root;
+        return optionsHaveBeenSet;
+    });
+}
 
-//    auto getModeOptionsHandler = [](httpd_req_t *request) {
-//    };
+esp_err_t ModeOptions::deleteModeOptionsHttpHandler(httpd_req_t *request)
+{
+    auto controller = static_cast<ModeController*>(request->user_ctx);
+    if (nullptr == controller) {
+        return ESP_FAIL;
+    }
 
-    auto postModeOptionsHandler = [=](httpd_req_t *request) {
-        return jsonRequestHelper(request, [=](cJSON *jsonRequestData, cJSON **jsonResponseData) -> bool {
-            bool optionsHaveBeenSet = m_controller->setModeOptions(jsonRequestData);
-            *jsonResponseData = createLedModeData();
-            return optionsHaveBeenSet;
-        });
-    };
-
-    return {
-//        HttpEndpoint {
-//            .method = HTTP_GET,
-//            .uri = "/led/mode/options",
-//            .handler = getModeOptionsHandler,
-//        },
-        HttpEndpoint {
-            .method = HTTP_POST,
-            .uri = "/led/mode/options",
-            .handler = postModeOptionsHandler,
-        },
-        // TODO delete mode options
-//        HttpEndpoint {
-//            .method = HTTP_DELETE,
-//            .uri = "/led/mode/options",
-//            .handler = deleteModeOptionsHandler,
-//        },
-    };
+    controller->resetModeOptions();
+    httpd_resp_send(request, "", 0);
+    return ESP_OK;
 }
 
 }

@@ -1,119 +1,139 @@
 #include "Preset.h"
-#include "../PresetManager/Preset.h"
 #include "../PresetManager/PresetManager.h"
 
 namespace LedWall::http {
 
-Preset::Preset(ModeController *controller) : m_controller(controller)
+Preset::Preset(ModeController *controller):
+    m_controller(controller),
+    m_get_presets_uri {
+        .uri = BASE_URI "/led/presets",
+        .method = http_method::HTTP_GET,
+        .handler = Preset::getPresetsHttpHandler,
+        .user_ctx = nullptr
+    },
+    m_save_preset_uri {
+        .uri = BASE_URI "/led/preset/save",
+        .method = http_method::HTTP_POST,
+        .handler = Preset::savePresetHttpHandler,
+        .user_ctx = m_controller
+    },
+    m_load_preset_uri {
+        .uri = BASE_URI "/led/preset/load",
+        .method = http_method::HTTP_POST,
+        .handler = Preset::loadPresetHttpHandler,
+        .user_ctx = m_controller
+    },
+    m_delete_preset_uri {
+        .uri = BASE_URI "/led/preset/delete",
+        .method = http_method::HTTP_POST,
+        .handler = Preset::deletePresetHttpHandler,
+        .user_ctx = nullptr
+    },
+    m_clear_presets_uri {
+        .uri = BASE_URI "/led/preset/clear",
+        .method = http_method::HTTP_POST,
+        .handler = Preset::clearPresetsHttpHandler,
+        .user_ctx = nullptr
+    }
 {}
 
-std::vector<EBLi::http::module::HttpModule::HttpEndpoint> Preset::getHttpEndpoints() const
+std::vector<httpd_uri_t *> Preset::getHandlers()
 {
-    auto getPresetList = [](httpd_req_t *request) {
-        PresetManager pm;
+    return {&m_get_presets_uri, &m_save_preset_uri, &m_load_preset_uri, &m_delete_preset_uri, &m_clear_presets_uri};
+}
 
-        cJSON *jsonRoot = cJSON_CreateObject();
-        auto presetList = cJSON_AddArrayToObject(jsonRoot, "presets");
-        for (const auto& preset : pm.getPresets()) {
-            cJSON_AddItemToArray(presetList, cJSON_CreateString(preset.getPresetName().c_str()));
+esp_err_t Preset::getPresetsHttpHandler(httpd_req_t *request)
+{
+    PresetManager pm;
+
+    cJSON *jsonRoot = cJSON_CreateObject();
+    auto presetList = cJSON_AddArrayToObject(jsonRoot, "presets");
+    for (const auto& preset : pm.getPresets()) {
+        cJSON_AddItemToArray(presetList, cJSON_CreateString(preset.getPresetName().c_str()));
+    }
+
+    return sendJsonResponse(jsonRoot, request);
+}
+
+esp_err_t Preset::savePresetHttpHandler(httpd_req_t *request)
+{
+    auto controller = static_cast<ModeController*>(request->user_ctx);
+    if (nullptr == controller) {
+        return ESP_FAIL;
+    }
+
+    return jsonRequestHelper(request, [controller](cJSON *jsonRequestData, cJSON **jsonResponseData) {
+        cJSON *const presetName = cJSON_GetObjectItem(jsonRequestData, "name");
+        if (cJSON_IsString(presetName) && strlen(presetName->valuestring) <= ::LedWall::Preset::ValidNameLength) {
+            controller->savePreset(presetName->valuestring);
+        } else {
+            return false;
         }
 
-        return sendJsonResponse(jsonRoot, request);
-    };
+        PresetManager pm;
+        if (pm.hasPreset(presetName->valuestring)) {
+            *jsonResponseData = createPresetData(pm.getPreset(presetName->valuestring));
+        }
 
-    auto createPresetData = [=](const ::LedWall::Preset &preset) {
-        cJSON *presetJson = cJSON_CreateObject();
-        cJSON_AddStringToObject(presetJson, "name", preset.getPresetName().c_str());
-        cJSON_AddStringToObject(presetJson, "mode", preset.getModeName().c_str());
-        cJSON_AddItemToObject(presetJson, "options", cJSON_Duplicate(preset.getModeOptions(), true));
+        return true;
+    });
+}
 
-        return presetJson;
-    };
+esp_err_t Preset::loadPresetHttpHandler(httpd_req_t *request)
+{
+    auto controller = static_cast<ModeController*>(request->user_ctx);
+    if (nullptr == controller) {
+        return ESP_FAIL;
+    }
 
-    auto savePreset = [=](httpd_req_t *request) {
-        return jsonRequestHelper(request, [=](cJSON *jsonRequestData, cJSON **jsonResponseData) {
-            cJSON *const presetName = cJSON_GetObjectItem(jsonRequestData, "name");
-            if (cJSON_IsString(presetName) && strlen(presetName->valuestring) <= ::LedWall::Preset::ValidNameLength) {
-                m_controller->savePreset(presetName->valuestring);
-            } else {
+    return jsonRequestHelper(request, [controller](cJSON *jsonRequestData, cJSON **jsonResponseData) {
+        cJSON *const presetName = cJSON_GetObjectItem(jsonRequestData, "name");
+        if (cJSON_IsString(presetName) && strlen(presetName->valuestring) <= ::LedWall::Preset::ValidNameLength) {
+            if (!controller->loadPreset(presetName->valuestring)) {
                 return false;
             }
+        } else {
+            return false;
+        }
 
-            PresetManager pm;
-            if (pm.hasPreset(presetName->valuestring)) {
-                *jsonResponseData = createPresetData(pm.getPreset(presetName->valuestring));
-            }
+        PresetManager pm;
+        if (pm.hasPreset(presetName->valuestring)) {
+            *jsonResponseData = createPresetData(pm.getPreset(presetName->valuestring));
+        }
 
-            return true;
-        });
-    };
+        return true;
+    });
+}
 
-    auto loadPreset = [=](httpd_req_t *request) {
-        return jsonRequestHelper(request, [=](cJSON *jsonRequestData, cJSON **jsonResponseData) {
-            cJSON *const presetName = cJSON_GetObjectItem(jsonRequestData, "name");
-            if (cJSON_IsString(presetName) && strlen(presetName->valuestring) <= ::LedWall::Preset::ValidNameLength) {
-                if (!m_controller->loadPreset(presetName->valuestring)) {
-                    return false;
-                }
-            } else {
-                return false;
-            }
+esp_err_t Preset::deletePresetHttpHandler(httpd_req_t *request)
+{
+    return jsonRequestHelper(request, [=](cJSON *jsonRequestData, cJSON **jsonResponseData) {
+        cJSON *const presetName = cJSON_GetObjectItem(jsonRequestData, "name");
+        if (cJSON_IsString(presetName) && strlen(presetName->valuestring) <= ::LedWall::Preset::ValidNameLength) {
+            LedWall::ModeController::deletePreset(presetName->valuestring);
+        } else {
+            return false;
+        }
 
-            PresetManager pm;
-            if (pm.hasPreset(presetName->valuestring)) {
-                *jsonResponseData = createPresetData(pm.getPreset(presetName->valuestring));
-            }
+        return true;
+    });
+}
 
-            return true;
-        });
-    };
+esp_err_t Preset::clearPresetsHttpHandler(httpd_req_t *request)
+{
+    LedWall::ModeController::deleteAllPresets();
+    httpd_resp_send(request, "", 0);
+    return ESP_OK;
+}
 
-    auto deletePreset = [=](httpd_req_t *request) {
-        return jsonRequestHelper(request, [=](cJSON *jsonRequestData, cJSON **jsonResponseData) {
-            cJSON *const presetName = cJSON_GetObjectItem(jsonRequestData, "name");
-            if (cJSON_IsString(presetName) && strlen(presetName->valuestring) <= ::LedWall::Preset::ValidNameLength) {
-                LedWall::ModeController::deletePreset(presetName->valuestring);
-            } else {
-                return false;
-            }
+cJSON * Preset::createPresetData(const ::LedWall::Preset &preset)
+{
+    cJSON *presetJson = cJSON_CreateObject();
+    cJSON_AddStringToObject(presetJson, "name", preset.getPresetName().c_str());
+    cJSON_AddStringToObject(presetJson, "mode", preset.getModeName().c_str());
+    cJSON_AddItemToObject(presetJson, "options", cJSON_Duplicate(preset.getModeOptions(), true));
 
-            return true;
-        });
-    };
-
-    auto deleteAllPresets = [=](httpd_req_t *request) {
-        LedWall::ModeController::deleteAllPresets();
-        httpd_resp_send(request, "", 0);
-        return ESP_OK;
-    };
-
-    return {
-        HttpEndpoint {
-            .method = HTTP_GET,
-            .uri = "/led/presets",
-            .handler = getPresetList,
-        },
-        HttpEndpoint {
-            .method = HTTP_POST,
-            .uri = "/led/preset/save",
-            .handler = savePreset,
-        },
-        HttpEndpoint {
-            .method = HTTP_POST,
-            .uri = "/led/preset/load",
-            .handler = loadPreset,
-        },
-        HttpEndpoint {
-            .method = HTTP_POST,
-            .uri = "/led/preset/delete",
-            .handler = deletePreset,
-        },
-        HttpEndpoint {
-            .method = HTTP_POST,
-            .uri = "/led/preset/clear",
-            .handler = deleteAllPresets,
-        },
-    };
+    return presetJson;
 }
 
 }
