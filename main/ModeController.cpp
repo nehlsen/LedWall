@@ -247,6 +247,14 @@ void ModeController::getModeOptions(cJSON *optionsObject) const
     getLedMode()->readOptions(optionsObject);
 }
 
+bool ModeController::resetModeOptions()
+{
+    // TODO ModeController::resetModeOptions()
+    ESP_LOGW(LOG_TAG, "TODO: ModeController::resetModeOptions(...)");
+
+    return false;
+}
+
 Mode::LedMode* ModeController::getLedMode() const
 {
     return m_ledMode;

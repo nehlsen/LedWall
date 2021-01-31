@@ -38,6 +38,7 @@ public:
 
     bool setModeOptions(cJSON *optionsObject);
     void getModeOptions(cJSON *optionsObject) const;
+    bool resetModeOptions();
 
     Mode::LedMode *getLedMode() const;
 
