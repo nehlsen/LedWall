@@ -1,12 +1,12 @@
 [submodule "components/FastLedIdf"]
 	path = components/FastLedIdf
-	url = git@github.com:nehlsen/FastLedIdf.git
+	url = https://github.com/nehlsen/FastLedIdf.git
 [submodule "components/Mates-for-LEDs"]
 	path = components/Mates-for-LEDs
-	url = git@github.com:nehlsen/Mates-for-LEDs.git
+	url = https://github.com/nehlsen/Mates-for-LEDs.git
 [submodule "components/EBLi"]
 	path = components/EBLi
-	url = git@github.com:nehlsen/EBLi.git
+	url = https://github.com/nehlsen/EBLi.git
 [submodule "components/AHT10-IDF"]
 	path = components/AHT10-IDF
-	url = git@github.com:nehlsen/AHT10-IDF.git
+	url = https://github.com/nehlsen/AHT10-IDF.git
