@@ -3,8 +3,7 @@
 
 #include <ConfigProperty.h>
 
-namespace LedWall
-{
+namespace LedWall {
 
 class ModeController;
 
@@ -20,14 +19,14 @@ struct Config
     static const int LED_MODE_FALLBACK;
 
     static void init();
-    static EBLi::ConfigProperty *matrixWidth();
-    static EBLi::ConfigProperty *matrixHeight();
-    static EBLi::ConfigProperty *brightness();
-    static EBLi::ConfigProperty *powerOnMode();
-    static EBLi::ConfigProperty *powerLastState();
-    static EBLi::ConfigProperty *ledModeAutoRestore();
+    static EBLi::config::ConfigProperty *matrixWidth();
+    static EBLi::config::ConfigProperty *matrixHeight();
+    static EBLi::config::ConfigProperty *brightness();
+    static EBLi::config::ConfigProperty *powerOnMode();
+    static EBLi::config::ConfigProperty *powerLastState();
+    static EBLi::config::ConfigProperty *ledModeAutoRestore();
     //! last used led-mode (will be restored on power up)
-    static EBLi::ConfigProperty *ledModeLast();
+    static EBLi::config::ConfigProperty *ledModeLast();
 
     static bool isPoweredOnBoot();
     static int bootIntoLedMode();

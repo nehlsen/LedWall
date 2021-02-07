@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace EBLi {
+namespace EBLi::mqtt {
 class MqttPublisher;
 }
 
@@ -21,11 +21,11 @@ public:
 protected:
     ModeController* m_controller;
 
-    EBLi::MqttPublisher *m_publisherPower;
-    EBLi::MqttPublisher *m_publisherBrightness;
-    EBLi::MqttPublisher *m_publisherModeIndex;
-    EBLi::MqttPublisher *m_publisherModeName;
-    EBLi::MqttPublisher *m_publisherModeOptions;
+    EBLi::mqtt::MqttPublisher *m_publisherPower;
+    EBLi::mqtt::MqttPublisher *m_publisherBrightness;
+    EBLi::mqtt::MqttPublisher *m_publisherModeIndex;
+    EBLi::mqtt::MqttPublisher *m_publisherModeName;
+    EBLi::mqtt::MqttPublisher *m_publisherModeOptions;
 
     void publishMode();
     void publishModeOptions();

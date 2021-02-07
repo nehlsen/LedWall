@@ -69,9 +69,9 @@ void MqttAdapter::publishModeOptions()
 
 void MqttAdapter::setupPublishers()
 {
-    auto mqtt = EBLi::Mqtt::instance();
+    auto mqtt = EBLi::mqtt::Mqtt::instance();
 
-    m_publisherPower = mqtt->createPublisher("power", EBLi::MqttPublisher::RetainValue);
+    m_publisherPower = mqtt->createPublisher("power", EBLi::mqtt::MqttPublisher::RetainValue);
     m_publisherBrightness = mqtt->createPublisher("brightness");
     m_publisherModeIndex = mqtt->createPublisher("mode/index");
     m_publisherModeName = mqtt->createPublisher("mode/name");
@@ -80,7 +80,7 @@ void MqttAdapter::setupPublishers()
 
 void MqttAdapter::setupSubscribers()
 {
-    auto mqtt = EBLi::Mqtt::instance();
+    auto mqtt = EBLi::mqtt::Mqtt::instance();
 
     mqtt->createSubscriber("power", [this](const std::string &value) {
         m_controller->setPower(value == "1");

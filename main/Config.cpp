@@ -12,79 +12,79 @@ const int Config::LED_MODE_FALLBACK = 0;
 void Config::init()
 {
     matrixWidth()
-        ->setVisibility(EBLi::ConfigProperty::Device)
+        ->setVisibility(EBLi::config::ConfigProperty::Device)
         ->setDefaultValue(4)
-        ->setConstraint(EBLi::ConfigPropertyConstraint::Number(1, 100));
+        ->setConstraint(EBLi::config::ConfigPropertyConstraint::Number(1, 100));
 
     matrixHeight()
-        ->setVisibility(EBLi::ConfigProperty::Device)
+        ->setVisibility(EBLi::config::ConfigProperty::Device)
         ->setDefaultValue(4)
-        ->setConstraint(EBLi::ConfigPropertyConstraint::Number(1, 100));
+        ->setConstraint(EBLi::config::ConfigPropertyConstraint::Number(1, 100));
 
     brightness()
         ->setDefaultValue(255)
-        ->setConstraint(EBLi::ConfigPropertyConstraint::Number(0, 255))
+        ->setConstraint(EBLi::config::ConfigPropertyConstraint::Number(0, 255))
 //        ->setChangeHandler([controller](EBLi::ConfigProperty *property){
 //            controller->setBrightness(property->getValue<int>()); // FIXME endless loop
 //        })
         ;
 
     powerOnMode()
-        ->setVisibility(EBLi::ConfigProperty::Device)
+        ->setVisibility(EBLi::config::ConfigProperty::Device)
         ->setDefaultValue(PowerOnMode::RECOVER_LAST)
-        ->setConstraint(EBLi::ConfigPropertyConstraint::Number(PowerOnMode::ALWAYS_OFF, PowerOnMode::RECOVER_LAST));
+        ->setConstraint(EBLi::config::ConfigPropertyConstraint::Number(PowerOnMode::ALWAYS_OFF, PowerOnMode::RECOVER_LAST));
 
     powerLastState()
-        ->setVisibility(EBLi::ConfigProperty::Hidden)
+        ->setVisibility(EBLi::config::ConfigProperty::Hidden)
         ->setDefaultValue(POWER_STATE_FALLBACK)
-        ->setConstraint(EBLi::ConfigPropertyConstraint::Number(0, 1))
+        ->setConstraint(EBLi::config::ConfigPropertyConstraint::Number(0, 1))
         ;
 
     ledModeAutoRestore()
-        ->setVisibility(EBLi::ConfigProperty::Device)
+        ->setVisibility(EBLi::config::ConfigProperty::Device)
         // min:-1, max:ledModeCount-1
         ->setDefaultValue(LED_MODE_AUTO_RESTORE_LAST);
 
     ledModeLast()
-        ->setVisibility(EBLi::ConfigProperty::Hidden)
+        ->setVisibility(EBLi::config::ConfigProperty::Hidden)
         // min:0, max:ledModeCount-1
         ->setDefaultValue(LED_MODE_FALLBACK)
         ;
 }
 
-EBLi::ConfigProperty * Config::matrixWidth()
+EBLi::config::ConfigProperty * Config::matrixWidth()
 {
-    return EBLi::ConfigManager::instance()->property("matrix_width", "MatrixWidth");
+    return EBLi::config::ConfigManager::instance()->property("matrix_width", "MatrixWidth");
 }
 
-EBLi::ConfigProperty * Config::matrixHeight()
+EBLi::config::ConfigProperty * Config::matrixHeight()
 {
-    return EBLi::ConfigManager::instance()->property("matrix_height", "MatrixHeight");
+    return EBLi::config::ConfigManager::instance()->property("matrix_height", "MatrixHeight");
 }
 
-EBLi::ConfigProperty * Config::brightness()
+EBLi::config::ConfigProperty * Config::brightness()
 {
-    return EBLi::ConfigManager::instance()->property("matrix_brghtnss", "Brightness");
+    return EBLi::config::ConfigManager::instance()->property("matrix_brghtnss", "Brightness");
 }
 
-EBLi::ConfigProperty * Config::powerOnMode()
+EBLi::config::ConfigProperty * Config::powerOnMode()
 {
-    return EBLi::ConfigManager::instance()->property("pwr_on_mode", "PowerOnResetMode");
+    return EBLi::config::ConfigManager::instance()->property("pwr_on_mode", "PowerOnResetMode");
 }
 
-EBLi::ConfigProperty * Config::powerLastState()
+EBLi::config::ConfigProperty * Config::powerLastState()
 {
-    return EBLi::ConfigManager::instance()->property("pwr_last_state");
+    return EBLi::config::ConfigManager::instance()->property("pwr_last_state");
 }
 
-EBLi::ConfigProperty * Config::ledModeAutoRestore()
+EBLi::config::ConfigProperty * Config::ledModeAutoRestore()
 {
-    return EBLi::ConfigManager::instance()->property("led_mode_auto", "LedModeAutoRestore");
+    return EBLi::config::ConfigManager::instance()->property("led_mode_auto", "LedModeAutoRestore");
 }
 
-EBLi::ConfigProperty * Config::ledModeLast()
+EBLi::config::ConfigProperty * Config::ledModeLast()
 {
-    return EBLi::ConfigManager::instance()->property("led_mode_last");
+    return EBLi::config::ConfigManager::instance()->property("led_mode_last");
 }
 
 bool Config::isPoweredOnBoot()
