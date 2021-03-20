@@ -4,6 +4,7 @@
 #include <OtaUpdater.h>
 #include "ModeController.h"
 #include "ConfigManager.h"
+#include "PushButton/PushButtonController.h"
 #include "Config.h"
 
 #if defined(CONFIG_ENABLE_REST)
@@ -82,6 +83,12 @@ void app_main()
     server->addModule(new LedWall::http::ModeList());
     server->addModule(new LedWall::http::Preset(controller));
     #endif
+
+    auto pushButtonController = new LedWall::PushButton::PushButtonController(controller);
+    pushButtonController->addButton({
+        .gpio = GPIO_NUM_27,
+        .action = LedWall::ACTION_POWER_TOGGLE
+    });
 }
 
 #ifdef __cplusplus

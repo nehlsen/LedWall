@@ -3,6 +3,9 @@ set(COMPONENT_SRCS
         "Config.cpp"
         "ModeOptionsPersister.cpp"
 
+        "PushButton/PushButtonController.cpp"
+        "PushButton/ActionMultiplexer.cpp"
+
         "PresetManager/PresetManager.cpp"
         "PresetManager/Preset.cpp"
 
@@ -65,5 +68,5 @@ endif()
 
 register_component(
         SRCS ${COMPONENT_SRCS}
-        INCLUDE_DIRS "."
+        INCLUDE_DIRS "." ${CMAKE_CURRENT_SOURCE_DIR}
 )
