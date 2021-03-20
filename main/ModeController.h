@@ -2,7 +2,6 @@
 #define LEDWALL_MODECONTROLLER_H
 
 #include <list>
-#include <stdint.h>
 #include <string>
 
 class CRGB;

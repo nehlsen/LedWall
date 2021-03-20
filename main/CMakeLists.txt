@@ -5,6 +5,7 @@ set(COMPONENT_SRCS
 
         "PushButton/PushButtonController.cpp"
         "PushButton/ActionMultiplexer.cpp"
+        "PushButton/ActionListenerModeController.cpp"
 
         "PresetManager/PresetManager.cpp"
         "PresetManager/Preset.cpp"

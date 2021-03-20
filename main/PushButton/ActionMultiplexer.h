@@ -1,21 +1,20 @@
 #ifndef LEDWALL_ACTIONMULTIPLEXER_H
 #define LEDWALL_ACTIONMULTIPLEXER_H
 
+#include <vector>
 #include "Actions.h"
+#include "ActionListener.h"
 
 namespace LedWall {
-
-class ModeController;
 
 class ActionMultiplexer
 {
 public:
-    explicit ActionMultiplexer(ModeController *modeController);
-
     void triggerAction(Action action);
+    void addActionListener(ActionListener *actionListener);
 
 private:
-    ModeController *m_modeController;
+    std::vector<ActionListener*> m_actionListeners;
 };
 
 }

@@ -4,6 +4,7 @@
 #include <driver/gpio.h>
 #include <vector>
 #include "ActionMultiplexer.h"
+#include "ActionListener.h"
 
 class Button;
 
@@ -17,13 +18,15 @@ struct ButtonCallbackArgs {
 class PushButtonController
 {
 public:
-    explicit PushButtonController(ModeController *modeController);
+    explicit PushButtonController();
 
     struct ButtonConfig {
         gpio_num_t gpio;
         Action action;
     };
     int addButton(ButtonConfig btn);
+
+    void addActionListener(ActionListener *actionListener);
 
 private:
     ActionMultiplexer *m_actionMultiplexer;

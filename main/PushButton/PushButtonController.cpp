@@ -17,8 +17,8 @@ static void buttonCallback(void *args)
     buttonCallbackArgs->actionMultiplexer->triggerAction(buttonCallbackArgs->action);
 }
 
-PushButtonController::PushButtonController(ModeController *modeController):
-    m_actionMultiplexer(new ActionMultiplexer(modeController))
+PushButtonController::PushButtonController():
+    m_actionMultiplexer(new ActionMultiplexer())
 {
 }
 
@@ -37,6 +37,11 @@ int PushButtonController::addButton(ButtonConfig btn)
     button->setEventCallback(BUTTON_CB_TAP, &buttonCallback, &m_buttons.back().second);
 
     return m_buttons.size();
+}
+
+void PushButtonController::addActionListener(ActionListener *actionListener)
+{
+    m_actionMultiplexer->addActionListener(actionListener);
 }
 
 }
