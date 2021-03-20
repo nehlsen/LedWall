@@ -10,3 +10,6 @@
 [submodule "components/AHT10-IDF"]
 	path = components/AHT10-IDF
 	url = https://github.com/nehlsen/AHT10-IDF.git
+[submodule "components/espButtonIdf"]
+	path = components/espButtonIdf
+	url = https://github.com/nehlsen/espButtonIdf.git
