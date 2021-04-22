@@ -1,12 +1,12 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>LedWall</title>
     <script src="https://code.jquery.com/jquery-3.5.0.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <link rel="shortcut icon" type="image/png" href="ledwall-16.png">
 
@@ -20,7 +20,17 @@
             box-shadow: 0 0.5em 1em -0.125em rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.02);
             color: #4a4a4a;
             display: block;
-            padding: 1.25rem;
+            /*padding: 1.25rem;*/
+        }
+
+        #tabs {
+            float: right;
+        }
+        #tab-content .tabbed-columns {
+            display: none;
+        }
+        #tab-content .is-active {
+            display: flex;
         }
     </style>
 </head>
@@ -29,138 +39,216 @@
 <div class="container">
     <div class="columns">
         <div class="column is-full">
-            <div class="box"><h1 class="title"><img src="ledwall-16.png" alt="ICO"> LedWall</h1></div>
-        </div>
-    </div>
-    <div class="columns">
-        <div class="column is-one-third">
             <div class="box">
-<!--                TODO current mode ?! -->
-                <h2 class="title"><i class="fa fas fa-tasks"></i> Modes</h2>
-                <p class="help">Click to activate...</p>
-                <div class="menu">
-                    <ul id="modes-list" class="menu-list">
-                        <li id="modes-list-placeholder" class="has-text-grey">Loading...</li>
+                <div class="tabs" id="tabs">
+                    <ul>
+                        <li class="is-active" data-tab="1">
+                            <a>
+                                <span class="icon is-small"><i class="fa fa-image"></i></span>
+                                <span>Visuals</span>
+                            </a>
+                        </li>
+                        <li data-tab="2">
+                            <a>
+                                <span class="icon is-small"><i class="fa fa-cogs"></i></span>
+                                <span>System</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
+
+                <h1 class="title"><img src="ledwall-16.png" alt="ICO"> LedWall</h1>
             </div>
         </div>
-        <div class="column is-one-third">
-            <div class="box">
-                <h2 class="title"><i class="fa fas fa-toolbox"></i> System Info</h2>
-                <table class="table">
-                    <tr>
-                        <th>idfVersion</th>
-                        <td id="sys-info-idfVersion"><em class="has-text-grey">loading...</em></td>
-                    </tr>
-                    <tr>
-                        <th>cores</th>
-                        <td id="sys-info-cores"><em class="has-text-grey">loading...</em></td>
-                    </tr>
-                    <tr>
-                        <th>restarts</th>
-                        <td id="sys-info-restarts"><em class="has-text-grey">loading...</em></td>
-                    </tr>
-                    <tr>
-                        <th>projectName</th>
-                        <td id="sys-info-projectName"><em class="has-text-grey">loading...</em></td>
-                    </tr>
-                    <tr>
-                        <th>projectVersion</th>
-                        <td id="sys-info-projectVersion"><em class="has-text-grey">loading...</em></td>
-                    </tr>
-                    <tr>
-                        <th>compileTime</th>
-                        <td id="sys-info-compileTime"><em class="has-text-grey">loading...</em></td>
-                    </tr>
-                    <tr>
-                        <th>compileDate</th>
-                        <td id="sys-info-compileDate"><em class="has-text-grey">loading...</em></td>
-                    </tr>
-                    <tr>
-                        <th>ledPin</th>
-                        <td id="sys-info-ledPin"><em class="has-text-grey">loading...</em></td>
-                    </tr>
-                </table>
+    </div>
+    <div id="tab-content">
+        <div class="columns tabbed-columns is-active" data-content="1">
+            <div class="column">
+                <div class="box">
+                    <a href="#" class="is-pulled-right" id="modes-list-update-button"><i class="fa fa-sync"></i></a>
+                    <h2 class="title"><i class="fa fas fa-tasks"></i> Modes</h2>
+                    <p class="help">Click to activate...</p>
+                    <div class="menu">
+                        <ul id="modes-list" class="menu-list">
+                            <li id="modes-list-placeholder" class="has-text-grey">Loading...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="box">
+                    <h2 class="title"><i class="fa fas fa-toolbox"></i> Mode Options</h2>
+                    <table class="table is-fullwidth" id="table-mode-options">
+                        <tbody>
+                        <tr id="mode-options-loading">
+                            <td colspan="2"><em class="has-text-grey">loading...</em></td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="2" class="has-text-right">
+                                <a href="#" class="button">Save</a>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="box">
+                    <a href="#" class="is-pulled-right" id="presets-list-update-button"><i class="fa fa-sync"></i></a>
+                    <h2 class="title"><i class="fa fas fa-tasks"></i> Presets</h2>
+                    <div class="field has-addons">
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Save as..." id="preset-save-name">
+                        </div>
+                        <div class="control">
+                            <button class="button is-info" id="preset-save-button">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                    <p class="help">Click to activate...</p>
+                    <div class="menu">
+                        <ul id="presets-list" class="menu-list">
+                            <li id="presets-list-placeholder" class="has-text-grey">Loading...</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="column is-one-third">
-            <div class="box">
-                <div>
-                    <h2 class="title"><i class="fa fas fa-cogs"></i> config</h2>
-                    <p class="help">Fields marked with * require a reboot for the config to apply</p>
-                </div>
 
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal">
-                        <label class="label">MatrixWidth*</label>
-                    </div>
-                    <div class="field-body"><div class="field">
-                        <p class="control"><input class="input" type="number" min="1" max="255" step="1" placeholder="loading..." id="config-MatrixWidth" /></p>
-                    </div></div>
+        <div class="columns tabbed-columns" data-content="2">
+            <div class="column">
+                <div class="box">
+                    <h2 class="title"><i class="fa fas fa-toolbox"></i> System Info</h2>
+                    <table class="table is-fullwidth" id="table-sys-info">
+                        <tr id="sys-info-loading">
+                            <td colspan="2"><em class="has-text-grey">loading...</em></td>
+                        </tr>
+                        <!--
+                        FIXME API v2 does not report ledPin ?!
+                        <tr>
+                            <th>ledPin</th>
+                            <td id="sys-info-ledPin"><em class="has-text-grey">loading...</em></td>
+                        </tr>
+                        -->
+                    </table>
                 </div>
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal"><label class="label">MatrixHeight*</label></div>
-                    <div class="field-body">
-                        <p class="control"><input class="input" type="number" min="1" max="255" step="1" placeholder="loading..." id="config-MatrixHeight" /></p>
-                    </div>
-                </div>
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal"><label class="label">Brightness</label></div>
-                    <div class="field-body">
-                        <div class="control">
-                            <input class="input" type="number" min="1" max="255" step="1" placeholder="loading..." id="config-Brightness" />
-                        </div>
-                    </div>
-                </div>
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal"><label class="label">PowerOnResetMode*</label></div>
-                    <div class="field-body">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="loading..." id="config-PowerOnResetMode" />
-                        </div>
-                    </div>
-                </div>
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal"><label class="label">LedModeAutoRestore*</label></div>
-                    <div class="field-body">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="loading..." id="config-LedModeAutoRestore" />
-                        </div>
-                    </div>
-                </div>
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal"><label class="label">MqttBroker*</label></div>
-                    <div class="field-body">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="loading..." id="config-MqttBroker" />
-                        </div>
-                    </div>
-                </div>
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal"><label class="label">MqttDeviceTopic*</label></div>
-                    <div class="field-body">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="loading..." id="config-MqttDeviceTopic" />
-                        </div>
-                    </div>
-                </div>
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal"><label class="label">MqttGroupTopic*</label></div>
-                    <div class="field-body">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="loading..." id="config-MqttGroupTopic" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field is-grouped">
-                    <div class="control">
-                        <button class="button is-primary" id="config-save">Save</button>
+            </div>
+            <div class="column">
+                <div class="box">
+                    <div>
+                        <h2 class="title"><i class="fa fas fa-cogs"></i> config</h2>
+                        <p class="help">Fields marked with * require a reboot for the config to apply</p>
                     </div>
 
-                    <div class="control">
-                        <button class="button is-danger" id="action-reboot">Reboot</button>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">MatrixWidth*</label>
+                        </div>
+                        <div class="field-body"><div class="field">
+                            <p class="control"><input class="input" type="number" min="1" max="255" step="1" placeholder="loading..." id="config-MatrixWidth" /></p>
+                        </div></div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"><label class="label">MatrixHeight*</label></div>
+                        <div class="field-body">
+                            <p class="control"><input class="input" type="number" min="1" max="255" step="1" placeholder="loading..." id="config-MatrixHeight" /></p>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"><label class="label">Brightness</label></div>
+                        <div class="field-body">
+                            <div class="control">
+                                <input class="input" type="number" min="1" max="255" step="1" placeholder="loading..." id="config-Brightness" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"><label class="label">PowerOnResetMode*</label></div>
+                        <div class="field-body">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="loading..." id="config-PowerOnResetMode" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"><label class="label">LedModeAutoRestore*</label></div>
+                        <div class="field-body">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="loading..." id="config-LedModeAutoRestore" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"><label class="label">MqttBroker*</label></div>
+                        <div class="field-body">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="loading..." id="config-MqttBroker" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"><label class="label">MqttDeviceTopic*</label></div>
+                        <div class="field-body">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="loading..." id="config-MqttDeviceTopic" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"><label class="label" for="config-MqttGroupTopic">MqttGroupTopic*</label></div>
+                        <div class="field-body">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="loading..." id="config-MqttGroupTopic" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"><label class="label" for="config-timezone">timezone*</label></div>
+                        <div class="field-body">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="loading..." id="config-timezone" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"><label class="label" for="config-aht10_i2c_sda">aht10_i2c_sda*</label></div>
+                        <div class="field-body">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="loading..." id="config-aht10_i2c_sda" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"><label class="label" for="config-aht10_i2c_scl">aht10_i2c_scl*</label></div>
+                        <div class="field-body">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="loading..." id="config-aht10_i2c_scl" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"><label class="label" for="config-SensorsPublishDelay">SensorsPublishDelay*</label></div>
+                        <div class="field-body">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="loading..." id="config-SensorsPublishDelay" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button class="button is-primary" id="config-save">Save</button>
+                        </div>
+
+                        <div class="control">
+                            <button class="button is-danger" id="action-reboot">Reboot</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -170,49 +258,177 @@
 
 <script type="application/javascript">
     $('document').ready(function () {
-        $.getJSON("/api/v1/led/modes", function (modesResponse) {
-            console.log(modesResponse);
-            let modesList = $('#modes-list');
-            modesResponse.modes.forEach(mode => {
-                modesList.append(`<li><a href='#' onclick='return false;' data-mode-index='${mode.index}' class='mode-link'>${mode.name}</a></li>`);
-            });
-            $('#modes-list-placeholder').hide();
-            $('.mode-link').click(function () {
-                $.ajax({
-                    type: 'POST',
-                    url: "/api/v1/led/mode",
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        index: $(this).data('modeIndex')
-                    }),
+        let updateModes = function () {
+            $.getJSON("/api/v2/led/modes", function (modesResponse) {
+                console.log(modesResponse);
+                let modesList = $('#modes-list');
+                $('#modes-list .mode').remove();
+                modesResponse.modes.forEach(mode => {
+                    modesList.append(`<li class="mode"><a href='#' onclick='return false;' data-mode-index='${mode.index}' class='mode-link'>${mode.name}</a></li>`);
+                });
+                $('#modes-list-placeholder').hide();
+                $('.mode-link').click(function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: "/api/v2/led/mode",
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            index: $(this).data('modeIndex')
+                        }),
+                        complete: function () { updateCurrentMode(); }
+                    });
                 });
             });
-        });
-        $.getJSON("/api/v1/system/info", function (sysInfo) {
-            console.log(sysInfo);
-            $('#sys-info-idfVersion').html(sysInfo.idfVersion);
-            $('#sys-info-cores').html(sysInfo.cores);
-            $('#sys-info-restarts').html(sysInfo.restarts);
-            $('#sys-info-projectName').html(sysInfo.projectName);
-            $('#sys-info-projectVersion').html(sysInfo.projectVersion);
-            $('#sys-info-compileTime').html(sysInfo.compileTime);
-            $('#sys-info-compileDate').html(sysInfo.compileDate);
-            $('#sys-info-ledPin').html(sysInfo.ledPin);
-        });
-        $.getJSON("/api/v1/config", function (config) {
-            console.log(config);
-            $('#config-MatrixWidth').val(config.MatrixWidth);
-            $('#config-MatrixHeight').val(config.MatrixHeight);
-            $('#config-Brightness').val(config.Brightness);
-            $('#config-PowerOnResetMode').val(config.PowerOnResetMode);
-            $('#config-LedModeAutoRestore').val(config.LedModeAutoRestore);
-            $('#config-MqttBroker').val(config.MqttBroker);
-            $('#config-MqttDeviceTopic').val(config.MqttDeviceTopic);
-            $('#config-MqttGroupTopic').val(config.MqttGroupTopic);
+        };
+        let updateCurrentMode = function () {
+            $.getJSON("/api/v2/led/mode", function (modeResponse) {
+                $('#modes-list a').removeClass('is-active');
+                $('#modes-list a[data-mode-index="' + modeResponse.index + '"]').addClass('is-active');
+
+                clearModeOptions();
+                showModeOptions(modeResponse.options);
+            });
+        };
+        let clearModeOptions = function () {
+            $('#table-mode-options tbody tr').remove();
+        };
+        let showModeOptions = function (modeOptions) {
+            let $modeOptionsTBody = $('#table-mode-options tbody');
+
+            jQuery.each(modeOptions, function(modeOptionKey, modeOptionValue) {
+                let domElementId = 'mode-option-' + modeOptionKey;
+                let $domElement = $('#' + domElementId);
+                if ($domElement.length < 1) {
+                    $modeOptionsTBody.append($(`
+<tr>
+    <th>${modeOptionKey}</th>
+    <td><input type="text" id="mode-option-${modeOptionKey}" value="${modeOptionValue}" /></td>
+</tr>
+`));
+                } else {
+                    $domElement.val(modeOptionValue)
+                }
+            });
+
+            let modeOptionsLoadingIndicator = $('#mode-options-loading');
+            if (modeOptionsLoadingIndicator.length > 0) {
+                modeOptionsLoadingIndicator.remove();
+            }
+        };
+        let updatePresets = function () {
+            $.getJSON("/api/v2/led/presets", function (presetsResponse) {
+                console.log(presetsResponse);
+                let $presetsList = $('#presets-list');
+                $('#presets-list .preset').remove();
+                presetsResponse.presets.forEach(preset => {
+                    $presetsList.append(`
+<li class="preset">
+<a href='#' onclick='return false;' class='preset-delete is-pulled-right' data-preset-name='${preset}'><i class="fa fa-trash"></i></a>
+<a href='#' onclick='return false;' class='preset-activate' data-preset-name='${preset}'>${preset}</a>
+</li>
+`);
+                });
+                $('#presets-list-placeholder').hide();
+                $('.preset-activate').click(function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: "/api/v2/led/preset/load",
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            name: $(this).data('presetName')
+                        }),
+                    });
+                });
+                $('.preset-delete').click(function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: "/api/v2/led/preset/delete",
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            name: $(this).data('presetName')
+                        }),
+                        complete: function () { updatePresets(); }
+                    });
+                });
+            });
+        };
+        let setupPresetSave = function () {
+            $('#preset-save-button').click(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: "/api/v2/led/preset/save",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        name: $('#preset-save-name').val()
+                    }),
+                    error: function () { alert('failed to save preset'); },
+                    success: function () { $('#preset-save-name').val('') },
+                    complete: function () { updatePresets(); }
+                });
+            });
+        };
+        let updateSystemInfo = function () {
+            $.getJSON("/api/v2/system/info", function (sysInfo) {
+                console.log(sysInfo);
+                jQuery.each(sysInfo, function(sysInfoKey, sysInfoValue) {
+                    let domElementId = 'sys-info-' + sysInfoKey;
+                    let $domElement = $('#' + domElementId);
+                    if ($domElement.length < 1) {
+                        $('#table-sys-info').append($(
+                            '<tr><th>' + sysInfoKey + '</th><td id="sys-info-' + sysInfoKey + '">' + sysInfoValue + '</td></tr>'
+                        ));
+                    } else {
+                        $domElement.html(sysInfoValue)
+                    }
+
+                    let sysInfoLoadingIndicator = $('#sys-info-loading');
+                    if (sysInfoLoadingIndicator.length > 0) {
+                        sysInfoLoadingIndicator.remove();
+                    }
+                });
+            });
+        };
+        let updateSystemConfig = function () {
+            $.getJSON("/api/v2/config", function (config) {
+                console.log(config);
+                $('#config-MatrixWidth').val(config.MatrixWidth);
+                $('#config-MatrixHeight').val(config.MatrixHeight);
+                $('#config-Brightness').val(config.Brightness);
+                $('#config-PowerOnResetMode').val(config.PowerOnResetMode);
+                $('#config-LedModeAutoRestore').val(config.LedModeAutoRestore);
+                $('#config-MqttBroker').val(config.MqttBroker);
+                $('#config-MqttDeviceTopic').val(config.MqttDeviceTopic);
+                $('#config-MqttGroupTopic').val(config.MqttGroupTopic);
+                $('#config-timezone').val(config.timezone);
+                $('#config-aht10_i2c_sda').val(config.aht10_i2c_sda);
+                $('#config-aht10_i2c_scl').val(config.aht10_i2c_scl);
+                $('#config-SensorsPublishDelay').val(config.SensorsPublishDelay);
+            });
+        };
+
+        $('#tabs li').on('click', function() {
+            const tab = $(this).data('tab');
+
+            $('#tabs li').removeClass('is-active');
+            $(this).addClass('is-active');
+
+            $('#tab-content .tabbed-columns').removeClass('is-active');
+            $('.tabbed-columns[data-content="' + tab + '"]').addClass('is-active');
         });
 
+        updateModes();
+        $('#modes-list-update-button').on('click', function () { updateModes(); updateCurrentMode(); });
+        updatePresets();
+        $('#presets-list-update-button').on('click', updatePresets);
+        setupPresetSave();
+        updateCurrentMode();
+
+        // TODO delay until tab is activated
+        updateSystemInfo();
+        updateSystemConfig();
+
         $('#config-save').click(function () {
-            $.ajax("/api/v1/config", {
+            $.ajax("/api/v2/config", {
                 data: {
                     MatrixWidth: $('#config-MatrixWidth').val(),
                     MatrixHeight: $('#config-MatrixHeight').val(),
@@ -222,13 +438,17 @@
                     MqttBroker: $('#config-MqttBroker').val(),
                     MqttDeviceTopic: $('#config-MqttDeviceTopic').val(),
                     MqttGroupTopic: $('#config-MqttGroupTopic').val(),
+                    timezone: $('#config-timezone').val(),
+                    aht10_i2c_sda: $('#config-aht10_i2c_sda').val(),
+                    aht10_i2c_scl: $('#config-aht10_i2c_scl').val(),
+                    SensorsPublishDelay: $('#config-SensorsPublishDelay').val(),
                 },
                 contentType: 'application/json',
                 type: 'POST'
             });
         });
         $('#action-reboot').click(function () {
-            $.post("/api/v1/system/reboot");
+            $.post("/api/v2/system/reboot");
         });
 
     });
