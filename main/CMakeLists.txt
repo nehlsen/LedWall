@@ -4,8 +4,6 @@ set(COMPONENT_SRCS
         "ModeOptionsPersister.cpp"
 
         "PushButton/PushButtonController.cpp"
-        "PushButton/ActionMultiplexer.cpp"
-        "PushButton/ActionListenerModeController.cpp"
 
         "PresetManager/PresetManager.cpp"
         "PresetManager/Preset.cpp"

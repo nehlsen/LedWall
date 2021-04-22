@@ -1,4 +1,5 @@
 #include "PushButtonController.h"
+#include "../events.h"
 #include <button.h>
 #include <esp_log.h>
 
@@ -8,40 +9,20 @@ static void buttonCallback(void *args)
 {
     ESP_LOGI("PushButton", "buttonCallback...");
 
-    auto buttonCallbackArgs = static_cast<ButtonCallbackArgs*>(args);
-    if (nullptr == buttonCallbackArgs) {
-        return;
-    }
-
-    ESP_LOGI("PushButton", "buttonCallback -> %d", buttonCallbackArgs->action);
-    buttonCallbackArgs->actionMultiplexer->triggerAction(buttonCallbackArgs->action);
-}
-
-PushButtonController::PushButtonController():
-    m_actionMultiplexer(new ActionMultiplexer())
-{
+    auto event = static_cast<int32_t*>(args);
+    esp_event_post(LEDWALL_EVENTS, *event, nullptr, 0, portMAX_DELAY);
 }
 
 int PushButtonController::addButton(ButtonConfig btn)
 {
-    ESP_LOGI("PushButtonController", "addButton, gpio: %d, action: %d", btn.gpio, btn.action);
+    ESP_LOGI("PushButtonController", "addButton, gpio: %d, event: %d", btn.gpio, btn.event);
 
-    auto button = new Button(btn.gpio);
-    ButtonCallbackArgs callbackArgs = {
-        .actionMultiplexer = m_actionMultiplexer,
-        .action = btn.action
-    };
+    auto buttonToEvent = std::pair(new Button(btn.gpio), btn.event);
+    m_buttons.push_back(buttonToEvent);
 
-    m_buttons.push_back(std::pair(button, callbackArgs));
-
-    button->setEventCallback(BUTTON_CB_TAP, &buttonCallback, &m_buttons.back().second);
+    m_buttons.back().first->setEventCallback(BUTTON_CB_TAP, &buttonCallback, &m_buttons.back().second);
 
     return m_buttons.size();
-}
-
-void PushButtonController::addActionListener(ActionListener *actionListener)
-{
-    m_actionMultiplexer->addActionListener(actionListener);
 }
 
 }
