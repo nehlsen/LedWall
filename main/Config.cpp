@@ -1,6 +1,7 @@
 #include "Config.h"
 #include <ConfigManager.h>
 #include <ConfigPropertyConstraint.h>
+#include <MatrixOptions.h>
 
 namespace LedWall
 {
@@ -11,6 +12,11 @@ const int Config::LED_MODE_FALLBACK = 0;
 
 void Config::init()
 {
+    matrixOptions()
+        ->setVisibility(EBLi::config::ConfigProperty::Device)
+        ->setDefaultValue(MatrixOptions::MatrixInvertHorizontal)
+        ->setConstraint(EBLi::config::ConfigPropertyConstraint::Number(0, 128));
+
     matrixWidth()
         ->setVisibility(EBLi::config::ConfigProperty::Device)
         ->setDefaultValue(4)
@@ -50,6 +56,11 @@ void Config::init()
         // min:0, max:ledModeCount-1
         ->setDefaultValue(LED_MODE_FALLBACK)
         ;
+}
+
+EBLi::config::ConfigProperty * Config::matrixOptions()
+{
+    return EBLi::config::ConfigManager::instance()->property("matrix_options", "MatrixOptions");
 }
 
 EBLi::config::ConfigProperty * Config::matrixWidth()

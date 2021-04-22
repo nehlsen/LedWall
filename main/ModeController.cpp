@@ -60,7 +60,8 @@ ModeController::ModeController()
     ESP_LOGI(LOG_TAG, "Using PIN %d for LEDs", CONFIG_DATA_PIN);
     CFastLED::addLeds<WS2812B, CONFIG_DATA_PIN, GRB>(m_leds, (matrixWidth*matrixHeight));
 
-    m_matrix = new LedMatrix(FastLED, matrixWidth, matrixHeight, MatrixInvertHorizontal);
+    const int matrixOptions = Config::matrixOptions()->getValue<int>();
+    m_matrix = new LedMatrix(FastLED, matrixWidth, matrixHeight, matrixOptions);
 
     turnAllLedsOff();
 

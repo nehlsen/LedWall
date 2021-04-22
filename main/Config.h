@@ -19,6 +19,7 @@ struct Config
     static const int LED_MODE_FALLBACK;
 
     static void init();
+    static EBLi::config::ConfigProperty *matrixOptions();
     static EBLi::config::ConfigProperty *matrixWidth();
     static EBLi::config::ConfigProperty *matrixHeight();
     static EBLi::config::ConfigProperty *brightness();
