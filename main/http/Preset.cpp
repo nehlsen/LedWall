@@ -27,13 +27,13 @@ Preset::Preset(ModeController *controller):
         .uri = BASE_URI "/led/preset/delete",
         .method = http_method::HTTP_POST,
         .handler = Preset::deletePresetHttpHandler,
-        .user_ctx = nullptr
+        .user_ctx = m_controller
     },
     m_clear_presets_uri {
         .uri = BASE_URI "/led/preset/clear",
         .method = http_method::HTTP_POST,
         .handler = Preset::clearPresetsHttpHandler,
-        .user_ctx = nullptr
+        .user_ctx = m_controller
     }
 {}
 
@@ -107,10 +107,15 @@ esp_err_t Preset::loadPresetHttpHandler(httpd_req_t *request)
 
 esp_err_t Preset::deletePresetHttpHandler(httpd_req_t *request)
 {
-    return jsonRequestHelper(request, [=](cJSON *jsonRequestData, cJSON **jsonResponseData) {
+    auto controller = static_cast<ModeController*>(request->user_ctx);
+    if (nullptr == controller) {
+        return ESP_FAIL;
+    }
+
+    return jsonRequestHelper(request, [controller](cJSON *jsonRequestData, cJSON **jsonResponseData) {
         cJSON *const presetName = cJSON_GetObjectItem(jsonRequestData, "name");
         if (cJSON_IsString(presetName) && strlen(presetName->valuestring) <= ::LedWall::Preset::ValidNameLength) {
-            LedWall::ModeController::deletePreset(presetName->valuestring);
+            controller->deletePreset(presetName->valuestring);
         } else {
             return false;
         }
@@ -121,7 +126,12 @@ esp_err_t Preset::deletePresetHttpHandler(httpd_req_t *request)
 
 esp_err_t Preset::clearPresetsHttpHandler(httpd_req_t *request)
 {
-    LedWall::ModeController::deleteAllPresets();
+    auto controller = static_cast<ModeController*>(request->user_ctx);
+    if (nullptr == controller) {
+        return ESP_FAIL;
+    }
+
+    controller->deleteAllPresets();
     httpd_resp_send(request, "", 0);
     return ESP_OK;
 }

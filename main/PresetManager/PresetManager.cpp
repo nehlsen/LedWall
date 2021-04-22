@@ -41,6 +41,11 @@ PresetList PresetManager::getPresets()
 {
     ESP_LOGD(LOG_TAG, "getPresets");
 
+    // FIXME do not load if already loaded
+    if (!m_presetList.empty()) {
+        return m_presetList;
+    }
+
     if (readPresetsFromFile()) {
         ESP_LOGD(LOG_TAG, "getPresets, readPresets succeed: %d presets available", m_presetList.size());
     }

@@ -3,6 +3,8 @@
 
 #include <list>
 #include <string>
+#include "PresetManager/Preset.h"
+#include "PresetManager/PresetManager.h"
 
 class CRGB;
 class LedMatrix;
@@ -32,8 +34,9 @@ public:
 
     void savePreset(const std::string &presetName);
     bool loadPreset(const std::string &presetName);
-    static void deletePreset(const std::string &presetName);
-    static void deleteAllPresets();
+    bool loadPreset(const Preset &preset);
+    void deletePreset(const std::string &presetName);
+    void deleteAllPresets();
 
     bool setModeOptions(cJSON *optionsObject);
     void getModeOptions(cJSON *optionsObject) const;
@@ -51,6 +54,8 @@ protected:
     void updateMode(int newModeIndex, Mode::LedMode *newMode);
 
     static int getModeIndex(const std::string &name);
+
+    PresetManager m_presetManager;
 
     static void setLedUpdateTaskEnabled(bool enabled);
     void turnAllLedsOff();

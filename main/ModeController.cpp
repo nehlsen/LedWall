@@ -9,7 +9,6 @@
 #include "ModeOptionsPersister.h"
 #include "events.h"
 #include "Config.h"
-#include "PresetManager/PresetManager.h"
 
 namespace LedWall {
 
@@ -175,28 +174,30 @@ std::string ModeController::getModeName() const
 
 void ModeController::savePreset(const std::string &presetName)
 {
-    PresetManager pm;
-    pm.savePreset(presetName, Mode::LedModes.at(m_modeIndex).name, m_ledMode);
+    m_presetManager.savePreset(presetName, Mode::LedModes.at(m_modeIndex).name, m_ledMode);
 }
 
 bool ModeController::loadPreset(const std::string &presetName)
 {
-    PresetManager pm;
-
-    if (!pm.hasPreset(presetName)) {
+    if (!m_presetManager.hasPreset(presetName)) {
         ESP_LOGE(LOG_TAG, "loadPreset(\"%s\"): FAILED, no such preset", presetName.c_str());
         return false;
     }
     const auto preset = pm.getPreset(presetName);
 
+    return loadPreset(m_presetManager.getPreset(presetName));
+}
+
+bool ModeController::loadPreset(const Preset &preset)
+{
     const int modeIndex = getModeIndex(preset.getModeName());
     if (modeIndex < 0) {
-        ESP_LOGE(LOG_TAG, "loadPreset(\"%s\"): FAILED, no such mode: \"%s\"", presetName.c_str(), preset.getModeName().c_str());
+        ESP_LOGE(LOG_TAG, "loadPreset(\"%s\"): FAILED, no such mode: \"%s\"", preset.getPresetName().c_str(), preset.getModeName().c_str());
         return false;
     }
 
     if (modeIndex == m_modeIndex) {
-        ESP_LOGW(LOG_TAG, "loadPreset(\"%s\"): current mode and requested mode are the same, just load options", presetName.c_str());
+        ESP_LOGW(LOG_TAG, "loadPreset(\"%s\"): current mode and requested mode are the same, just load options", preset.getPresetName().c_str());
     } else {
         updateMode(modeIndex, Mode::LedModes.at(modeIndex).factory(*m_matrix));
     }
@@ -208,14 +209,12 @@ bool ModeController::loadPreset(const std::string &presetName)
 
 void ModeController::deletePreset(const std::string &presetName)
 {
-    PresetManager pm;
-    pm.deletePreset(presetName);
+    m_presetManager.deletePreset(presetName);
 }
 
 void ModeController::deleteAllPresets()
 {
-    PresetManager pm;
-    pm.deleteAllPresets();
+    m_presetManager.deleteAllPresets();
 }
 
 bool ModeController::setModeOptions(cJSON *optionsObject)
