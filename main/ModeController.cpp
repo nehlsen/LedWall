@@ -263,11 +263,13 @@ Mode::LedMode* ModeController::getLedMode() const
 void ModeController::updateMode(int newModeIndex, Mode::LedMode *newMode)
 {
     turnAllLedsOff();
+    setLedUpdateTaskEnabled(false);
 
     m_modeIndex = newModeIndex;
     delete m_ledMode;
     m_ledMode = newMode;
 
+    setLedUpdateTaskEnabled(true);
     Config::ledModeLast()->setValue(m_modeIndex);
     esp_event_post(LEDWALL_EVENTS, LEDWALL_EVENT_MODE_CHANGED, (void*)&m_modeIndex, sizeof(m_modeIndex), portMAX_DELAY);
 }
