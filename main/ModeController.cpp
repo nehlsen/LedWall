@@ -29,6 +29,8 @@ static EventGroupHandle_t led_update_task_event_group;
         random16_add_entropy(random());
 
         Mode::LedMode *ledMode = controller->getLedMode();
+        // FIXME it seems we can run into issues if we rapidly change modes
+        //       then the mode above (line 31) is not the same as it would be it line 39 which in turn panics because `ledMode` is gone
         if (ledMode) {
             if (ledMode->update()) {
                 FastLED.show();
@@ -265,8 +267,16 @@ void ModeController::updateMode(int newModeIndex, Mode::LedMode *newMode)
     turnAllLedsOff();
     setLedUpdateTaskEnabled(false);
 
+    // a semaphore would probably be better
+    // this should protect the `led_update_task`
+    // which gets the current mode, does something with it but its gone between the GET and the DO-STUFF
+    if (m_deleteLater != nullptr) {
+        delete m_deleteLater;
+        m_deleteLater = nullptr;
+    }
+
     m_modeIndex = newModeIndex;
-    delete m_ledMode;
+    m_deleteLater = m_ledMode;
     m_ledMode = newMode;
 
     setLedUpdateTaskEnabled(true);

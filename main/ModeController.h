@@ -51,6 +51,7 @@ protected:
     bool m_power = true;
     int m_modeIndex = -1;
     Mode::LedMode *m_ledMode = nullptr;
+    Mode::LedMode *m_deleteLater = nullptr;
     void updateMode(int newModeIndex, Mode::LedMode *newMode);
 
     static int getModeIndex(const std::string &name);
