@@ -47,6 +47,22 @@ static EventGroupHandle_t led_update_task_event_group;
     }
 }
 
+void mode_controller_led_wall_event(void* event_handler_arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
+{
+    auto controller = static_cast<ModeController*>(event_handler_arg);
+    ESP_ERROR_CHECK(nullptr == controller ? ESP_FAIL : ESP_OK);
+
+    switch (event_id) {
+        case LEDWALL_BTN_EVENT_POWER:
+            controller->setPower(!controller->getPower());
+            break;
+
+        default:
+            // NO OP
+            break;
+    }
+}
+
 ModeController::ModeController()
 {
     const int matrixWidth = Config::matrixWidth()->getValue<int>();
@@ -72,6 +88,8 @@ ModeController::ModeController()
     setPower(Config::isPoweredOnBoot());
     setBrightness(Config::brightness()->getValue<int>());
     setModeByIndex(Config::bootIntoLedMode());
+
+    esp_event_handler_register(LEDWALL_EVENTS, ESP_EVENT_ANY_ID, mode_controller_led_wall_event, this);
 
     xTaskCreatePinnedToCore(
             &led_update_task,
