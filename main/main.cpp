@@ -5,7 +5,6 @@
 #include "ModeController.h"
 #include "ConfigManager.h"
 #include "PushButton/PushButtonController.h"
-#include "PushButton/ActionListenerModeController.h"
 #include "Config.h"
 
 #if defined(CONFIG_ENABLE_REST)
@@ -86,7 +85,6 @@ void app_main()
     #endif
 
     auto pushButtonController = new LedWall::PushButton::PushButtonController();
-    pushButtonController->addActionListener(new LedWall::ActionListenerModeController(controller));
     pushButtonController->addButton({
         .gpio = GPIO_NUM_27,
         .action = LedWall::ACTION_POWER_TOGGLE
