@@ -185,7 +185,6 @@ bool ModeController::loadPreset(const std::string &presetName)
         ESP_LOGE(LOG_TAG, "loadPreset(\"%s\"): FAILED, no such preset", presetName.c_str());
         return false;
     }
-    const auto preset = pm.getPreset(presetName);
 
     return loadPreset(m_presetManager.getPreset(presetName));
 }
