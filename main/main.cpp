@@ -6,6 +6,7 @@
 #include "ConfigManager.h"
 #include "PushButton/PushButtonController.h"
 #include "Config.h"
+#include "events.h"
 
 #if defined(CONFIG_ENABLE_REST)
 #include <WebServer.h>
@@ -87,7 +88,7 @@ void app_main()
     auto pushButtonController = new LedWall::PushButton::PushButtonController();
     pushButtonController->addButton({
         .gpio = GPIO_NUM_27,
-        .action = LedWall::ACTION_POWER_TOGGLE
+        .event = LEDWALL_BTN_EVENT_PRESET_NEXT
     });
 }
 
