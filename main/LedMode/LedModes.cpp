@@ -12,6 +12,7 @@
 #include "FancyDemo.h"
 #include "GameOfLife.h"
 #include "ModeTime.h"
+#include "Bubbles.h"
 
 #ifdef CONFIG_ENABLE_CAM
 #include "Camera.h"
@@ -26,6 +27,7 @@ namespace LedWall::Mode {
 
 LedMode *createModeStatus(LedMatrix& matrix) { return new LedModeStatus(matrix); }
 LedMode *createModeBars(LedMatrix& matrix) { return new Bars(matrix); }
+LedMode *createModeBubbles(LedMatrix& matrix) { return new Bubbles(matrix); }
 LedMode *createModeMultiBars(LedMatrix& matrix) { return new MultiBars(matrix); }
 LedMode *createModeFireworks(LedMatrix& matrix) { return new Fireworks(matrix); }
 LedMode *createModeSample(LedMatrix& matrix) { return new LedModeSample(matrix); }
@@ -40,6 +42,7 @@ LedMode *createModeTime(LedMatrix& matrix) { return new ModeTime(matrix); }
 
 LedModeDef_t modeStatusDef {"Status", &createModeStatus};
 LedModeDef_t modeBarsDef {"Bars", &createModeBars};
+LedModeDef_t modeBubblesDef {"Bubbles", &createModeBubbles};
 LedModeDef_t modeMultiBarsDef {"MultiBars", &createModeMultiBars};
 LedModeDef_t modeFireworksDef {"Fireworks", &createModeFireworks};
 LedModeDef_t modeSampleDef {"Sample", &createModeSample};
@@ -65,6 +68,7 @@ LedModeDef_t modeNetworkDef {"Network", &createModeNetwork};
 std::vector<LedModeDef_t> LedModes {
         modeStatusDef,
         modeBarsDef,
+        modeBubblesDef,
         modeMultiBarsDef,
         modeFireworksDef,
         modeSampleDef,
