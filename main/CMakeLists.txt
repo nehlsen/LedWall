@@ -19,6 +19,7 @@ set(COMPONENT_SRCS
         "LedMode/LedModeHsiboy.cpp"
         "LedMode/Fireworks.cpp"
         "LedMode/Bars.cpp"
+        "LedMode/Bubbles.cpp"
         "LedMode/MultiBars.cpp"
         "LedMode/Fire.cpp"
         "LedMode/Network.cpp"
