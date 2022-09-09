@@ -3,6 +3,7 @@
 #include <esp_log.h>
 #include <OtaUpdater.h>
 #include "ModeController.h"
+#include "PresetManager/PresetChanger.h"
 #include "ConfigManager.h"
 #include "PushButton/PushButtonController.h"
 #include "Config.h"
@@ -15,6 +16,7 @@
 #include "http/ModeOptions.h"
 #include "http/ModeList.h"
 #include "http/Preset.h"
+#include "http/PresetChangerModule.h"
 #endif
 
 #if defined(CONFIG_ENABLE_MQTT)
@@ -70,10 +72,12 @@ void app_main()
 
     auto controller = new LedWall::ModeController;
 
+    auto presetChanger = new LedWall::PresetChanger(controller);
+
     auto updater = new EBLi::ota::OtaUpdater; // FIXME shouldn't this be in ebli:init_all ?!
 
     #if defined(CONFIG_ENABLE_MQTT)
-    auto mqtt = new LedWall::MqttAdapter(controller);
+    auto mqtt = new LedWall::MqttAdapter(controller, presetChanger);
     #endif
 
     #if defined(CONFIG_ENABLE_REST)
@@ -83,6 +87,7 @@ void app_main()
     server->addModule(new LedWall::http::ModeOptions(controller));
     server->addModule(new LedWall::http::ModeList());
     server->addModule(new LedWall::http::Preset(controller));
+    server->addModule(new LedWall::http::PresetChangerModule(presetChanger));
     #endif
 
     auto pushButtonController = new LedWall::PushButton::PushButtonController();

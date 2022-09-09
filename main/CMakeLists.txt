@@ -7,6 +7,7 @@ set(COMPONENT_SRCS
 
         "PresetManager/PresetManager.cpp"
         "PresetManager/Preset.cpp"
+        "PresetManager/PresetChanger.cpp"
 
         "ModeController.cpp"
         "LedMode/LedMode.cpp"
@@ -53,7 +54,14 @@ else()
 endif()
 
 if(CONFIG_ENABLE_REST)
-    list(APPEND COMPONENT_SRCS http/Power.cpp http/Mode.cpp http/ModeOptions.cpp http/ModeList.cpp http/Preset.cpp)
+    list(APPEND COMPONENT_SRCS
+            http/Power.cpp
+            http/Mode.cpp
+            http/ModeOptions.cpp
+            http/ModeList.cpp
+            http/Preset.cpp
+            http/PresetChangerModule.cpp
+    )
     message(STATUS "LedWall: REST Interface enabled")
 else()
     message(STATUS "LedWall: REST Interface disabled")

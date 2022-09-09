@@ -1,5 +1,6 @@
 #include "MqttAdapter.h"
 #include "../ModeController.h"
+#include "../PresetManager/PresetChanger.h"
 #include "../events.h"
 #include "../LedMode/LedModes.h"
 #include <Mqtt.h>
@@ -18,8 +19,8 @@ void led_wall_events(void* event_handler_arg, esp_event_base_t event_base, int32
     mqtt->onLedWallEvent(event_id, event_data);
 }
 
-MqttAdapter::MqttAdapter(ModeController *controller):
-    m_controller(controller)
+MqttAdapter::MqttAdapter(ModeController *controller, LedWall::PresetChanger *presetChanger) :
+    m_controller(controller), m_presetChanger(presetChanger)
 {
     esp_event_handler_register(LEDWALL_EVENTS, ESP_EVENT_ANY_ID, led_wall_events, this);
 
@@ -88,6 +89,7 @@ void MqttAdapter::setupSubscribers()
     mqtt->createSubscriber("brightness", [this](const std::string &value) {
         m_controller->setBrightness(std::stoi(value));
     });
+
     mqtt->createSubscriber("mode/index", [this](const std::string &value) {
         m_controller->setModeByIndex(std::stoi(value));
     });
@@ -99,6 +101,7 @@ void MqttAdapter::setupSubscribers()
         m_controller->setModeOptions(optionsObject);
         cJSON_Delete(optionsObject);
     });
+
     mqtt->createSubscriber("preset/save", [this](const std::string &value) {
         m_controller->savePreset(value);
     });
@@ -111,6 +114,11 @@ void MqttAdapter::setupSubscribers()
     mqtt->createSubscriber("preset/clear", [this](const std::string &value) {
         m_controller->deleteAllPresets();
     });
+
+    mqtt->createSubscriber("preset/changer/next", [this](const std::string &value) {
+        m_presetChanger->activateNextPreset();
+    });
+
     mqtt->createSubscriber("reboot", [this](const std::string &value) {
         m_controller->triggerSystemReboot();
     });
