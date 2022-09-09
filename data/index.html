@@ -63,58 +63,85 @@
     </div>
     <div id="tab-content">
         <div class="columns tabbed-columns is-active" data-content="1">
-            <div class="column">
+            <div class="column is-full">
                 <div class="box">
-                    <a href="#" class="is-pulled-right" id="modes-list-update-button"><i class="fa fa-sync"></i></a>
-                    <h2 class="title"><i class="fa fas fa-tasks"></i> Modes</h2>
-                    <p class="help">Click to activate...</p>
-                    <div class="menu">
-                        <ul id="modes-list" class="menu-list">
-                            <li id="modes-list-placeholder" class="has-text-grey">Loading...</li>
+                    <div class="tabs" id="tabs-visuals">
+                        <ul>
+                            <li class="is-active" data-tab="tabs-visuals-presets">
+                                <a>
+                                    <span class="icon is-small"><i class="fa fa-tasks"></i></span>
+                                    <span>Presets</span>
+                                </a>
+                            </li>
+                            <li data-tab="tabs-visuals-modes">
+                                <a>
+                                    <span class="icon is-small"><i class="fa fa-cogs"></i></span>
+                                    <span>Modes</span>
+                                </a>
+                            </li>
+                            <li data-tab="tabs-visuals-mode-options">
+                                <a>
+                                    <span class="icon is-small"><i class="fa fa-cogs"></i></span>
+                                    <span>Options</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
-                </div>
-            </div>
 
-            <div class="column">
-                <div class="box">
-                    <h2 class="title"><i class="fa fas fa-toolbox"></i> Mode Options</h2>
-                    <table class="table is-fullwidth" id="table-mode-options">
-                        <tbody>
-                        <tr id="mode-options-loading">
-                            <td colspan="2"><em class="has-text-grey">loading...</em></td>
-                        </tr>
-                        </tbody>
-                        <tfoot>
-                        <tr>
-                            <td colspan="2" class="has-text-right">
-                                <a href="#" class="button">Save</a>
-                            </td>
-                        </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-
-            <div class="column">
-                <div class="box">
-                    <a href="#" class="is-pulled-right" id="presets-list-update-button"><i class="fa fa-sync"></i></a>
-                    <h2 class="title"><i class="fa fas fa-tasks"></i> Presets</h2>
-                    <div class="field has-addons">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="Save as..." id="preset-save-name">
+                    <div id="tabs-visuals-content">
+                        <div class="columns tabbed-columns is-active" data-content="tabs-visuals-presets">
+                            <div class="column">
+                                <a href="#" class="is-pulled-right" id="presets-list-update-button"><i class="fa fa-sync"></i></a>
+                                <h2 class="title"><i class="fa fas fa-tasks"></i> Presets</h2>
+                                <p class="help">Click to activate...</p>
+                                <div class="menu">
+                                    <ul id="presets-list" class="menu-list">
+                                        <li id="presets-list-placeholder" class="has-text-grey">Loading...</li>
+                                    </ul>
+                                </div>
+                                <div class="field has-addons">
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="Save as..." id="preset-save-name">
+                                    </div>
+                                    <div class="control">
+                                        <button class="button is-info" id="preset-save-button">
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="control">
-                            <button class="button is-info" id="preset-save-button">
-                                Save
-                            </button>
+                        <div class="columns tabbed-columns" data-content="tabs-visuals-modes">
+                            <div class="column">
+                                <a href="#" class="is-pulled-right" id="modes-list-update-button"><i class="fa fa-sync"></i></a>
+                                <h2 class="title"><i class="fa fas fa-tasks"></i> Modes</h2>
+                                <p class="help">Click to activate...</p>
+                                <div class="menu">
+                                    <ul id="modes-list" class="menu-list">
+                                        <li id="modes-list-placeholder" class="has-text-grey">Loading...</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <p class="help">Click to activate...</p>
-                    <div class="menu">
-                        <ul id="presets-list" class="menu-list">
-                            <li id="presets-list-placeholder" class="has-text-grey">Loading...</li>
-                        </ul>
+                        <div class="columns tabbed-columns" data-content="tabs-visuals-mode-options">
+                            <div class="column">
+                                <h2 class="title"><i class="fa fas fa-toolbox"></i> Mode Options</h2>
+                                <table class="table is-fullwidth" id="table-mode-options">
+                                    <tbody>
+                                    <tr id="mode-options-loading">
+                                        <td colspan="2"><em class="has-text-grey">loading...</em></td>
+                                    </tr>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="2" class="has-text-right">
+                                            <a href="#" class="button">Save</a>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -250,6 +277,12 @@
                             <button class="button is-danger" id="action-reboot">Reboot</button>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="box">
+                    <h2 class="title"><i class="fa fas fa-toolbox"></i> Files / Backup</h2>
+                    <a href="/api/v2/fs/presets.json">presets.json</a>
                 </div>
             </div>
         </div>
@@ -413,6 +446,15 @@
             $(this).addClass('is-active');
 
             $('#tab-content .tabbed-columns').removeClass('is-active');
+            $('.tabbed-columns[data-content="' + tab + '"]').addClass('is-active');
+        });
+        $('#tabs-visuals li').on('click', function() {
+            const tab = $(this).data('tab');
+
+            $('#tabs-visuals li').removeClass('is-active');
+            $(this).addClass('is-active');
+
+            $('#tabs-visuals-content .tabbed-columns').removeClass('is-active');
             $('.tabbed-columns[data-content="' + tab + '"]').addClass('is-active');
         });
 
