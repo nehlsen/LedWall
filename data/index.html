@@ -91,22 +91,28 @@
                     <div id="tabs-visuals-content">
                         <div class="columns tabbed-columns is-active" data-content="tabs-visuals-presets">
                             <div class="column">
-                                <a href="#" class="is-pulled-right" id="presets-list-update-button"><i class="fa fa-sync"></i></a>
-                                <h2 class="title"><i class="fa fas fa-tasks"></i> Presets</h2>
-                                <p class="help">Click to activate...</p>
-                                <div class="menu">
-                                    <ul id="presets-list" class="menu-list">
-                                        <li id="presets-list-placeholder" class="has-text-grey">Loading...</li>
-                                    </ul>
-                                </div>
-                                <div class="field has-addons">
-                                    <div class="control">
-                                        <input class="input" type="text" placeholder="Save as..." id="preset-save-name">
+                                <div class="columns">
+                                    <div class="column">
+                                        <a href="#" class="is-pulled-right" id="presets-list-update-button"><i class="fa fa-sync"></i></a>
+                                        <h2 class="title"><i class="fa fas fa-tasks"></i> Presets</h2>
+                                        <p class="help">Click to activate...</p>
+                                        <div class="menu">
+                                            <ul id="presets-list" class="menu-list">
+                                                <li id="presets-list-placeholder" class="has-text-grey">Loading...</li>
+                                            </ul>
+                                        </div>
                                     </div>
-                                    <div class="control">
-                                        <button class="button is-info" id="preset-save-button">
-                                            Save
-                                        </button>
+                                    <div class="column">
+                                        <div class="field has-addons">
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder="Save as..." id="preset-save-name">
+                                            </div>
+                                            <div class="control">
+                                                <button class="button is-info" id="preset-save-button">
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -492,7 +498,6 @@
         $('#action-reboot').click(function () {
             $.post("/api/v2/system/reboot");
         });
-
     });
 </script>
 
