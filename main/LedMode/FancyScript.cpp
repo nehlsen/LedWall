@@ -1,8 +1,6 @@
 #include "FancyScript.h"
-
 #include <utility>
-#include "LedMode/FancyParts/Nothing.h"
-#include "LedMode/FancyParts/ExplodingLetters.h"
+#include "FancyParts/FancyPartFactory.h"
 
 /*
  *
@@ -18,16 +16,13 @@ namespace LedWall::Mode {
 FancyScript::FancyScript(LedMatrix &matrix) : LedMode(matrix)
 {
     setScript({
-        "Nothing",
-        "Nothing,",
-        "Nothing,0",
-        "Nothing,0,",
         "ExpLet,0,5",
         "ExpLet,0,4",
         "ExpLet,0,3",
         "ExpLet,0,2",
         "ExpLet,0,1",
-        "ExpLet,0,0",
+        "ExpLet,0,2022",
+        "Sprinkle",
     });
 }
 
@@ -71,14 +66,7 @@ FancyParts::FancyPart *FancyScript::createPart(const std::string& line)
     const auto options = extractOptions(line);
     const auto arguments = extractArguments(line);
 
-    if (partName == "Nothing") {
-        return new FancyParts::Nothing(m_matrix, options, arguments);
-    }
-    if (partName == "ExpLet") {
-        return new FancyParts::ExplodingLetters(m_matrix, options, arguments);
-    }
-
-    return new FancyParts::Nothing(m_matrix, options, arguments);
+    return FancyParts::FancyPartFactory::create(partName, m_matrix, options, arguments);
 }
 
 std::string FancyScript::extractPartName(const std::string &line)

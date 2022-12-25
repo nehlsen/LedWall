@@ -21,15 +21,9 @@ class FancyPart
 {
 public:
     FancyPart(LedMatrix &matrix, PartOptions options, std::string arguments);
-
-//    explicit FancyPart(uint16_t firstFrame, LedMatrix &matrix, PartOptions options = NO_OPS);
-//    explicit FancyPart(FancyPart *previousPart, PartOptions options = NO_OPS);
     virtual ~FancyPart() = default;
 
     virtual uint16_t getFrameCount() const = 0;
-
-//    uint16_t getFirstFrame() const;
-//    uint16_t getLastFrame() const;
 
     virtual void render(uint16_t relativeFrame);
 
@@ -38,16 +32,12 @@ protected:
 
     LedMatrix &m_matrix;
 
-
     const PartOptions m_options;
     bool hasOption(PartOptions option) const;
     bool isForward() const;
     bool isHorizontal() const;
 
     const std::string m_arguments;
-
-//private:
-//    const uint16_t m_firstFrame;
 };
 
 }
