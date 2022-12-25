@@ -14,6 +14,9 @@ public:
 
     void setScript(std::vector<std::string> lines);
 
+    void setScript(const std::string& script);
+    std::string getScript() const;
+
     bool update() override;
 
 protected:

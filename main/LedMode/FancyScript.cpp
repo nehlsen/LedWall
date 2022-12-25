@@ -1,5 +1,6 @@
 #include "FancyScript.h"
 #include <utility>
+#include <sstream>
 #include "FancyParts/FancyPartFactory.h"
 
 /*
@@ -55,6 +56,29 @@ void FancyScript::setScript(std::vector<std::string> lines)
 {
     // TODO protect other methods from "no lines at all" e.g. always have "nothing mode"
     m_lines = std::move(lines);
+}
+
+void FancyScript::setScript(const std::string& script)
+{
+    m_lines.clear();
+
+    std::istringstream i(script);
+    std::string buf;
+    while(getline(i, buf, '\n')) {
+        m_lines.push_back(buf);
+    }
+}
+
+std::string FancyScript::getScript() const
+{
+    std::string lines;
+    std::ostringstream o(lines);
+
+    for (const auto & line : m_lines) {
+        o << line << "\n";
+    }
+
+    return lines;
 }
 
 bool FancyScript::update()
