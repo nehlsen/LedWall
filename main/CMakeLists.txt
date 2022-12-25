@@ -42,6 +42,10 @@ set(COMPONENT_SRCS
         "LedMode/FancyDemo/FdNHeartC.cpp"
         "LedMode/FancyDemo/FdSprinkle.cpp"
         "LedMode/FancyDemo/Nothing.cpp"
+        "LedMode/FancyScript.cpp"
+        "LedMode/FancyParts/FancyPart.cpp"
+        "LedMode/FancyParts/ExplodingLetters.cpp"
+        "LedMode/FancyParts/Nothing.cpp"
         "LedMode/GameOfLife.cpp"
         )
 
