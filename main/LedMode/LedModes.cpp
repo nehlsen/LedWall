@@ -13,6 +13,7 @@
 #include "GameOfLife.h"
 #include "ModeTime.h"
 #include "Bubbles.h"
+#include "NewYearsEve.h"
 
 #ifdef CONFIG_ENABLE_CAM
 #include "Camera.h"
@@ -39,6 +40,7 @@ LedMode *createModeWave(LedMatrix& matrix) { return new Wave(matrix); }
 LedMode *createModeFancyDemo(LedMatrix& matrix) { return new FancyDemo(matrix); }
 LedMode *createModeGameOfLife(LedMatrix& matrix) { return new GameOfLife(matrix); }
 LedMode *createModeTime(LedMatrix& matrix) { return new ModeTime(matrix); }
+LedMode *createModeNewYearsEve(LedMatrix& matrix) { return new NewYearsEve(matrix); }
 
 LedModeDef_t modeStatusDef {"Status", &createModeStatus};
 LedModeDef_t modeBarsDef {"Bars", &createModeBars};
@@ -54,6 +56,7 @@ LedModeDef_t modeWaveDef {"Wave", &createModeWave};
 LedModeDef_t modeFancyDemoDef {"FancyDemo", &createModeFancyDemo};
 LedModeDef_t modeGameOfLifeDef {"GameOfLife", &createModeGameOfLife};
 LedModeDef_t modeTimeDef {"Time", &createModeTime};
+LedModeDef_t modeNewYearsEveDef {"NewYears", &createModeNewYearsEve};
 
 #ifdef CONFIG_ENABLE_CAM
 LedMode *createModeCamera(LedMatrix& matrix) { return new Camera(matrix); }
@@ -80,6 +83,7 @@ std::vector<LedModeDef_t> LedModes {
         modeFancyDemoDef,
         modeGameOfLifeDef,
         modeTimeDef,
+        modeNewYearsEveDef,
 #ifdef CONFIG_ENABLE_CAM
         modeCameraDef,
 #endif
