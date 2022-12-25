@@ -47,7 +47,14 @@ set(COMPONENT_SRCS
         "LedMode/FancyParts/FancyPartFactory.cpp"
         "LedMode/FancyParts/ExplodingLetters.cpp"
         "LedMode/FancyParts/Sprinkle.cpp"
+        "LedMode/FancyParts/ColorRays.cpp"
+        "LedMode/FancyParts/BarsGrow.cpp"
+        "LedMode/FancyParts/BarsOpen.cpp"
+        "LedMode/FancyParts/CubeRoll.cpp"
+        "LedMode/FancyParts/CubeGrow.cpp"
         "LedMode/FancyParts/Nothing.cpp"
+        "LedMode/FancyParts/CircleGrow.cpp"
+        "LedMode/FancyParts/CN.cpp"
         "LedMode/GameOfLife.cpp"
         )
 
