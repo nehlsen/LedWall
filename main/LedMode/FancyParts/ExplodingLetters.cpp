@@ -18,10 +18,6 @@ uint16_t ExplodingLetters::getFrameCount() const
 
 void ExplodingLetters::renderImpl(uint16_t relativeFrame)
 {
-    if (relativeFrame == 0) {
-        m_matrix.clear(false);
-    }
-
     Canvas c(m_letters.pixels());
 
     if (relativeFrame >= m_stillFrames) {

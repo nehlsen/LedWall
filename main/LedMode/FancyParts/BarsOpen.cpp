@@ -15,8 +15,6 @@ uint16_t BarsOpen::getFrameCount() const
 
 void BarsOpen::renderImpl(uint16_t relativeFrame)
 {
-    m_matrix.clear(false);
-
     if (isHorizontal()) {
         uint8_t x0 = 0;
         uint8_t x1 = m_matrix.getWidth() - 1;

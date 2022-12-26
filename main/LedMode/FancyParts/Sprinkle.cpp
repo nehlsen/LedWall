@@ -11,8 +11,6 @@ uint16_t Sprinkle::getFrameCount() const
 
 void Sprinkle::renderImpl(uint16_t relativeFrame)
 {
-    m_matrix.clear(false);
-
     GfxPrimitive prim;
 
     const int count = (m_matrix.getWidth() * m_matrix.getHeight()) * 0.15;

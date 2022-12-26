@@ -11,8 +11,6 @@ uint16_t ColorRays::getFrameCount() const
 
 void ColorRays::renderImpl(uint16_t relativeFrame)
 {
-    m_matrix.clear(false);
-
     if (m_lines.pixels().empty()) {
         initLines();
     }

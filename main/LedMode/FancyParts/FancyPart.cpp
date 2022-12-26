@@ -1,6 +1,6 @@
 #include "FancyPart.h"
-
 #include <utility>
+#include <LedMatrix.h>
 
 namespace LedWall::Mode::FancyParts {
 
@@ -10,6 +10,10 @@ FancyPart::FancyPart(LedMatrix &matrix, PartOptions options, std::string argumen
 
 void FancyPart::render(uint16_t relativeFrame)
 {
+    if (isClearFrame()) {
+        m_matrix.clear(false);
+    }
+
     renderImpl(isForward() ? relativeFrame : getFrameCount() - relativeFrame);
 }
 
@@ -26,6 +30,11 @@ bool FancyPart::isForward() const
 bool FancyPart::isHorizontal() const
 {
     return !hasOption(VERTICAL);
+}
+
+bool FancyPart::isClearFrame() const
+{
+    return !hasOption(KEEP_FRAME);
 }
 
 }

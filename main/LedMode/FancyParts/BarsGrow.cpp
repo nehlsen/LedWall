@@ -15,8 +15,6 @@ uint16_t BarsGrow::getFrameCount() const
 
 void BarsGrow::renderImpl(uint16_t relativeFrame)
 {
-    m_matrix.clear(false);
-
     if (isHorizontal()) {
         uint8_t x0 = std::round(m_matrix.getWidth() / 2.0 - 1.5);
         uint8_t x1 = x0 + 2;

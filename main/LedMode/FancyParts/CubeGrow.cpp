@@ -11,8 +11,6 @@ uint16_t CubeGrow::getFrameCount() const
 
 void CubeGrow::renderImpl(uint16_t relativeFrame)
 {
-    m_matrix.clear(false);
-
     uint8_t x = m_matrix.getWidth() / 2 - 1 - relativeFrame;
     uint8_t y = m_matrix.getHeight() / 2 - 1 - relativeFrame;
 

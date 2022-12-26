@@ -9,12 +9,14 @@ class LedMatrix;
 namespace LedWall::Mode::FancyParts {
 
 enum PartOptions {
-    FORWARD    = 0b0000,
-    REVERSE    = 0b0001,
-    HORIZONTAL = 0b0000,
-    VERTICAL   = 0b0010,
+    FORWARD     = 0b0000,
+    REVERSE     = 0b0001,
+    HORIZONTAL  = 0b0000,
+    VERTICAL    = 0b0010,
+    CLEAR_FRAME = 0b0000,
+    KEEP_FRAME  = 0b0100,
 
-    NO_OPS     = 0b0000,
+    NO_OPS      = 0b0000,
 };
 
 class FancyPart
@@ -36,6 +38,7 @@ protected:
     bool hasOption(PartOptions option) const;
     bool isForward() const;
     bool isHorizontal() const;
+    bool isClearFrame() const;
 
     const std::string m_arguments;
 };

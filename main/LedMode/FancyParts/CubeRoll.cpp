@@ -23,8 +23,6 @@ uint16_t CubeRoll::getFrameCount() const
 
 void CubeRoll::renderImpl(uint16_t relativeFrame)
 {
-    m_matrix.clear(false);
-
     uint8_t cubeSize = 9;
 
     uint8_t x = 0;
