@@ -2,8 +2,9 @@
 #define LEDWALL_FANCYSCRIPT_H
 
 #include "LedMode.h"
-#include "LedMode/FancyParts/FancyPart.h"
+#include "FancyParts/FancyPart.h"
 #include <vector>
+#include <string>
 
 namespace LedWall::Mode {
 
@@ -18,6 +19,9 @@ public:
     std::string getScript() const;
 
     bool update() override;
+
+    void readOptions(cJSON *root) override;
+    bool writeOptions(cJSON *root) override;
 
 protected:
     std::vector<std::string> m_lines;

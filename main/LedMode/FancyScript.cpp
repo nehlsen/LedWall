@@ -2,6 +2,8 @@
 #include <utility>
 #include <sstream>
 #include "FancyParts/FancyPartFactory.h"
+#include <cJSON.h>
+#include <esp_log.h>
 
 /*
  *
@@ -11,6 +13,9 @@
  *  ARGs : arguments to the part itself
  *
  */
+
+#define JSON_MAX_LINE_LENGTH 32
+#define JSON_MAX_LINE_COUNT 100
 
 namespace LedWall::Mode {
 
@@ -93,6 +98,52 @@ bool FancyScript::update()
         ++m_currentLine;
         m_partFrame = 0;
     }
+
+    return true;
+}
+
+void FancyScript::readOptions(cJSON *root)
+{
+    cJSON *const script = cJSON_AddArrayToObject(root, "script");
+
+    for (const auto& line : m_lines) {
+        cJSON *const jsonLine = cJSON_CreateString(line.c_str());
+        if (!jsonLine) {
+            ESP_LOGE("FancyScript", "Failed to write JSON - maybe out of memory?");
+            cJSON_Delete(script);
+            return;
+        }
+        cJSON_AddItemToArray(jsonLine, script);
+    }
+}
+
+bool FancyScript::writeOptions(cJSON *root)
+{
+    cJSON *const script = cJSON_GetObjectItem(root, "script");
+    if (!cJSON_IsArray(script)) {
+        return false;
+    }
+
+    std::vector<std::string> newLines;
+
+    cJSON* item;
+    cJSON_ArrayForEach(item, script) {
+        if (!cJSON_IsString(item)) {
+            continue;
+        }
+        if (strlen(item->valuestring) > JSON_MAX_LINE_LENGTH) {
+            continue;
+        }
+
+        newLines.emplace_back(item->valuestring);
+
+        if (newLines.size() > JSON_MAX_LINE_COUNT) {
+            break;
+        }
+    }
+
+    m_lines = std::move(newLines);
+    return true;
 }
 
 FancyParts::FancyPart *FancyScript::getCurrentPart()
