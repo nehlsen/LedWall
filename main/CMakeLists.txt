@@ -43,6 +43,8 @@ set(COMPONENT_SRCS
         "LedMode/FancyParts/Nothing.cpp"
         "LedMode/FancyParts/CircleGrow.cpp"
         "LedMode/FancyParts/CN.cpp"
+        "LedMode/FancyParts/FlashingLetters.cpp"
+        "LedMode/FancyParts/PartArguments.cpp"
         "LedMode/GameOfLife.cpp"
         )
 

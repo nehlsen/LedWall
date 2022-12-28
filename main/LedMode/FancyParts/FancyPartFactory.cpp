@@ -9,6 +9,7 @@
 #include "CubeGrow.h"
 #include "CircleGrow.h"
 #include "CN.h"
+#include "FlashingLetters.h"
 
 namespace LedWall::Mode::FancyParts {
 
@@ -16,6 +17,9 @@ FancyPart *FancyPartFactory::create(const std::string &partName, LedMatrix &matr
 {
     if (partName == "ExpLet") {
         return new FancyParts::ExplodingLetters(matrix, options, arguments);
+    }
+    if (partName == "FlashLet") {
+        return new FancyParts::FlashingLetters(matrix, options, arguments);
     }
     if (partName == "Sprinkle") {
         return new FancyParts::Sprinkle(matrix, options, arguments);

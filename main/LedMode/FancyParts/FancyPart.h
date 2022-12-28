@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string>
+#include "PartArguments.h"
 
 class LedMatrix;
 
@@ -40,7 +41,7 @@ protected:
     bool isHorizontal() const;
     bool isClearFrame() const;
 
-    const std::string m_arguments;
+    const PartArguments m_arguments;
 };
 
 }
