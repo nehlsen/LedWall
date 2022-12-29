@@ -2,8 +2,7 @@
 #include "PartArguments.h"
 #include <Canvas.h>
 
-#define FRAMES_PER_LETTER 25
-#define FRAMES_BLANK (FRAMES_PER_LETTER/2)
+#define FRAMES_PER_LETTER 5
 
 namespace LedWall::Mode::FancyParts {
 
@@ -17,7 +16,7 @@ void FlashingLetters::renderImpl(uint16_t relativeFrame)
     auto partFrames = getFramesPerLetter() + getBlankFramesPerLetter();
     auto letterFrame = relativeFrame % partFrames;
 
-    if (letterFrame < getFramesPerLetter()) {
+    if (letterFrame < (getFramesPerLetter() - 1)) {
         int letterIndex = relativeFrame / partFrames;
 
         auto letter = getLetters().substr(letterIndex, 1);
@@ -39,7 +38,7 @@ int FlashingLetters::getFramesPerLetter() const
 
 int FlashingLetters::getBlankFramesPerLetter() const
 {
-    return m_arguments.argument(2, FRAMES_BLANK);
+    return m_arguments.argument(2, (getFramesPerLetter() / 2));
 }
 
 }
