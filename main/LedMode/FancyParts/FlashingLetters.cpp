@@ -1,8 +1,9 @@
 #include "FlashingLetters.h"
 #include "PartArguments.h"
 #include <Canvas.h>
+#include <Text.h>
 
-#define FRAMES_PER_LETTER 5
+#define FRAMES_COUNT_EXPLOSION 5
 
 namespace LedWall::Mode::FancyParts {
 
@@ -20,20 +21,18 @@ void FlashingLetters::renderImpl(uint16_t relativeFrame)
         int letterIndex = relativeFrame / partFrames;
 
         auto letter = getLetters().substr(letterIndex, 1);
-        m_text.setText(letter);
-
-        Canvas(m_text.pixels()).renderCentered(m_matrix);
+        Canvas(Text().setText(letter).pixels()).renderCentered(m_matrix);
     }
 }
 
 std::string FlashingLetters::getLetters() const
 {
-    return m_arguments.argument(0, "fallback");
+    return m_arguments.argument(0, "flashing!");
 }
 
 int FlashingLetters::getFramesPerLetter() const
 {
-    return m_arguments.argument(1, FRAMES_PER_LETTER);
+    return m_arguments.argument(1, FRAMES_COUNT_EXPLOSION);
 }
 
 int FlashingLetters::getBlankFramesPerLetter() const
