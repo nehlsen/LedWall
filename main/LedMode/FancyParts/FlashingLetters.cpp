@@ -2,8 +2,6 @@
 #include "PartArguments.h"
 #include <Canvas.h>
 
-#include <QDebug>
-
 #define FRAMES_PER_LETTER 25
 #define FRAMES_BLANK (FRAMES_PER_LETTER/2)
 
@@ -18,8 +16,6 @@ void FlashingLetters::renderImpl(uint16_t relativeFrame)
 {
     auto partFrames = getFramesPerLetter() + getBlankFramesPerLetter();
     auto letterFrame = relativeFrame % partFrames;
-
-    qDebug() << relativeFrame << partFrames << letterFrame;
 
     if (letterFrame < getFramesPerLetter()) {
         int letterIndex = relativeFrame / partFrames;
