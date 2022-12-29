@@ -14,6 +14,7 @@
 #include "ModeTime.h"
 #include "Bubbles.h"
 #include "NewYearsEve.h"
+#include "FancyScript.h"
 
 #ifdef CONFIG_ENABLE_CAM
 #include "Camera.h"
@@ -41,6 +42,7 @@ LedMode *createModeFancyDemo(LedMatrix& matrix) { return new FancyDemo(matrix); 
 LedMode *createModeGameOfLife(LedMatrix& matrix) { return new GameOfLife(matrix); }
 LedMode *createModeTime(LedMatrix& matrix) { return new ModeTime(matrix); }
 LedMode *createModeNewYearsEve(LedMatrix& matrix) { return new NewYearsEve(matrix); }
+LedMode *createModeFancyScript(LedMatrix& matrix) { return new FancyScript(matrix); }
 
 LedModeDef_t modeStatusDef {"Status", &createModeStatus};
 LedModeDef_t modeBarsDef {"Bars", &createModeBars};
@@ -57,6 +59,7 @@ LedModeDef_t modeFancyDemoDef {"FancyDemo", &createModeFancyDemo};
 LedModeDef_t modeGameOfLifeDef {"GameOfLife", &createModeGameOfLife};
 LedModeDef_t modeTimeDef {"Time", &createModeTime};
 LedModeDef_t modeNewYearsEveDef {"NewYears", &createModeNewYearsEve};
+LedModeDef_t modeFancyScriptDef {"FancyScript", &createModeFancyScript};
 
 #ifdef CONFIG_ENABLE_CAM
 LedMode *createModeCamera(LedMatrix& matrix) { return new Camera(matrix); }
@@ -84,6 +87,7 @@ std::vector<LedModeDef_t> LedModes {
         modeGameOfLifeDef,
         modeTimeDef,
         modeNewYearsEveDef,
+        modeFancyScriptDef,
 #ifdef CONFIG_ENABLE_CAM
         modeCameraDef,
 #endif
