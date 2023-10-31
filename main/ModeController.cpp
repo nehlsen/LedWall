@@ -43,7 +43,9 @@ static EventGroupHandle_t led_update_task_event_group;
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
 
+        // FIXME move this before the access to *ledMode to prevent dangling pointer access ?!
         xEventGroupWaitBits(led_update_task_event_group, LED_WALL_ENABLED_BIT, false, false, portMAX_DELAY);
+        // FIXME properly handle timeout of xEventGroupWaitBits
     }
 }
 

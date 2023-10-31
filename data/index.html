@@ -103,6 +103,9 @@
                                         </div>
                                     </div>
                                     <div class="column">
+                                        <button class="button is-primary is-outlined is-fullwidth" id="btn-autochanger-toggle">Auto Changer On/Off</button>
+                                    </div>
+                                    <div class="column">
                                         <div class="field has-addons">
                                             <div class="control">
                                                 <input class="input" type="text" placeholder="Save as..." id="preset-save-name">
@@ -444,6 +447,43 @@
                 $('#config-SensorsPublishDelay').val(config.SensorsPublishDelay);
             });
         };
+
+        let $autoChangerToggleButton = $('#btn-autochanger-toggle');
+        let updateAutoChangerStatus = function () {
+            $.getJSON("/api/v2/presetChanger/options", function (presetChangerOptionsResponse) {
+                showAutoChangerStatus(presetChangerOptionsResponse);
+            });
+        };
+        let setAutoChangerStatus = function (enableAutoChanger) {
+            $.ajax({
+                type: 'POST',
+                url: "/api/v2/led/presetChanger/options",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    auto: enableAutoChanger
+                }),
+                error: function () { console.log('failed to change auto changer status'); },
+                success: function (responseData) { showAutoChangerStatus(responseData); }
+            });
+        };
+        let showAutoChangerStatus = function (presetChangerOptions) {
+            /* presetChangerOptions:
+            {
+              "random": false,
+              "auto": true,
+              "delay": 10
+            }
+            */
+
+            if (presetChangerOptions.auto === true) {
+                $autoChangerToggleButton.removeClass('is-outlined');
+            } else {
+                $autoChangerToggleButton.addClass('is-outlined');
+            }
+        };
+        $autoChangerToggleButton.on('click', function () {
+            setAutoChangerStatus($(this).hasClass('is-outlined'));
+        });
 
         $('#tabs li').on('click', function() {
             const tab = $(this).data('tab');

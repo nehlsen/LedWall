@@ -119,8 +119,15 @@ bool GameOfLife::update()
         m_lastGenerationTime = currentTime;
     }
 
-    m_matrix.fade(SCALEDOWN_FACTOR);
+//    m_matrix.fade(SCALEDOWN_FACTOR);
+    m_matrix.clear(false);
     drawWorld(m_currentWorld);
+
+    // TODO reset if nothing changes
+//    if (currentWorl == lastWorld) {
+//        reset();
+//        randomSeed()
+//    }
 
     return true;
 }
@@ -233,14 +240,12 @@ bool GameOfLife::isDeadAndShouldLive(uint8_t x, uint8_t y) const
 bool GameOfLife::shouldSurvive(uint8_t x, uint8_t y) const
 {
     const uint8_t liveNeighbours = countLiveNeighbours(x, y);
-//    if (countLiveNeighbours>0) ESP_LOGI("GameOfLife", "shouldSurvive %d/%d, neighbours:%d", x, y, countLiveNeighbours);
     return liveNeighbours == 2 || liveNeighbours == 3;
 }
 
 bool GameOfLife::shouldLive(uint8_t x, uint8_t y) const
 {
     const uint8_t liveNeighbours = countLiveNeighbours(x, y);
-//    if (countLiveNeighbours>0) ESP_LOGI("GameOfLife", "shouldLive %d/%d, neighbours:%d", x, y, countLiveNeighbours);
     return liveNeighbours == 3;
 }
 

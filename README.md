@@ -55,10 +55,25 @@ cmake ..
 make flash
 ```
 
+## Electrical Layout
+
+Following Pins are used by LEDWall. Changeable via different compile time flags and config parameters.
+
+| GPIO    | Usage                    |
+|--------:|--------------------------|
+|      26 | LEDs                     |
+|       5 | I2C SDA - AHT10, BH1750  |
+|       4 | I2C SCL - AHT10, BH1750  |
+| (VP) 36 | (ADC1/CH0) Battery Meter |
+|      12 | Debugger                 |
+|      13 | Debugger                 |
+|      14 | Debugger                 |
+|      15 | Debugger                 |
+
 ## Usage samples
 
 - Trigger OTA update \
-`curl -X POST <IP-OF-LEDWALL>/ota "https://url.to/update"`
+`curl -X POST <IP-OF-LEDWALL>/api/v2/ota "https://url.to/update"`
 
 ## MQTT
 

@@ -59,7 +59,7 @@ LedModeDef_t modeFancyDemoDef {"FancyDemo", &createModeFancyDemo};
 LedModeDef_t modeGameOfLifeDef {"GameOfLife", &createModeGameOfLife};
 LedModeDef_t modeTimeDef {"Time", &createModeTime};
 LedModeDef_t modeNewYearsEveDef {"NewYears", &createModeNewYearsEve};
-LedModeDef_t modeFancyScriptDef {"FancyScript", &createModeFancyScript};
+LedModeDef_t modeFancyScriptDef {"Macro", &createModeFancyScript};
 
 #ifdef CONFIG_ENABLE_CAM
 LedMode *createModeCamera(LedMatrix& matrix) { return new Camera(matrix); }

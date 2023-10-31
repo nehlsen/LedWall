@@ -108,12 +108,11 @@ void FancyScript::readOptions(cJSON *root)
 
     for (const auto& line : m_lines) {
         cJSON *const jsonLine = cJSON_CreateString(line.c_str());
-        if (!jsonLine) {
+        if (!jsonLine || !cJSON_AddItemToArray(script, jsonLine)) {
             ESP_LOGE("FancyScript", "Failed to write JSON - maybe out of memory?");
             cJSON_Delete(script);
             return;
         }
-        cJSON_AddItemToArray(jsonLine, script);
     }
 }
 

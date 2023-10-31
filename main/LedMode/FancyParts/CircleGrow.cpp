@@ -6,6 +6,7 @@ namespace LedWall::Mode::FancyParts {
 
 uint16_t CircleGrow::getFrameCount() const
 {
+    // FIXME return min(m_matrix.getHeight(), m_matrix.getWidth()) / 2;
     return m_matrix.getHeight() / 2;
 }
 
